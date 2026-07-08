@@ -22,10 +22,6 @@ function detectDeviceType(): DeviceType {
   return 'desktop';
 }
 
-function hasConsent(): boolean {
-  return localStorage.getItem('cookie-consent') === 'accepted';
-}
-
 const EVENT_COLLECTION = 'visitorEvents';
 
 const PENDING_KEY = 'orgasoft_pending_events';
@@ -53,12 +49,10 @@ class VisitorTracker {
   }
 
   trackPageView(page: string) {
-    if (!hasConsent()) return;
     this.enqueue('pageview', page);
   }
 
   trackCTAClick(type: EventType, page: string, meta?: string) {
-    if (!hasConsent()) return;
     this.enqueue(type, page, meta);
   }
 
