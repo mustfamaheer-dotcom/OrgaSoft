@@ -11,6 +11,7 @@ import {
   initAnalytics,
 } from '../firebase';
 import logger from '../lib/logger';
+import { visitorTracker } from '../lib/visitorTracker';
 
 function deepMergeDefaults(defaults: any, loaded: any): any {
   const result = { ...defaults };
@@ -148,6 +149,7 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     initialized.current = true;
 
     initAnalytics();
+    visitorTracker.init();
 
     const unsubData = subscribeSiteData((data) => {
       if (data) {

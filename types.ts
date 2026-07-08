@@ -150,3 +150,33 @@ export interface Product {
   showOnHome?: boolean;
   demoUrl?: string;
 }
+
+export type EventType = 'pageview' | 'cta_click' | 'whatsapp_click' | 'phone_click';
+export type DeviceType = 'mobile' | 'desktop' | 'tablet';
+
+export interface VisitorEvent {
+  id: string;
+  timestamp: string;
+  page: string;
+  referrer: string;
+  userAgent: string;
+  language: string;
+  sessionId: string;
+  eventType: EventType;
+  deviceType: DeviceType;
+  meta?: string;
+}
+
+export interface DailyStats {
+  date: string;
+  totalPageViews: number;
+  uniqueVisitors: number;
+  uniqueSessions: number;
+  topPages: { page: string; views: number }[];
+  countries: { country: string; count: number }[];
+  devices: { device: string; count: number }[];
+  languages: { language: string; count: number }[];
+  ctaClicks: number;
+  whatsappClicks: number;
+  phoneClicks: number;
+}

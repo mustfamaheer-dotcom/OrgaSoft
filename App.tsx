@@ -10,6 +10,7 @@ import LoadingSkeleton from './components/LoadingSkeleton';
 import CookieConsent from './components/CookieConsent';
 import Footer from './components/Footer';
 import { ArrowUp } from 'lucide-react';
+import { visitorTracker } from './lib/visitorTracker';
 
 const AdminDashboard = lazy(() => import('./views/AdminDashboard'));
 const ProductDetail = lazy(() => import('./views/ProductDetail'));
@@ -43,6 +44,15 @@ const AppContent: React.FC = () => {
   const [currentPage, setCurrentPage] = useState('home');
   const [activeProductId, setActiveProductId] = useState<string | null>(null);
   const { isRTL, lang, siteData } = useSite();
+
+  const getPageName = (path: string) => {
+    if (path === '/admin') return 'admin';
+    if (path === '/applications') return 'applications';
+    if (path.startsWith('/product/')) return `product:${path.replace('/product/', '')}`;
+    return 'home';
+  };
+
+  const trackCurrentPage = () => visitorTracker.trackPageView(getPageName(location.pathname));
 
   const handleNavigate = (page: string) => {
     if (page.startsWith('product-')) {
@@ -79,6 +89,7 @@ const AppContent: React.FC = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    trackCurrentPage();
   }, [location.pathname]);
 
   useEffect(() => {

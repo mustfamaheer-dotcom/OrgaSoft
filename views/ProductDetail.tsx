@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useSite } from '../context/SiteContext';
 import { ChevronLeft, ChevronRight, CheckCircle2, PhoneCall, MessageCircle, Zap, PlayCircle, Grid3X3, Handshake, ExternalLink } from 'lucide-react';
 import KitImage from '../components/KitImage';
+import { visitorTracker } from '../lib/visitorTracker';
 
 interface ProductDetailProps {
   productId: string;
@@ -14,6 +15,10 @@ interface ProductDetailProps {
 const ProductDetail: React.FC<ProductDetailProps> = ({ productId, onBack, onNavigate }) => {
   const { lang, siteData, isRTL } = useSite();
   const product = siteData.products.find(p => p.id === productId);
+
+  useEffect(() => {
+    if (product) visitorTracker.trackPageView(`product:${product.id}`);
+  }, [product]);
 
   if (!product) {
     return (
@@ -33,6 +38,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productId, onBack, onNavi
   const supportWhatsapp = product.supportWhatsapp || siteData.contacts.whatsapp;
 
   const handleWhatsApp = (msg: string) => {
+    visitorTracker.trackCTAClick('whatsapp_click', `product:${product.id}`, product.id);
     window.open(`https://wa.me/${supportWhatsapp}?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
@@ -238,13 +244,14 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productId, onBack, onNavi
                 </div>
               </div>
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                <div className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/10">
+                <a href={`tel:${supportPhone}`} onClick={() => visitorTracker.trackCTAClick('phone_click', `product:${product.id}`, product.id)}
+                  className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-colors">
                   <PhoneCall className="w-4 h-4 text-[#df4d21] shrink-0" />
                   <div className="min-w-0">
                     <div className="text-[9px] font-bold text-white/70 uppercase tracking-wider">{lang === 'ar' ? 'رقم الدعم' : 'Support Line'}</div>
                     <div className="font-black text-xs sm:text-sm truncate" dir="ltr">{supportPhone}</div>
                   </div>
-                </div>
+                </a>
                 <button
                   onClick={() => handleWhatsApp(supportMsg)}
                   className="flex items-center justify-center gap-2 px-4 py-3 min-h-[44px] sm:px-5 sm:py-3 bg-[#df4d21] hover:bg-[#aa4832] text-white font-black rounded-xl text-xs uppercase tracking-widest transition-all active:scale-[0.97]"

@@ -14,6 +14,7 @@ import PartnersTab from '../admin/components/PartnersTab';
 import ContactTab from '../admin/components/ContactTab';
 import FooterTab from '../admin/components/FooterTab';
 import UIStringsTab from '../admin/components/UIStringsTab';
+import VisitorsTab from '../admin/components/VisitorsTab';
 import { logoutFromFirebase, onAuthChange, getCurrentUser } from '../lib/auth';
 import ToastContainer from '../admin/components/Toast';
 import logger from '../lib/logger';
@@ -138,6 +139,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
     contact:    lang === 'ar' ? 'لوحة التحكم بالنظام' : 'System Control Panel',
     footer:     lang === 'ar' ? 'لوحة التحكم بالنظام' : 'System Control Panel',
     uistrings:  lang === 'ar' ? 'النصوص الظاهرة' : 'UI Strings',
+    visitors:   lang === 'ar' ? 'زوار الموقع' : 'Site Visitors',
   };
 
   if (!authChecked) {
@@ -165,6 +167,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
       case 'contact': return <ContactTab {...tabProps} />;
       case 'footer': return <FooterTab {...tabProps} />;
       case 'uistrings': return <UIStringsTab {...tabProps} />;
+      case 'visitors': return <VisitorsTab isRTL={isRTL} />;
       default: return <GeneralTab {...tabProps} />;
     }
   };

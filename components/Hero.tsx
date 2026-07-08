@@ -2,6 +2,7 @@ import React from 'react';
 import { useSite } from '../context/SiteContext';
 import { MessageCircle, ArrowRight, ArrowLeft, CheckCircle2, Zap, Shield, TrendingUp, Star, Users, Clock, Award, Database, Activity } from 'lucide-react';
 import KitImage from './KitImage';
+import { visitorTracker } from '../lib/visitorTracker';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   users: Users,
@@ -16,6 +17,7 @@ const Hero: React.FC<{ onNavigate: (page: string) => void }> = React.memo(({ onN
   const { hero, contacts, uiStrings, companyName } = siteData;
 
   const handleWhatsAppClick = () => {
+    visitorTracker.trackCTAClick('whatsapp_click', 'hero', 'hero-section');
     const message = lang === 'ar'
       ? 'مرحباً، أرغب في الاستفسار عن خدماتكم'
       : 'Hello, I would like to inquire about your services';
