@@ -7,37 +7,42 @@ interface DailyStat { date: string; time?: string; pageviews: number; visitors: 
 
 const ChartTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload) return null;
+  const item = payload[0]?.payload;
   return (
-    <div className="bg-white dark:bg-[#1a2744] border border-slate-200 dark:border-[#1e293b] rounded-xl px-4 py-3 shadow-xl">
-      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{label}</p>
+    <div className="bg-white dark:bg-[#1a2744] border border-slate-200 dark:border-[#1e293b] rounded-2xl px-5 py-4 shadow-2xl">
+      <p className="text-[13px] font-black text-slate-700 dark:text-slate-200 mb-0.5">{label}</p>
+      {item?.time && <p className="text-[10px] font-bold text-slate-400 mb-2">{item.time}</p>}
       {payload.map((p: any, i: number) => (
-        <p key={i} className="text-sm font-bold" style={{ color: p.color }}>{p.name}: {p.value.toLocaleString()}</p>
+        <div key={i} className="flex items-center gap-2 text-sm">
+          <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: p.color }} />
+          <span className="font-bold" style={{ color: p.color }}>{p.name}: <span className="text-slate-800 dark:text-white">{p.value.toLocaleString()}</span></span>
+        </div>
       ))}
     </div>
   );
 };
 
 export const VisitorsLineChart: React.FC<{ data: DailyStat[] }> = ({ data }) => (
-  <ResponsiveContainer width="100%" height={300}>
-    <AreaChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 5 }}>
+  <ResponsiveContainer width="100%" height={320}>
+    <AreaChart data={data} margin={{ top: 15, right: 15, left: 0, bottom: 10 }}>
       <defs>
-        <linearGradient id="pvGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#0f639e" stopOpacity={0.25}/><stop offset="100%" stopColor="#0f639e" stopOpacity={0}/></linearGradient>
-        <linearGradient id="visGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#df4d21" stopOpacity={0.15}/><stop offset="100%" stopColor="#df4d21" stopOpacity={0}/></linearGradient>
+        <linearGradient id="pvGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#0f639e" stopOpacity={0.35}/><stop offset="100%" stopColor="#0f639e" stopOpacity={0}/></linearGradient>
+        <linearGradient id="visGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#df4d21" stopOpacity={0.2}/><stop offset="100%" stopColor="#df4d21" stopOpacity={0}/></linearGradient>
       </defs>
-      <CartesianGrid strokeDasharray="4 4" stroke="#e2e8f0" strokeOpacity={0.5} />
+      <CartesianGrid strokeDasharray="4 4" stroke="#e2e8f0" strokeOpacity={0.4} />
       <XAxis dataKey="date" tick={({ x, y, payload }: any) => {
         const item = data.find(d => d.date === payload.value);
         return (
           <g transform={`translate(${x},${y})`}>
-            <text x={0} y={0} dy={12} textAnchor="middle" fill="#94a3b8" fontSize={10} fontWeight={700}>{payload.value}</text>
-            <text x={0} y={0} dy={24} textAnchor="middle" fill="#64748b" fontSize={8} fontWeight={500}>{item?.time || ''}</text>
+            <text x={0} y={0} dy={14} textAnchor="middle" fill="#64748b" fontSize={13} fontWeight={700}>{payload.value}</text>
+            <text x={0} y={0} dy={28} textAnchor="middle" fill="#94a3b8" fontSize={10} fontWeight={600}>{item?.time || ''}</text>
           </g>
         );
-      }} axisLine={false} tickLine={false} interval={0} height={50} />
-      <YAxis tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+      }} axisLine={true} tickLine={false} interval={0} height={60} tickMargin={4} stroke="#e2e8f0" />
+      <YAxis tick={{ fontSize: 11, fill: '#94a3b8', fontWeight: 600 }} axisLine={false} tickLine={false} />
       <Tooltip content={<ChartTooltip />} />
-      <Area type="monotone" dataKey="pageviews" stroke="#0f639e" strokeWidth={2.5} fill="url(#pvGrad)" dot={{ fill: '#0f639e', strokeWidth: 2, r: 3 }} activeDot={{ r: 5, strokeWidth: 0 }} />
-      <Area type="monotone" dataKey="visitors" stroke="#df4d21" strokeWidth={2} fill="url(#visGrad)" dot={{ fill: '#df4d21', strokeWidth: 2, r: 3 }} activeDot={{ r: 5, strokeWidth: 0 }} />
+      <Area type="monotone" dataKey="pageviews" stroke="#0f639e" strokeWidth={3} fill="url(#pvGrad)" dot={{ fill: '#0f639e', strokeWidth: 2, r: 4 }} activeDot={{ r: 6, strokeWidth: 0 }} />
+      <Area type="monotone" dataKey="visitors" stroke="#df4d21" strokeWidth={2.5} fill="url(#visGrad)" dot={{ fill: '#df4d21', strokeWidth: 2, r: 4 }} activeDot={{ r: 6, strokeWidth: 0 }} />
     </AreaChart>
   </ResponsiveContainer>
 );
