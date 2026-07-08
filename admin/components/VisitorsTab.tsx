@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { collection, getDocs, query, orderBy, limit, startAfter, addDoc, serverTimestamp, writeBatch, doc } from 'firebase/firestore';
 import { db } from '../../firebase';
-import { Eye, Users, MousePointerClick, Smartphone, BarChart3, MessageCircle, Phone, Loader2, Play, Activity, TrendingUp, ArrowUpRight, Zap, Target, TrendingDown, Layers, Trash2, AlertTriangle } from 'lucide-react';
+import { Eye, MousePointerClick, Smartphone, BarChart3, MessageCircle, Phone, Loader2, Play, Activity, TrendingUp, ArrowUpRight, Zap, Target, TrendingDown, Layers, Trash2, AlertTriangle } from 'lucide-react';
 import type { VisitorEvent, Product, Language } from '../../types';
 import { SectionHeader } from './FormComponents';
 import { VisitorsLineChart, TopPagesRanking, DevicePieChart } from './VisitorsCharts';
@@ -218,29 +218,24 @@ const VisitorsTab: React.FC<VisitorsTabProps> = ({ isRTL, products, lang }) => {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            <div className={metricCard}>
-              <div className="flex items-start justify-between mb-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className={`${metricCard} lg:col-span-1`}>
+              <div className="flex items-start justify-between mb-2">
                 <div className="w-10 h-10 bg-[#0f639e]/10 rounded-xl flex items-center justify-center text-[#0f639e]"><Eye className="w-5 h-5" /></div>
                 <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-500"><ArrowUpRight className="w-3 h-3" />{totalPageViews}</span>
               </div>
               <div className={metricValue} style={{ color: '#0f639e' }}>{totalPageViews.toLocaleString()}</div>
               <div className={metricLabel}>{isRTL ? 'مشاهدات الصفحات' : 'PAGE VIEWS'}</div>
-            </div>
-            <div className={metricCard}>
-              <div className="flex items-start justify-between mb-3">
-                <div className="w-10 h-10 bg-[#3292ca]/10 rounded-xl flex items-center justify-center text-[#3292ca]"><Users className="w-5 h-5" /></div>
-                <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-500"><ArrowUpRight className="w-3 h-3" />{uniqueSessions}</span>
+              <div className="mt-2 pt-2 border-t border-slate-100 dark:border-[#1e293b]">
+                <div className="flex items-center justify-between text-[10px]">
+                  <span className="font-bold text-slate-400">{isRTL ? 'صفحات مختلفة' : 'Unique pages'}</span>
+                  <span className="font-black text-slate-600 dark:text-slate-300">{Object.keys(pageCounts).length}</span>
+                </div>
+                <div className="flex items-center justify-between text-[10px] mt-1">
+                  <span className="font-bold text-slate-400">{isRTL ? 'زيارات لكل صفحة' : 'Avg per page'}</span>
+                  <span className="font-black text-slate-600 dark:text-slate-300">{Object.keys(pageCounts).length > 0 ? (totalPageViews / Object.keys(pageCounts).length).toFixed(1) : '0'}</span>
+                </div>
               </div>
-              <div className={metricValue} style={{ color: '#3292ca' }}>{uniqueSessions.toLocaleString()}</div>
-              <div className={metricLabel}>{isRTL ? 'الزوار الفريدون' : 'UNIQUE VISITORS'}</div>
-            </div>
-            <div className={metricCard}>
-              <div className="flex items-start justify-between mb-3">
-                <div className="w-10 h-10 bg-[#df4d21]/10 rounded-xl flex items-center justify-center text-[#df4d21]"><MousePointerClick className="w-5 h-5" /></div>
-              </div>
-              <div className={metricValue} style={{ color: '#df4d21' }}>{ctaClicks.toLocaleString()}</div>
-              <div className={metricLabel}>{isRTL ? 'نقرات الدعوة' : 'CTA CLICKS'}</div>
             </div>
             <div className={metricCard}>
               <div className="flex items-start justify-between mb-3">
