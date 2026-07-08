@@ -113,13 +113,19 @@ const VisitorsTab: React.FC<VisitorsTabProps> = ({ isRTL, products, lang }) => {
   });
 
   const EGYPT_OFFSET = 2;
+  const to12 = (h: number) => {
+    if (h === 0) return '12AM';
+    if (h < 12) return `${h}AM`;
+    if (h === 12) return '12PM';
+    return `${h - 12}PM`;
+  };
   const periods = [
-    { key: 'dawn', labelAr: 'الفجر', labelEn: 'Dawn', range: [0, 5], icon: '🌙' },
-    { key: 'morning', labelAr: 'الصباح', labelEn: 'Morning', range: [6, 11], icon: '☀️' },
-    { key: 'noon', labelAr: 'الظهر', labelEn: 'Noon', range: [12, 14], icon: '🌤️' },
-    { key: 'afternoon', labelAr: 'العصر', labelEn: 'Afternoon', range: [15, 17], icon: '🌅' },
-    { key: 'evening', labelAr: 'المساء', labelEn: 'Evening', range: [18, 20], icon: '🌆' },
-    { key: 'night', labelAr: 'الليل', labelEn: 'Night', range: [21, 23], icon: '🌃' },
+    { key: 'dawn', labelAr: 'الفجر', labelEn: 'Dawn', timeAr: `${to12(0)}-${to12(5)}`, timeEn: `${to12(0)}-${to12(5)}`, range: [0, 5] },
+    { key: 'morning', labelAr: 'الصباح', labelEn: 'Morning', timeAr: `${to12(6)}-${to12(11)}`, timeEn: `${to12(6)}-${to12(11)}`, range: [6, 11] },
+    { key: 'noon', labelAr: 'الظهر', labelEn: 'Noon', timeAr: `${to12(12)}-${to12(14)}`, timeEn: `${to12(12)}-${to12(14)}`, range: [12, 14] },
+    { key: 'afternoon', labelAr: 'العصر', labelEn: 'Afternoon', timeAr: `${to12(15)}-${to12(17)}`, timeEn: `${to12(15)}-${to12(17)}`, range: [15, 17] },
+    { key: 'evening', labelAr: 'المساء', labelEn: 'Evening', timeAr: `${to12(18)}-${to12(20)}`, timeEn: `${to12(18)}-${to12(20)}`, range: [18, 20] },
+    { key: 'night', labelAr: 'الليل', labelEn: 'Night', timeAr: `${to12(21)}-${to12(23)}`, timeEn: `${to12(21)}-${to12(23)}`, range: [21, 23] },
   ];
   const getEgyptHour = (ts: string) => {
     const d = new Date(ts);
@@ -135,7 +141,7 @@ const VisitorsTab: React.FC<VisitorsTabProps> = ({ isRTL, products, lang }) => {
     }, {});
   const chartData = periods.map(p => {
     const d = periodMap[p.key] || { pageviews: 0, visitors: new Set() };
-    return { date: isRTL ? p.labelAr : p.labelEn, pageviews: d.pageviews, visitors: d.visitors.size };
+    return { date: isRTL ? p.labelAr : p.labelEn, time: isRTL ? p.timeAr : p.timeEn, pageviews: d.pageviews, visitors: d.visitors.size };
   });
   const peakPeriod = [...chartData].sort((a, b) => b.visitors - a.visitors)[0];
 
@@ -144,12 +150,6 @@ const VisitorsTab: React.FC<VisitorsTabProps> = ({ isRTL, products, lang }) => {
   const sessionsWithAction = new Set(publicEvents.filter(e => e.eventType !== 'pageview').map(e => e.sessionId));
   const engagementRate = uniqueSessions > 0 ? (sessionsWithAction.size / uniqueSessions * 100) : 0;
   const pagesPerSession = uniqueSessions > 0 ? (totalPageViews / uniqueSessions) : 0;
-
-  const sessionPageCounts = publicEvents.filter(e => e.eventType === 'pageview')
-    .reduce<Record<string, number>>((acc, e) => { acc[e.sessionId] = (acc[e.sessionId] || 0) + 1; return acc; }, {});
-  const bounceSessions = Object.values(sessionPageCounts).filter(c => c === 1).length;
-  const engagedSessions = Object.values(sessionPageCounts).filter(c => c >= 2 && c <= 4).length;
-  const superEngagedSessions = Object.values(sessionPageCounts).filter(c => c >= 5).length;
 
   const halfPoint = new Date();
   halfPoint.setDate(halfPoint.getDate() - Math.floor(daysFilter / 2));
@@ -282,7 +282,7 @@ const VisitorsTab: React.FC<VisitorsTabProps> = ({ isRTL, products, lang }) => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="p-4 bg-white dark:bg-[#131d31] rounded-2xl border border-slate-100 dark:border-[#1e293b] shadow-sm">
               <div className="flex items-center gap-2 mb-2">
                 <Target className="w-3.5 h-3.5 text-[#0f639e]" />
@@ -312,26 +312,6 @@ const VisitorsTab: React.FC<VisitorsTabProps> = ({ isRTL, products, lang }) => {
                 {growth >= 0 ? '+' : ''}{growth.toFixed(1)}%
               </span>
               <div className="text-[10px] font-bold text-slate-400 mt-0.5">{isRTL ? 'نصف الفترة vs النصف الثاني' : '1st half vs 2nd half'}</div>
-            </div>
-            <div className="p-4 bg-white dark:bg-[#131d31] rounded-2xl border border-slate-100 dark:border-[#1e293b] shadow-sm">
-              <div className="flex items-center gap-2 mb-3">
-                <Activity className="w-3.5 h-3.5 text-amber-500" />
-                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{isRTL ? 'جودة الجلسات' : 'SESSION QUALITY'}</span>
-              </div>
-              <div className="space-y-1.5">
-                <div className="flex items-center gap-2">
-                  <div className="h-2 rounded-full bg-rose-200 dark:bg-rose-900/30" style={{ width: `${uniqueSessions > 0 ? bounceSessions / uniqueSessions * 100 : 0}%`, minWidth: bounceSessions > 0 ? '4px' : '0' }} />
-                  <span className="text-[10px] font-bold text-slate-500 shrink-0">{isRTL ? 'ارتداد' : 'Bounce'} {bounceSessions}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="h-2 rounded-full bg-amber-200 dark:bg-amber-900/30" style={{ width: `${uniqueSessions > 0 ? engagedSessions / uniqueSessions * 100 : 0}%`, minWidth: engagedSessions > 0 ? '4px' : '0' }} />
-                  <span className="text-[10px] font-bold text-slate-500 shrink-0">{isRTL ? 'تفاعل' : 'Engaged'} {engagedSessions}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="h-2 rounded-full bg-emerald-200 dark:bg-emerald-900/30" style={{ width: `${uniqueSessions > 0 ? superEngagedSessions / uniqueSessions * 100 : 0}%`, minWidth: superEngagedSessions > 0 ? '4px' : '0' }} />
-                  <span className="text-[10px] font-bold text-slate-500 shrink-0">{isRTL ? 'متفاعل جداً' : 'Super'} {superEngagedSessions}</span>
-                </div>
-              </div>
             </div>
           </div>
 
