@@ -232,18 +232,18 @@ const VisitorsTab: React.FC<VisitorsTabProps> = ({ isRTL, products, lang }) => {
             <div className={`${metricCard} lg:col-span-1`}>
               <div className="flex items-start justify-between mb-2">
                 <div className="w-10 h-10 bg-[#0f639e]/10 rounded-xl flex items-center justify-center text-[#0f639e]"><Eye className="w-5 h-5" /></div>
-                <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-500"><ArrowUpRight className="w-3 h-3" />{totalPageViews}</span>
+                <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-500"><ArrowUpRight className="w-3 h-3" />{uniqueSessions}</span>
               </div>
-              <div className={metricValue} style={{ color: '#0f639e' }}>{totalPageViews.toLocaleString()}</div>
-              <div className={metricLabel}>{isRTL ? 'مشاهدات الصفحات' : 'PAGE VIEWS'}</div>
+              <div className={metricValue} style={{ color: '#0f639e' }}>{uniqueSessions.toLocaleString()}</div>
+              <div className={metricLabel}>{isRTL ? 'الزوار' : 'VISITORS'}</div>
               <div className="mt-2 pt-2 border-t border-slate-100 dark:border-[#1e293b]">
                 <div className="flex items-center justify-between text-[10px]">
-                  <span className="font-bold text-slate-400">{isRTL ? 'صفحات مختلفة' : 'Unique pages'}</span>
-                  <span className="font-black text-slate-600 dark:text-slate-300">{Object.keys(pageCounts).length}</span>
+                  <span className="font-bold text-slate-400">{isRTL ? 'إجمالي المشاهدات' : 'Total views'}</span>
+                  <span className="font-black text-slate-600 dark:text-slate-300">{totalPageViews.toLocaleString()}</span>
                 </div>
                 <div className="flex items-center justify-between text-[10px] mt-1">
-                  <span className="font-bold text-slate-400">{isRTL ? 'زيارات لكل صفحة' : 'Avg per page'}</span>
-                  <span className="font-black text-slate-600 dark:text-slate-300">{Object.keys(pageCounts).length > 0 ? (totalPageViews / Object.keys(pageCounts).length).toFixed(1) : '0'}</span>
+                  <span className="font-bold text-slate-400">{isRTL ? 'صفحات/زائر' : 'Pages/visitor'}</span>
+                  <span className="font-black text-slate-600 dark:text-slate-300">{pagesPerSession.toFixed(1)}</span>
                 </div>
               </div>
             </div>
