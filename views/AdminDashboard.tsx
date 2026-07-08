@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSite } from '../context/SiteContext';
-import { saveSectionsToFirebase } from '../firebase';
 import type { SiteContent } from '../types';
 import AdminLogin from '../admin/components/AdminLogin';
 import AdminLayout from '../admin/components/AdminLayout';
@@ -16,7 +15,6 @@ import FooterTab from '../admin/components/FooterTab';
 import UIStringsTab from '../admin/components/UIStringsTab';
 import VisitorsTab from '../admin/components/VisitorsTab';
 import { logoutFromFirebase, onAuthChange, getCurrentUser } from '../lib/auth';
-import ToastContainer from '../admin/components/Toast';
 import logger from '../lib/logger';
 
 interface AdminDashboardProps {
@@ -46,14 +44,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   const [activeTab, setActiveTab] = useState<string>('general');
   const [dirtyTabs, setDirtyTabs] = useState<Set<string>>(new Set());
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; type: 'product' | 'partner' | 'service' } | null>(null);
-  const [toasts, setToasts] = useState<{ id: number; message: string; type: 'success' | 'error' }[]>([]);
-  const toastId = useRef(0);
-
-  const addToast = useCallback((message: string, type: 'success' | 'error' = 'success') => {
-    const id = ++toastId.current;
-    setToasts(prev => [...prev, { id, message, type }]);
-    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 4000);
-  }, []);
 
   useEffect(() => { setData(siteData); }, [siteData]);
 
@@ -158,7 +148,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
       case 'contact': return <ContactTab {...tabProps} />;
       case 'footer': return <FooterTab {...tabProps} />;
       case 'uistrings': return <UIStringsTab {...tabProps} />;
-      case 'visitors': return <VisitorsTab isRTL={isRTL} />;
+      case 'visitors': return <VisitorsTab isRTL={isRTL} products={data.products} lang={lang} />;
       default: return <GeneralTab {...tabProps} />;
     }
   };
@@ -183,7 +173,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
       >
         {renderTab()}
       </AdminLayout>
-      <ToastContainer toasts={toasts} onDismiss={(id) => setToasts(prev => prev.filter(t => t.id !== id))} />
     </>
   );
 };

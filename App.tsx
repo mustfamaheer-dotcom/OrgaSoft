@@ -52,7 +52,10 @@ const AppContent: React.FC = () => {
     return 'home';
   };
 
-  const trackCurrentPage = () => visitorTracker.trackPageView(getPageName(location.pathname));
+  const trackCurrentPage = () => {
+    if (location.pathname.startsWith('/admin')) return;
+    visitorTracker.trackPageView(getPageName(location.pathname));
+  };
 
   const handleNavigate = (page: string) => {
     if (page.startsWith('product-')) {

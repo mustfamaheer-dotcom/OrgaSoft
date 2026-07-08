@@ -82,6 +82,7 @@ export const INITIAL_SITE_DATA: SiteContent = {
     showFacebook: true,
     showTwitter: true,
     showYoutube: true,
+    showWhatsapp: true,
     branches: []
   }
 };

@@ -2,11 +2,11 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { collection, getDocs, query, orderBy, limit, startAfter, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { Eye, Users, MousePointerClick, Smartphone, BarChart3, MessageCircle, Phone, Loader2, Play, Activity, Clock, TrendingUp, ArrowUpRight } from 'lucide-react';
-import type { VisitorEvent } from '../../types';
+import type { VisitorEvent, Product, Language } from '../../types';
 import { SectionHeader } from './FormComponents';
 import { VisitorsLineChart, TopPagesRanking, DevicePieChart } from './VisitorsCharts';
 
-interface VisitorsTabProps { isRTL: boolean }
+interface VisitorsTabProps { isRTL: boolean; products: Product[]; lang: Language }
 
 const PAGE_SIZE = 5000;
 
@@ -15,7 +15,7 @@ const metricValue = 'text-3xl sm:text-4xl font-black tracking-tight';
 const metricLabel = 'text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.15em]';
 const cardTitle = 'text-sm font-black text-[#0f639e] dark:text-white tracking-tight flex items-center gap-2';
 
-const VisitorsTab: React.FC<VisitorsTabProps> = ({ isRTL }) => {
+const VisitorsTab: React.FC<VisitorsTabProps> = ({ isRTL, products, lang }) => {
   const [events, setEvents] = useState<VisitorEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -78,7 +78,14 @@ const VisitorsTab: React.FC<VisitorsTabProps> = ({ isRTL }) => {
 
   const pageCounts = events.filter(e => e.eventType === 'pageview')
     .reduce<Record<string, number>>((acc, e) => { acc[e.page] = (acc[e.page] || 0) + 1; return acc; }, {});
-  const topPages = Object.entries(pageCounts).map(([page, views]) => ({ page, views }));
+  const topPages = Object.entries(pageCounts).map(([page, views]) => {
+    if (page.startsWith('product:')) {
+      const productId = page.replace('product:', '');
+      const product = products.find(p => p.id === productId);
+      if (product) return { page: product.name[lang] || product.name.en, views };
+    }
+    return { page, views };
+  });
 
   const dailyMap = events.filter(e => e.eventType === 'pageview')
     .reduce<Record<string, { pageviews: number; visitors: Set<string> }>>((acc, e) => {

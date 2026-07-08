@@ -174,6 +174,8 @@ const ContactTab: React.FC<ContactTabProps> = ({ data, updateNestedField, isRTL 
               checked={data.contacts.showTwitter !== false} onChange={v => updateNestedField('contacts.showTwitter', v)} />
             <ToggleField label={isRTL ? 'يوتيوب' : 'YouTube'} description={isRTL ? 'إظهار أيقونة يوتيوب في التذييل' : 'Show YouTube icon in footer'}
               checked={data.contacts.showYoutube !== false} onChange={v => updateNestedField('contacts.showYoutube', v)} />
+            <ToggleField label={isRTL ? 'واتساب' : 'WhatsApp'} description={isRTL ? 'إظهار أيقونة واتساب في التذييل' : 'Show WhatsApp icon in footer'}
+              checked={data.contacts.showWhatsapp !== false} onChange={v => updateNestedField('contacts.showWhatsapp', v)} />
           </div>
         </div>
 

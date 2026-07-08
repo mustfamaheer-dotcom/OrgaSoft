@@ -35,7 +35,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productId, onBack, onNavi
   }
 
   const supportPhone = product.supportPhone || siteData.contacts.phoneSupport;
-  const supportWhatsapp = product.supportWhatsapp || siteData.contacts.whatsapp;
+  const supportWhatsapp = siteData.contacts.whatsapp;
 
   const handleWhatsApp = (msg: string) => {
     visitorTracker.trackCTAClick('whatsapp_click', `product:${product.id}`, product.id);

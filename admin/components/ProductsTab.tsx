@@ -267,9 +267,8 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ data, setData, isRTL, lang, s
         <h4 className={sectionTitle}>
           <PhoneCall className="w-5 h-5 text-[#df4d21]" /> {isRTL ? 'إعدادات الدعم والظهور' : 'Support & Visibility'}
         </h4>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <InputField label={isRTL ? 'رقم الدعم الفني' : 'Support Phone Number'} value={editingProduct.supportPhone || ''} onChange={v => setEditingProduct({ ...editingProduct, supportPhone: v })} />
-          <InputField label={isRTL ? 'رقم واتساب (مثال: 201111159107)' : 'WhatsApp Number (e.g., 201111159107)'} value={editingProduct.supportWhatsapp || ''} onChange={v => setEditingProduct({ ...editingProduct, supportWhatsapp: v })} />
           <InputField label={isRTL ? 'رابط النسخة التجريبية' : 'Application Demo URL'} value={editingProduct.demoUrl || ''} onChange={v => setEditingProduct({ ...editingProduct, demoUrl: v })} />
         </div>
         <div className="p-5 bg-slate-50/50 dark:bg-[#1a2744]/50 rounded-xl border-2 border-slate-200 dark:border-[#1e293b]">

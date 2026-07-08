@@ -86,6 +86,7 @@ export interface SiteContent {
     showFacebook?: boolean;
     showTwitter?: boolean;
     showYoutube?: boolean;
+    showWhatsapp?: boolean;
     branches?: Branch[];
   };
 }
@@ -146,7 +147,6 @@ export interface Product {
   }>;
   productPartners?: ProductPartner[];
   supportPhone?: string;
-  supportWhatsapp?: string;
   showOnHome?: boolean;
   demoUrl?: string;
 }
