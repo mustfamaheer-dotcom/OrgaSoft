@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { collection, getDocs, query, orderBy, limit, startAfter, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, limit, startAfter, addDoc, serverTimestamp, writeBatch, doc } from 'firebase/firestore';
 import { db } from '../../firebase';
-import { Eye, Users, MousePointerClick, Smartphone, BarChart3, MessageCircle, Phone, Loader2, Play, Activity, TrendingUp, ArrowUpRight, Zap, Target, TrendingDown, Layers } from 'lucide-react';
+import { Eye, Users, MousePointerClick, Smartphone, BarChart3, MessageCircle, Phone, Loader2, Play, Activity, TrendingUp, ArrowUpRight, Zap, Target, TrendingDown, Layers, Trash2, AlertTriangle } from 'lucide-react';
 import type { VisitorEvent, Product, Language } from '../../types';
 import { SectionHeader } from './FormComponents';
 import { VisitorsLineChart, TopPagesRanking, DevicePieChart } from './VisitorsCharts';
@@ -23,6 +23,31 @@ const VisitorsTab: React.FC<VisitorsTabProps> = ({ isRTL, products, lang }) => {
   const [lastDoc, setLastDoc] = useState<any>(null);
   const [hasMore, setHasMore] = useState(true);
   const [testStatus, setTestStatus] = useState<string | null>(null);
+  const [resetConfirm, setResetConfirm] = useState(false);
+  const [resetting, setResetting] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const handleResetAll = async () => {
+    if (!resetConfirm) { setResetConfirm(true); return; }
+    setResetting(true);
+    try {
+      const col = collection(db, 'visitorEvents');
+      let docs = (await getDocs(query(col, limit(500)))).docs;
+      while (docs.length > 0) {
+        const batch = writeBatch(db);
+        docs.forEach(d => batch.delete(doc(db, 'visitorEvents', d.id)));
+        await batch.commit();
+        if (docs.length < 500) break;
+        docs = (await getDocs(query(col, limit(500)))).docs;
+      }
+      setEvents([]);
+      setResetConfirm(false);
+      setLastDoc(null);
+      setHasMore(true);
+      setRefreshKey(k => k + 1);
+    } catch { setResetting(false); setResetConfirm(false); }
+    setResetting(false);
+  };
 
   const writeTestEvent = async () => {
     setTestStatus('writing...');
@@ -61,7 +86,7 @@ const VisitorsTab: React.FC<VisitorsTabProps> = ({ isRTL, products, lang }) => {
     setLoading(false); setLoadingMore(false);
   }, [daysFilter, lastDoc]);
 
-  useEffect(() => { setLastDoc(null); fetchEvents(false); }, [daysFilter]);
+  useEffect(() => { setLastDoc(null); fetchEvents(false); }, [daysFilter, refreshKey]);
 
   const publicEvents = events.filter(e => !e.page.startsWith('admin'));
 
@@ -155,6 +180,15 @@ const VisitorsTab: React.FC<VisitorsTabProps> = ({ isRTL, products, lang }) => {
             </span>
           )}
         </div>
+        <div className="mr-auto" />
+        <button onClick={handleResetAll} disabled={resetting || events.length === 0}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg font-black text-[10px] uppercase tracking-widest transition-all ${resetConfirm
+            ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/30 animate-pulse'
+            : 'bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white'} disabled:opacity-30 disabled:animate-none`}
+          title={resetConfirm ? (isRTL ? 'انقر مرة أخرى للتأكيد' : 'Click again to confirm') : ''}>
+          {resetting ? <Loader2 className="w-3 h-3 animate-spin" /> : resetConfirm ? <AlertTriangle className="w-3 h-3" /> : <Trash2 className="w-3 h-3" />}
+          {resetConfirm ? (isRTL ? 'تأكيد الحذف' : 'CONFIRM') : (isRTL ? 'إعادة تعيين الإحصائيات' : 'RESET STATS')}
+        </button>
       </div>
 
       {loading ? (
