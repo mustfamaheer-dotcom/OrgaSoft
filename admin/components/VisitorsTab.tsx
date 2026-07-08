@@ -39,8 +39,6 @@ const VisitorsTab: React.FC<VisitorsTabProps> = ({ isRTL, products, lang }) => {
     } catch { setTestStatus('failed'); }
   };
 
-  useEffect(() => { writeTestEvent(); }, []);
-
   const fetchEvents = useCallback(async (loadMore = false) => {
     if (loadMore) setLoadingMore(true); else setLoading(true);
     try {
@@ -65,18 +63,20 @@ const VisitorsTab: React.FC<VisitorsTabProps> = ({ isRTL, products, lang }) => {
 
   useEffect(() => { setLastDoc(null); fetchEvents(false); }, [daysFilter]);
 
-  const totalPageViews = events.filter(e => e.eventType === 'pageview').length;
-  const uniqueSessions = new Set(events.map(e => e.sessionId)).size;
-  const ctaClicks = events.filter(e => e.eventType === 'cta_click').length;
-  const whatsappClicks = events.filter(e => e.eventType === 'whatsapp_click').length;
-  const phoneClicks = events.filter(e => e.eventType === 'phone_click').length;
+  const publicEvents = events.filter(e => !e.page.startsWith('admin'));
 
-  const deviceCounts = events.reduce<Record<string, number>>((acc, e) => {
+  const totalPageViews = publicEvents.filter(e => e.eventType === 'pageview').length;
+  const uniqueSessions = new Set(publicEvents.map(e => e.sessionId)).size;
+  const ctaClicks = publicEvents.filter(e => e.eventType === 'cta_click').length;
+  const whatsappClicks = publicEvents.filter(e => e.eventType === 'whatsapp_click').length;
+  const phoneClicks = publicEvents.filter(e => e.eventType === 'phone_click').length;
+
+  const deviceCounts = publicEvents.reduce<Record<string, number>>((acc, e) => {
     if (e.deviceType) acc[e.deviceType] = (acc[e.deviceType] || 0) + 1; return acc;
   }, {});
   const deviceData = Object.entries(deviceCounts).map(([device, count]) => ({ device, count }));
 
-  const pageCounts = events.filter(e => e.eventType === 'pageview')
+  const pageCounts = publicEvents.filter(e => e.eventType === 'pageview')
     .reduce<Record<string, number>>((acc, e) => { acc[e.page] = (acc[e.page] || 0) + 1; return acc; }, {});
   const topPages = Object.entries(pageCounts).map(([page, views]) => {
     if (page.startsWith('product:')) {
@@ -87,7 +87,7 @@ const VisitorsTab: React.FC<VisitorsTabProps> = ({ isRTL, products, lang }) => {
     return { page, views };
   });
 
-  const dailyMap = events.filter(e => e.eventType === 'pageview')
+  const dailyMap = publicEvents.filter(e => e.eventType === 'pageview')
     .reduce<Record<string, { pageviews: number; visitors: Set<string> }>>((acc, e) => {
       const day = e.timestamp?.slice(0, 10) || 'unknown';
       if (!acc[day]) acc[day] = { pageviews: 0, visitors: new Set() };
@@ -96,7 +96,7 @@ const VisitorsTab: React.FC<VisitorsTabProps> = ({ isRTL, products, lang }) => {
   const chartData = Object.entries(dailyMap).sort(([a], [b]) => a.localeCompare(b))
     .map(([date, d]) => ({ date, pageviews: d.pageviews, visitors: d.visitors.size }));
 
-  const recentEvents = [...events].sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || '')).slice(0, 10);
+  const recentEvents = [...publicEvents].sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || '')).slice(0, 10);
 
   return (
     <div className="space-y-8">
@@ -132,7 +132,7 @@ const VisitorsTab: React.FC<VisitorsTabProps> = ({ isRTL, products, lang }) => {
             <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{isRTL ? 'جاري التحميل...' : 'LOADING...'}</span>
           </div>
         </div>
-      ) : events.length === 0 ? (
+      ) : publicEvents.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-32 text-center">
           <div className="w-20 h-20 bg-slate-100 dark:bg-[#1a2744] rounded-[2rem] flex items-center justify-center mb-6">
             <Activity className="w-10 h-10 text-slate-300 dark:text-slate-600" />
