@@ -118,10 +118,16 @@ const VisitorsTab: React.FC<VisitorsTabProps> = ({ isRTL, products, lang }) => {
       if (!acc[hour]) acc[hour] = { pageviews: 0, visitors: new Set() };
       acc[hour].pageviews++; acc[hour].visitors.add(e.sessionId); return acc;
     }, {});
+  const to12Hour = (h: number) => {
+    if (h === 0) return '12AM';
+    if (h < 12) return `${h}AM`;
+    if (h === 12) return '12PM';
+    return `${h - 12}PM`;
+  };
   const chartData = Array.from({ length: 24 }, (_, i) => {
     const h = String(i).padStart(2, '0');
     const d = hourMap[h] || { pageviews: 0, visitors: new Set() };
-    return { date: `${h}:00`, pageviews: d.pageviews, visitors: d.visitors.size };
+    return { date: to12Hour(i), hour: i, pageviews: d.pageviews, visitors: d.visitors.size };
   });
   const peakHour = [...chartData].sort((a, b) => b.visitors - a.visitors)[0];
 
