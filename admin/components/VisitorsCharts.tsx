@@ -24,7 +24,7 @@ const ChartTooltip = ({ active, payload, label }: any) => {
 
 export const VisitorsLineChart: React.FC<{ data: DailyStat[] }> = ({ data }) => (
   <ResponsiveContainer width="100%" height={320}>
-    <AreaChart data={data} margin={{ top: 15, right: 15, left: 0, bottom: 10 }}>
+    <AreaChart data={data} margin={{ top: 20, right: 20, left: 0, bottom: 15 }}>
       <defs>
         <linearGradient id="pvGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#0f639e" stopOpacity={0.35}/><stop offset="100%" stopColor="#0f639e" stopOpacity={0}/></linearGradient>
         <linearGradient id="visGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#df4d21" stopOpacity={0.2}/><stop offset="100%" stopColor="#df4d21" stopOpacity={0}/></linearGradient>
@@ -33,13 +33,13 @@ export const VisitorsLineChart: React.FC<{ data: DailyStat[] }> = ({ data }) => 
       <XAxis dataKey="date" tick={({ x, y, payload }: any) => {
         const item = data.find(d => d.date === payload.value);
         return (
-          <g transform={`translate(${x},${y})`}>
-            <text x={0} y={0} dy={14} textAnchor="middle" fill="#64748b" fontSize={13} fontWeight={700}>{payload.value}</text>
-            <text x={0} y={0} dy={28} textAnchor="middle" fill="#94a3b8" fontSize={10} fontWeight={600}>{item?.time || ''}</text>
+          <g transform={`translate(${x},${y + 6})`}>
+            <text x={0} y={0} textAnchor="middle" fill="#475569" fontSize={15} fontWeight={800}>{payload.value}</text>
+            <text x={0} y={18} textAnchor="middle" fill="#94a3b8" fontSize={11} fontWeight={600}>{item?.time || ''}</text>
           </g>
         );
-      }} axisLine={true} tickLine={false} interval={0} height={60} tickMargin={4} stroke="#e2e8f0" />
-      <YAxis tick={{ fontSize: 11, fill: '#94a3b8', fontWeight: 600 }} axisLine={false} tickLine={false} />
+      }} axisLine={true} tickLine={false} interval={0} height={70} tickMargin={8} stroke="#e2e8f0" />
+      <YAxis tick={{ fontSize: 12, fill: '#94a3b8', fontWeight: 700 }} axisLine={false} tickLine={false} />
       <Tooltip content={<ChartTooltip />} />
       <Area type="monotone" dataKey="pageviews" stroke="#0f639e" strokeWidth={3} fill="url(#pvGrad)" dot={{ fill: '#0f639e', strokeWidth: 2, r: 4 }} activeDot={{ r: 6, strokeWidth: 0 }} />
       <Area type="monotone" dataKey="visitors" stroke="#df4d21" strokeWidth={2.5} fill="url(#visGrad)" dot={{ fill: '#df4d21', strokeWidth: 2, r: 4 }} activeDot={{ r: 6, strokeWidth: 0 }} />
