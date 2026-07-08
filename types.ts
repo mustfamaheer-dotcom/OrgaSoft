@@ -165,6 +165,7 @@ export interface VisitorEvent {
   eventType: EventType;
   deviceType: DeviceType;
   meta?: string;
+  createdAt?: any;
 }
 
 export interface DailyStats {

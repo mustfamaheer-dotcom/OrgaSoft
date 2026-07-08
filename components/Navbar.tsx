@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useSite } from '../context/SiteContext';
 import { UI_STRINGS } from '../constants';
 import { Menu, X, Globe, ChevronRight, MessageCircle, Phone, Terminal, Sun, Moon } from 'lucide-react';
+import { visitorTracker } from '../lib/visitorTracker';
 
 const Navbar: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) => {
   const { lang, setLang, siteData, isRTL, theme, toggleTheme } = useSite();
@@ -44,11 +45,13 @@ const Navbar: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }
   ];
 
   const handleNavClick = (id: string) => {
+    visitorTracker.trackCTAClick('cta_click', 'navbar', id);
     onNavigate(id);
     setIsOpen(false);
   };
 
   const handleWhatsApp = () => {
+    visitorTracker.trackCTAClick('whatsapp_click', 'navbar', 'navbar-whatsapp');
     const message = lang === 'ar'
       ? 'مرحباً، أرغب في الاستفسار عن خدماتكم'
       : 'Hello, I would like to inquire about your services';

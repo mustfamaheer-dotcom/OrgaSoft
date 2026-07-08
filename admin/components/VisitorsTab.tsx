@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { collection, getDocs, query, orderBy, limit, where, Timestamp } from 'firebase/firestore';
+import React, { useEffect, useState, useCallback } from 'react';
+import { collection, getDocs, query, orderBy, limit, startAfter } from 'firebase/firestore';
 import { db } from '../../firebase';
-import { Eye, Users, MousePointerClick, Smartphone, BarChart3, MessageCircle, Phone } from 'lucide-react';
+import { Eye, Users, MousePointerClick, Smartphone, BarChart3, MessageCircle, Phone, Loader2 } from 'lucide-react';
 import type { VisitorEvent } from '../../types';
 import { SectionHeader } from './FormComponents';
 import { VisitorsLineChart, TopPagesBarChart, DevicePieChart } from './VisitorsCharts';
@@ -14,34 +14,40 @@ const statCard = 'p-5 bg-white dark:bg-[#131d31] rounded-xl border border-slate-
 const statValue = 'text-2xl font-black text-[#0f639e] dark:text-white';
 const statLabel = 'text-[9px] font-black text-slate-400 uppercase tracking-widest';
 
+const PAGE_SIZE = 5000;
+
 const VisitorsTab: React.FC<VisitorsTabProps> = ({ isRTL }) => {
   const [events, setEvents] = useState<VisitorEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [daysFilter, setDaysFilter] = useState(7);
+  const [lastDoc, setLastDoc] = useState<any>(null);
+  const [hasMore, setHasMore] = useState(true);
 
-  useEffect(() => {
-    const fetchEvents = async () => {
-      setLoading(true);
-      try {
-        const since = new Date();
-        since.setDate(since.getDate() - daysFilter);
-        const sinceTimestamp = Timestamp.fromDate(since);
-        const q = query(
-          collection(db, 'visitorEvents'),
-          where('createdAt', '>=', sinceTimestamp),
-          orderBy('createdAt', 'desc'),
-          limit(5000)
-        );
-        const snap = await getDocs(q);
-        const items = snap.docs.map(d => ({ id: d.id, ...d.data() } as VisitorEvent));
-        setEvents(items);
-      } catch {
-        setEvents([]);
-      }
-      setLoading(false);
-    };
-    fetchEvents();
-  }, [daysFilter]);
+  const fetchEvents = useCallback(async (loadMore = false) => {
+    if (loadMore) setLoadingMore(true); else setLoading(true);
+    try {
+      const q = loadMore && lastDoc
+        ? query(collection(db, 'visitorEvents'), orderBy('createdAt', 'desc'), startAfter(lastDoc), limit(PAGE_SIZE))
+        : query(collection(db, 'visitorEvents'), orderBy('createdAt', 'desc'), limit(PAGE_SIZE));
+      const snap = await getDocs(q);
+      const items = snap.docs.map(d => ({ id: d.id, ...d.data() } as VisitorEvent));
+      const since = new Date();
+      since.setDate(since.getDate() - daysFilter);
+      const filtered = items.filter(e => {
+        const ts: any = e.createdAt || e.timestamp;
+        if (ts?.toDate) return ts.toDate() >= since;
+        if (typeof ts === 'string') return new Date(ts) >= since;
+        return false;
+      });
+      if (loadMore) setEvents(prev => [...prev, ...filtered]); else setEvents(filtered);
+      setLastDoc(snap.docs[snap.docs.length - 1] || null);
+      setHasMore(snap.docs.length === PAGE_SIZE);
+    } catch { setEvents([]); }
+    setLoading(false); setLoadingMore(false);
+  }, [daysFilter, lastDoc]);
+
+  useEffect(() => { setLastDoc(null); fetchEvents(false); }, [daysFilter]);
 
   const totalPageViews = events.filter(e => e.eventType === 'pageview').length;
   const uniqueSessions = new Set(events.map(e => e.sessionId)).size;
@@ -142,6 +148,15 @@ const VisitorsTab: React.FC<VisitorsTabProps> = ({ isRTL }) => {
             <h4 className="text-sm font-black text-[#0f639e] dark:text-white mb-4">{isRTL ? 'أكثر الصفحات زيارة' : 'Top Pages'}</h4>
             <TopPagesBarChart data={topPages} />
           </div>
+
+          {hasMore && (
+            <div className="text-center">
+              <button onClick={() => fetchEvents(true)} disabled={loadingMore}
+                className="px-8 py-3.5 bg-slate-100 dark:bg-[#1a2744] text-slate-400 font-black text-xs uppercase tracking-widest rounded-xl hover:text-[#0f639e] transition-all disabled:opacity-50">
+                {loadingMore ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : (isRTL ? 'تحميل المزيد' : 'LOAD MORE')}
+              </button>
+            </div>
+          )}
         </>
       )}
     </div>

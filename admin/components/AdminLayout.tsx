@@ -173,14 +173,16 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">SYNC</span>
                 </div>
               )}
-              <button onClick={onSave} disabled={isSaving}
-                className={`flex items-center gap-3 px-7 py-3.5 bg-gradient-to-r from-[#df4d21] to-[#c43d18] text-white font-black rounded-xl shadow-lg hover:shadow-[#df4d21]/30 hover:-translate-y-0.5 transition-all active:translate-y-0 text-xs tracking-widest whitespace-nowrap relative ${isSaving ? 'opacity-75 cursor-not-allowed' : ''}`}>
-                {isSaving ? (
-                  <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /><span>{t.saving}</span></>
-                ) : (
-                  <><span className="text-base leading-none">&#9654;</span><span>{t.deployBtn}</span></>
-                )}
-              </button>
+              {activeTab !== 'visitors' && (
+                <button onClick={onSave} disabled={isSaving}
+                  className={`flex items-center gap-3 px-7 py-3.5 bg-gradient-to-r from-[#df4d21] to-[#c43d18] text-white font-black rounded-xl shadow-lg hover:shadow-[#df4d21]/30 hover:-translate-y-0.5 transition-all active:translate-y-0 text-xs tracking-widest whitespace-nowrap relative ${isSaving ? 'opacity-75 cursor-not-allowed' : ''}`}>
+                  {isSaving ? (
+                    <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /><span>{t.saving}</span></>
+                  ) : (
+                    <><span className="text-base leading-none">&#9654;</span><span>{t.deployBtn}</span></>
+                  )}
+                </button>
+              )}
             </div>
           </header>
 

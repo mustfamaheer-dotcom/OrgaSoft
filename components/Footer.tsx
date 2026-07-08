@@ -1,6 +1,7 @@
 import React from 'react';
 import { useSite } from '../context/SiteContext';
 import { Facebook, Twitter, Youtube, Terminal, Mail, Phone, MapPin, ArrowRight, ArrowLeft, Building2 } from 'lucide-react';
+import { visitorTracker } from '../lib/visitorTracker';
 
 const Footer: React.FC<{ onNavigate: (page: string) => void }> = React.memo(({ onNavigate }) => {
   const { lang, siteData, isRTL } = useSite();
@@ -43,13 +44,13 @@ const Footer: React.FC<{ onNavigate: (page: string) => void }> = React.memo(({ o
 
           <div className="flex gap-3 sm:gap-4">
             {contacts.showFacebook !== false && contacts.facebook && (
-              <a href={contacts.facebook} target="_blank" rel="noopener noreferrer" className="w-11 h-11 sm:w-12 sm:h-12 bg-white/5 backdrop-blur-md border border-white/10 rounded-xl sm:rounded-2xl flex items-center justify-center text-slate-300 hover:bg-[#df4d21] hover:text-white hover:border-[#df4d21] hover:-translate-y-1 transition-all duration-300 shadow-xl active:scale-90"><Facebook className="w-[18px] h-[18px] sm:w-5 sm:h-5" /></a>
+              <a href={contacts.facebook} target="_blank" rel="noopener noreferrer" onClick={() => visitorTracker.trackCTAClick('cta_click', 'footer', 'facebook')} className="w-11 h-11 sm:w-12 sm:h-12 bg-white/5 backdrop-blur-md border border-white/10 rounded-xl sm:rounded-2xl flex items-center justify-center text-slate-300 hover:bg-[#df4d21] hover:text-white hover:border-[#df4d21] hover:-translate-y-1 transition-all duration-300 shadow-xl active:scale-90"><Facebook className="w-[18px] h-[18px] sm:w-5 sm:h-5" /></a>
             )}
             {contacts.showTwitter !== false && contacts.twitter && (
-              <a href={contacts.twitter} target="_blank" rel="noopener noreferrer" className="w-11 h-11 sm:w-12 sm:h-12 bg-white/5 backdrop-blur-md border border-white/10 rounded-xl sm:rounded-2xl flex items-center justify-center text-slate-300 hover:bg-[#df4d21] hover:text-white hover:border-[#df4d21] hover:-translate-y-1 transition-all duration-300 shadow-xl active:scale-90"><Twitter className="w-[18px] h-[18px] sm:w-5 sm:h-5" /></a>
+              <a href={contacts.twitter} target="_blank" rel="noopener noreferrer" onClick={() => visitorTracker.trackCTAClick('cta_click', 'footer', 'twitter')} className="w-11 h-11 sm:w-12 sm:h-12 bg-white/5 backdrop-blur-md border border-white/10 rounded-xl sm:rounded-2xl flex items-center justify-center text-slate-300 hover:bg-[#df4d21] hover:text-white hover:border-[#df4d21] hover:-translate-y-1 transition-all duration-300 shadow-xl active:scale-90"><Twitter className="w-[18px] h-[18px] sm:w-5 sm:h-5" /></a>
             )}
             {contacts.showYoutube !== false && contacts.youtube && (
-              <a href={contacts.youtube} target="_blank" rel="noopener noreferrer" className="w-11 h-11 sm:w-12 sm:h-12 bg-white/5 backdrop-blur-md border border-white/10 rounded-xl sm:rounded-2xl flex items-center justify-center text-slate-300 hover:bg-[#df4d21] hover:text-white hover:border-[#df4d21] hover:-translate-y-1 transition-all duration-300 shadow-xl active:scale-90"><Youtube className="w-[18px] h-[18px] sm:w-5 sm:h-5" /></a>
+              <a href={contacts.youtube} target="_blank" rel="noopener noreferrer" onClick={() => visitorTracker.trackCTAClick('cta_click', 'footer', 'youtube')} className="w-11 h-11 sm:w-12 sm:h-12 bg-white/5 backdrop-blur-md border border-white/10 rounded-xl sm:rounded-2xl flex items-center justify-center text-slate-300 hover:bg-[#df4d21] hover:text-white hover:border-[#df4d21] hover:-translate-y-1 transition-all duration-300 shadow-xl active:scale-90"><Youtube className="w-[18px] h-[18px] sm:w-5 sm:h-5" /></a>
             )}
           </div>
         </div>

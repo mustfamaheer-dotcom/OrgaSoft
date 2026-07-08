@@ -28,6 +28,8 @@ function hasConsent(): boolean {
 
 const EVENT_COLLECTION = 'visitorEvents';
 
+const PENDING_KEY = 'orgasoft_pending_events';
+
 class VisitorTracker {
   private sessionId: string = '';
   private eventQueue: Omit<VisitorEvent, 'id'>[] = [];
@@ -38,8 +40,9 @@ class VisitorTracker {
     if (this.initialized) return;
     this.initialized = true;
     this.sessionId = getOrCreateSession();
+    this.restorePending();
     this.flushInterval = setInterval(() => this.flush(), 30000);
-    window.addEventListener('beforeunload', () => this.flush());
+    window.addEventListener('beforeunload', () => this.persistPending());
   }
 
   destroy() {
@@ -73,6 +76,24 @@ class VisitorTracker {
     });
   }
 
+  private restorePending() {
+    try {
+      const saved = sessionStorage.getItem(PENDING_KEY);
+      if (saved) {
+        const pending = JSON.parse(saved);
+        if (Array.isArray(pending)) this.eventQueue.push(...pending);
+        sessionStorage.removeItem(PENDING_KEY);
+      }
+    } catch { /* ignore */ }
+  }
+
+  private persistPending() {
+    if (this.eventQueue.length === 0) return;
+    try {
+      sessionStorage.setItem(PENDING_KEY, JSON.stringify(this.eventQueue));
+    } catch { /* ignore */ }
+  }
+
   private async flush() {
     if (this.eventQueue.length === 0) return;
     const batch = this.eventQueue.splice(0, this.eventQueue.length);
@@ -81,7 +102,8 @@ class VisitorTracker {
       const promises = batch.map(ev => addDoc(col, { ...ev, createdAt: serverTimestamp() }));
       await Promise.all(promises);
     } catch {
-      // Silently fail - tracking is non-critical
+      this.eventQueue.unshift(...batch);
+      this.persistPending();
     }
   }
 }
