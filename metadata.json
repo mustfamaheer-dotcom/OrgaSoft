@@ -1,0 +1,8 @@
+{
+  "name": "Orga Soft - Modern Corporate Website",
+  "description": "A high-end, responsive corporate website for Orga Soft featuring multi-language support (English/Arabic), a dynamic content management system (Admin Dashboard), and modern UI components.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}

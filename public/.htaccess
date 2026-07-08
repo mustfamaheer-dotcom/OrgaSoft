@@ -1,0 +1,144 @@
+# ============================================================
+# Orga Soft — Apache .htaccess
+# SPA routing + security headers + asset caching + compression
+# ============================================================
+
+# Enable URL rewriting
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Force HTTPS (uncomment when SSL is active)
+  # RewriteCond %{HTTPS} !=on
+  # RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
+  # Block direct access to dotfiles, source maps, and sensitive files
+  RewriteRule (^|/)\.(?!well-known/) - [F,L]
+  RewriteRule \.(env|git|htaccess|htpasswd|md|map|json|lock|bak|sql|sqlite|db|log|sh|bat|ps1)$ - [F,L]
+
+  # Block access to package, source, and config files
+  RewriteRule ^(package|package-lock|yarn\.lock|tsconfig|vite\.config|vitest\.config|tailwind\.config|postcss\.config|firebase\.json|firestore\.rules|metadata\.json|firebase\.ts|index\.ts|App\.tsx|constants\.ts|types\.ts) - [F,L]
+
+  # SPA fallback — all non-file/non-folder requests go to index.html
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^ index.html [QSA,L]
+</IfModule>
+
+# ------------------------------------------------------------
+# Security: HTTP Basic Auth on /admin (extra server-level layer)
+# Combined with Firebase Auth in the React app, this prevents
+# anyone from skipping the login screen at the server level.
+#
+# To enable:
+#   1. Create a .htpasswd file OUTSIDE the public web root, e.g.
+#        /etc/apache2/.htpasswd  (Linux) or C:\private\.htpasswd (Windows)
+#   2. Generate the hash:
+#        Linux/Mac:  htpasswd -nb admin 'YOUR_STRONG_PASSWORD'
+#        Windows:    Use an online generator or Apache's htpasswd.exe
+#   3. Paste the resulting `user:hash` line below (replacing the
+#      Require valid-user stub) and uncomment the <Files> block.
+# ------------------------------------------------------------
+# <Files "index.html">
+#   <IfModule mod_auth_basic.c>
+#     AuthType Basic
+#     AuthName "Orga Soft Admin — Restricted"
+#     AuthUserFile "/path/to/your/.htpasswd"
+#     Require valid-user
+#   </IfModule>
+# </Files>
+
+# ------------------------------------------------------------
+# HTTP Security Headers
+# ------------------------------------------------------------
+<IfModule mod_headers.c>
+  # Prevent MIME-type sniffing
+  Header always set X-Content-Type-Options "nosniff"
+
+  # Prevent clickjacking — deny iframing from any origin
+  Header always set X-Frame-Options "DENY"
+
+  # XSS protection (legacy browsers)
+  Header always set X-XSS-Protection "1; mode=block"
+
+  # Strict referrer policy
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+  # Permissions policy — disable unused powerful features
+  Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=()"
+
+  # Cross-Origin-Opener-Policy
+  Header always set Cross-Origin-Opener-Policy "same-origin"
+
+  # Cross-Origin-Resource-Policy
+  Header always set Cross-Origin-Resource-Policy "same-origin"
+
+  # Content Security Policy
+  # Allows: self, Google Fonts, ImageKit CDN, Firebase, WhatsApp
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://*.firebaseio.com https://*.firebaseapp.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://ik.imagekit.io wss://*.firebaseio.com; frame-src 'self' https://www.google.com https://maps.google.com https://*.firebaseapp.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self';"
+
+  # HSTS — force HTTPS for 1 year (uncomment when SSL is active)
+  # Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+
+  # Remove the Server / X-Powered-By header for security through obscurity
+  Header unset X-Powered-By
+  Header unset Server
+</IfModule>
+
+# ------------------------------------------------------------
+# Block direct access to sensitive files (defense in depth)
+# ------------------------------------------------------------
+<FilesMatch "^(\.env|\.env\..*|\.git.*|\.htaccess|\.htpasswd|package\.json|package-lock\.json|tsconfig\.json|vite\.config\.ts|vitest\.config\.ts|tailwind\.config\.js|postcss\.config\.js|firebase\.json|firestore\.rules|metadata\.json|firebase\.ts|constants\.ts|types\.ts|App\.tsx|index\.tsx)$">
+  Require all denied
+</FilesMatch>
+
+# ------------------------------------------------------------
+# Cache control
+# ------------------------------------------------------------
+<IfModule mod_expires.c>
+  ExpiresActive On
+
+  # Hashed assets (Vite emits files with content hashes in the name)
+  # Match any file that contains a hash, e.g. index-abc123.js
+  <FilesMatch "\.(js|css|woff2?|ttf|otf|eot|svg|ico|png|jpg|jpeg|gif|webp|avif)$">
+    <IfModule mod_headers.c>
+      Header set Cache-Control "public, max-age=31536000, immutable"
+    </IfModule>
+  </FilesMatch>
+
+  # HTML — always revalidate (never cache the entry point)
+  <FilesMatch "\.(html|htm)$">
+    <IfModule mod_headers.c>
+      Header set Cache-Control "no-cache, no-store, must-revalidate"
+      Header set Pragma "no-cache"
+      Header set Expires "0"
+    </IfModule>
+  </FilesMatch>
+
+  # sitemap.xml and robots.txt — short cache
+  <FilesMatch "(sitemap\.xml|robots\.txt)$">
+    <IfModule mod_headers.c>
+      Header set Cache-Control "public, max-age=3600"
+    </IfModule>
+  </FilesMatch>
+</IfModule>
+
+# ------------------------------------------------------------
+# Gzip compression
+# ------------------------------------------------------------
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript
+  AddOutputFilterByType DEFLATE application/javascript application/x-javascript application/json
+  AddOutputFilterByType DEFLATE application/xml application/xml+rss application/atom+xml
+  AddOutputFilterByType DEFLATE image/svg+xml application/vnd.ms-fontobject application/x-font-ttf font/opentype
+</IfModule>
+
+# ------------------------------------------------------------
+# Disable directory listing
+# ------------------------------------------------------------
+Options -Indexes
+
+# ------------------------------------------------------------
+# Custom error pages (SPA)
+# ------------------------------------------------------------
+ErrorDocument 404 /index.html
+ErrorDocument 403 /index.html

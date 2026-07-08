@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://orga4soft.com/sitemap.xml
