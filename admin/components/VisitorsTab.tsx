@@ -112,14 +112,18 @@ const VisitorsTab: React.FC<VisitorsTabProps> = ({ isRTL, products, lang }) => {
     return { page, views };
   });
 
-  const dailyMap = publicEvents.filter(e => e.eventType === 'pageview')
+  const hourMap = publicEvents.filter(e => e.eventType === 'pageview')
     .reduce<Record<string, { pageviews: number; visitors: Set<string> }>>((acc, e) => {
-      const day = e.timestamp?.slice(0, 10) || 'unknown';
-      if (!acc[day]) acc[day] = { pageviews: 0, visitors: new Set() };
-      acc[day].pageviews++; acc[day].visitors.add(e.sessionId); return acc;
+      const hour = e.timestamp?.slice(11, 13) || '00';
+      if (!acc[hour]) acc[hour] = { pageviews: 0, visitors: new Set() };
+      acc[hour].pageviews++; acc[hour].visitors.add(e.sessionId); return acc;
     }, {});
-  const chartData = Object.entries(dailyMap).sort(([a], [b]) => a.localeCompare(b))
-    .map(([date, d]) => ({ date, pageviews: d.pageviews, visitors: d.visitors.size }));
+  const chartData = Array.from({ length: 24 }, (_, i) => {
+    const h = String(i).padStart(2, '0');
+    const d = hourMap[h] || { pageviews: 0, visitors: new Set() };
+    return { date: `${h}:00`, pageviews: d.pageviews, visitors: d.visitors.size };
+  });
+  const peakHour = [...chartData].sort((a, b) => b.visitors - a.visitors)[0];
 
   const totalActions = ctaClicks + whatsappClicks + phoneClicks;
   const conversionRate = totalPageViews > 0 ? (totalActions / totalPageViews * 100) : 0;
@@ -320,7 +324,14 @@ const VisitorsTab: React.FC<VisitorsTabProps> = ({ isRTL, products, lang }) => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 p-6 bg-white dark:bg-[#131d31] rounded-2xl border border-slate-100 dark:border-[#1e293b] shadow-sm">
               <div className="flex items-center justify-between mb-6">
-                <h4 className={cardTitle}><TrendingUp className="w-4 h-4 text-[#0f639e]" />{isRTL ? 'الزوار عبر الوقت' : 'Visitors Over Time'}</h4>
+                <div className="flex items-center gap-3">
+                  <h4 className={cardTitle}><TrendingUp className="w-4 h-4 text-[#0f639e]" />{isRTL ? 'الزوار خلال اليوم' : 'Hourly Visitors'}</h4>
+                  {peakHour && peakHour.visitors > 0 && (
+                    <span className="text-[9px] font-black text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-md uppercase tracking-widest">
+                      {isRTL ? `الذروة ${peakHour.date}` : `PEAK ${peakHour.date}`}
+                    </span>
+                  )}
+                </div>
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-[#0f639e]" /><span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{isRTL ? 'مشاهدات' : 'VIEWS'}</span></div>
                   <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-[#df4d21]" /><span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{isRTL ? 'زوار' : 'VISITORS'}</span></div>
