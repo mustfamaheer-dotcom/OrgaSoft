@@ -92,12 +92,20 @@ class VisitorTracker {
     } catch { /* ignore */ }
   }
 
+  private stripUndefined(obj: any): any {
+    const clean: any = {};
+    for (const [k, v] of Object.entries(obj)) {
+      if (v !== undefined) clean[k] = v;
+    }
+    return clean;
+  }
+
   private async flush() {
     if (this.eventQueue.length === 0) return;
     const batch = this.eventQueue.splice(0, this.eventQueue.length);
     try {
       const col = collection(db, EVENT_COLLECTION);
-      const promises = batch.map(ev => addDoc(col, { ...ev, createdAt: serverTimestamp() }));
+      const promises = batch.map(ev => addDoc(col, { ...this.stripUndefined(ev), createdAt: serverTimestamp() }));
       const results = await Promise.allSettled(promises);
       const failed = results.filter(r => r.status === 'rejected');
       if (failed.length > 0) {
