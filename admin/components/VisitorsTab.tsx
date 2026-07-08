@@ -4,7 +4,7 @@ import { db } from '../../firebase';
 import { Eye, Users, MousePointerClick, Smartphone, BarChart3, MessageCircle, Phone, Loader2, Play, Activity, Clock, TrendingUp, ArrowUpRight } from 'lucide-react';
 import type { VisitorEvent } from '../../types';
 import { SectionHeader } from './FormComponents';
-import { VisitorsLineChart, TopPagesBarChart, DevicePieChart } from './VisitorsCharts';
+import { VisitorsLineChart, TopPagesRanking, DevicePieChart } from './VisitorsCharts';
 
 interface VisitorsTabProps { isRTL: boolean }
 
@@ -211,8 +211,11 @@ const VisitorsTab: React.FC<VisitorsTabProps> = ({ isRTL }) => {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 p-6 bg-white dark:bg-[#131d31] rounded-2xl border border-slate-100 dark:border-[#1e293b] shadow-sm">
-              <h4 className={cardTitle + ' mb-6'}><BarChart3 className="w-4 h-4 text-[#0f639e]" />{isRTL ? 'أكثر الصفحات زيارة' : 'Top Pages'}</h4>
-              <TopPagesBarChart data={topPages} />
+              <div className="flex items-center justify-between mb-6">
+                <h4 className={cardTitle}><BarChart3 className="w-4 h-4 text-[#0f639e]" />{isRTL ? 'أكثر الصفحات زيارة' : 'Top Pages'}</h4>
+                <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">{isRTL ? 'زيارات' : 'VISITS'}</span>
+              </div>
+              <TopPagesRanking data={topPages} />
             </div>
             <div className="p-6 bg-white dark:bg-[#131d31] rounded-2xl border border-slate-100 dark:border-[#1e293b] shadow-sm">
               <h4 className={cardTitle + ' mb-4'}><Clock className="w-4 h-4 text-[#10b981]" />{isRTL ? 'آخر النشاطات' : 'Recent Activity'}</h4>

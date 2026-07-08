@@ -37,7 +37,7 @@ const TAB_SECTIONS: Record<string, (keyof SiteContent)[]> = {
 };
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
-  const { siteData, updateSiteData, resetDatabase, lang, isRTL, isSyncing } = useSite();
+  const { siteData, updateSiteData, lang, isRTL, isSyncing } = useSite();
   const [isLoggedIn, setIsLoggedIn] = useState(() => !!getCurrentUser());
   const [authChecked, setAuthChecked] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -119,15 +119,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
     setDeleteTarget(null);
   };
 
-  const handleResetDatabase = useCallback(async () => {
-    try {
-      await resetDatabase(data);
-      addToast(lang === 'ar' ? 'تمت إعادة تعيين قاعدة البيانات' : 'Database reset successfully', 'success');
-    } catch (error: any) {
-      addToast(error.message || (lang === 'ar' ? 'خطأ في إعادة التعيين' : 'Reset failed'), 'error');
-    }
-  }, [data, resetDatabase, lang, addToast]);
-
   const titles: Record<string, string> = {
     general:    lang === 'ar' ? 'لوحة التحكم بالنظام' : 'System Control Panel',
     navigation: lang === 'ar' ? 'لوحة التحكم بالنظام' : 'System Control Panel',
@@ -157,7 +148,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   const renderTab = () => {
     const tabProps = { data, setData: setDataAndMarkDirty, updateNestedField, isRTL, lang, setDeleteTarget };
     switch (activeTab) {
-      case 'general': return <GeneralTab {...tabProps} onResetDatabase={handleResetDatabase} />;
+      case 'general': return <GeneralTab {...tabProps} />;
       case 'navigation': return <NavigationTab {...tabProps} />;
       case 'hero': return <HeroTab {...tabProps} />;
       case 'about': return <AboutTab {...tabProps} />;
