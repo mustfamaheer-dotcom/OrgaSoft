@@ -23,7 +23,6 @@ function detectDeviceType(): DeviceType {
 }
 
 const EVENT_COLLECTION = 'visitorEvents';
-
 const PENDING_KEY = 'orgasoft_pending_events';
 
 class VisitorTracker {
@@ -31,21 +30,21 @@ class VisitorTracker {
   private eventQueue: Omit<VisitorEvent, 'id'>[] = [];
   private flushInterval: ReturnType<typeof setInterval> | null = null;
   private initialized = false;
+  private flushTimer: ReturnType<typeof setTimeout> | null = null;
 
   init() {
     if (this.initialized) return;
     this.initialized = true;
     this.sessionId = getOrCreateSession();
     this.restorePending();
-    this.flushInterval = setInterval(() => this.flush(), 30000);
+    this.flushInterval = setInterval(() => this.flush(), 15000);
     window.addEventListener('beforeunload', () => this.persistPending());
+    this.flush();
   }
 
   destroy() {
-    if (this.flushInterval) {
-      clearInterval(this.flushInterval);
-      this.flushInterval = null;
-    }
+    if (this.flushInterval) clearInterval(this.flushInterval);
+    if (this.flushTimer) clearTimeout(this.flushTimer);
   }
 
   trackPageView(page: string) {
@@ -57,6 +56,7 @@ class VisitorTracker {
   }
 
   private enqueue(eventType: EventType, page: string, meta?: string) {
+    const wasEmpty = this.eventQueue.length === 0;
     this.eventQueue.push({
       timestamp: new Date().toISOString(),
       page,
@@ -68,6 +68,10 @@ class VisitorTracker {
       deviceType: detectDeviceType(),
       meta,
     });
+    if (wasEmpty) {
+      if (this.flushTimer) clearTimeout(this.flushTimer);
+      this.flushTimer = setTimeout(() => this.flush(), 1000);
+    }
   }
 
   private restorePending() {
@@ -94,8 +98,15 @@ class VisitorTracker {
     try {
       const col = collection(db, EVENT_COLLECTION);
       const promises = batch.map(ev => addDoc(col, { ...ev, createdAt: serverTimestamp() }));
-      await Promise.all(promises);
-    } catch {
+      const results = await Promise.allSettled(promises);
+      const failed = results.filter(r => r.status === 'rejected');
+      if (failed.length > 0) {
+        console.warn('[VisitorTracker] Some events failed to write:', failed.length);
+        this.eventQueue.unshift(...batch);
+        this.persistPending();
+      }
+    } catch (err) {
+      console.warn('[VisitorTracker] Flush failed:', err);
       this.eventQueue.unshift(...batch);
       this.persistPending();
     }
