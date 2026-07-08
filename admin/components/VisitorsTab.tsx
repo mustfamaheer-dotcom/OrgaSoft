@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { collection, getDocs, query, orderBy, limit, startAfter, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../firebase';
-import { Eye, Users, MousePointerClick, Smartphone, BarChart3, MessageCircle, Phone, Loader2, Play, Activity, Clock, TrendingUp, ArrowUpRight } from 'lucide-react';
+import { Eye, Users, MousePointerClick, Smartphone, BarChart3, MessageCircle, Phone, Loader2, Play, Activity, TrendingUp, ArrowUpRight, Zap, Target, TrendingDown, Layers } from 'lucide-react';
 import type { VisitorEvent, Product, Language } from '../../types';
 import { SectionHeader } from './FormComponents';
 import { VisitorsLineChart, TopPagesRanking, DevicePieChart } from './VisitorsCharts';
@@ -96,7 +96,39 @@ const VisitorsTab: React.FC<VisitorsTabProps> = ({ isRTL, products, lang }) => {
   const chartData = Object.entries(dailyMap).sort(([a], [b]) => a.localeCompare(b))
     .map(([date, d]) => ({ date, pageviews: d.pageviews, visitors: d.visitors.size }));
 
-  const recentEvents = [...publicEvents].sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || '')).slice(0, 10);
+  const totalActions = ctaClicks + whatsappClicks + phoneClicks;
+  const conversionRate = totalPageViews > 0 ? (totalActions / totalPageViews * 100) : 0;
+  const sessionsWithAction = new Set(publicEvents.filter(e => e.eventType !== 'pageview').map(e => e.sessionId));
+  const engagementRate = uniqueSessions > 0 ? (sessionsWithAction.size / uniqueSessions * 100) : 0;
+  const pagesPerSession = uniqueSessions > 0 ? (totalPageViews / uniqueSessions) : 0;
+
+  const sessionPageCounts = publicEvents.filter(e => e.eventType === 'pageview')
+    .reduce<Record<string, number>>((acc, e) => { acc[e.sessionId] = (acc[e.sessionId] || 0) + 1; return acc; }, {});
+  const bounceSessions = Object.values(sessionPageCounts).filter(c => c === 1).length;
+  const engagedSessions = Object.values(sessionPageCounts).filter(c => c >= 2 && c <= 4).length;
+  const superEngagedSessions = Object.values(sessionPageCounts).filter(c => c >= 5).length;
+
+  const halfPoint = new Date();
+  halfPoint.setDate(halfPoint.getDate() - Math.floor(daysFilter / 2));
+  const firstHalfCount = publicEvents.filter(e => {
+    const ts: any = e.createdAt || e.timestamp;
+    if (ts?.toDate) return ts.toDate() < halfPoint;
+    if (typeof ts === 'string') return new Date(ts) < halfPoint;
+    return false;
+  }).length;
+  const secondHalfCount = publicEvents.length - firstHalfCount;
+  const growth = firstHalfCount > 0 ? ((secondHalfCount - firstHalfCount) / firstHalfCount * 100) : 0;
+
+  const pageActions = publicEvents.filter(e => e.eventType !== 'pageview')
+    .reduce<Record<string, number>>((acc, e) => { acc[e.page] = (acc[e.page] || 0) + 1; return acc; }, {});
+  const convertingPages = Object.entries(pageActions).map(([page, count]) => {
+    if (page.startsWith('product:')) {
+      const productId = page.replace('product:', '');
+      const product = products.find(p => p.id === productId);
+      if (product) return { page: product.name[lang] || product.name.en, count };
+    }
+    return { page, count };
+  }).sort((a, b) => b.count - a.count).slice(0, 8);
 
   return (
     <div className="space-y-8">
@@ -192,10 +224,67 @@ const VisitorsTab: React.FC<VisitorsTabProps> = ({ isRTL, products, lang }) => {
             </div>
             <div className={metricCard}>
               <div className="flex items-start justify-between mb-3">
-                <div className="w-10 h-10 bg-[#6366f1]/10 rounded-xl flex items-center justify-center text-[#6366f1]"><Activity className="w-5 h-5" /></div>
+                <div className="w-10 h-10 bg-[#6366f1]/10 rounded-xl flex items-center justify-center text-[#6366f1]"><Zap className="w-5 h-5" /></div>
+                <span className={`flex items-center gap-1 text-[10px] font-bold ${growth >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                  {growth >= 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                  {Math.abs(growth).toFixed(1)}%
+                </span>
               </div>
-              <div className={metricValue} style={{ color: '#6366f1' }}>{events.length.toLocaleString()}</div>
-              <div className={metricLabel}>{isRTL ? 'إجمالي الأحداث' : 'TOTAL EVENTS'}</div>
+              <div className={metricValue} style={{ color: '#6366f1' }}>{engagementRate.toFixed(1)}%</div>
+              <div className={metricLabel}>{isRTL ? 'معدل التفاعل' : 'ENGAGEMENT RATE'}</div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="p-4 bg-white dark:bg-[#131d31] rounded-2xl border border-slate-100 dark:border-[#1e293b] shadow-sm">
+              <div className="flex items-center gap-2 mb-2">
+                <Target className="w-3.5 h-3.5 text-[#0f639e]" />
+                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{isRTL ? 'معدل التحويل' : 'CONVERSION RATE'}</span>
+              </div>
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-2xl font-black text-slate-800 dark:text-white">{conversionRate.toFixed(1)}%</span>
+                <span className="text-[10px] font-bold text-slate-400">{totalActions}/{totalPageViews}</span>
+              </div>
+              <div className="w-full h-2 bg-slate-100 dark:bg-[#1e293b] rounded-full mt-2 overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-[#0f639e] to-[#60a5fa] rounded-full transition-all" style={{ width: `${Math.min(conversionRate, 100)}%` }} />
+              </div>
+            </div>
+            <div className="p-4 bg-white dark:bg-[#131d31] rounded-2xl border border-slate-100 dark:border-[#1e293b] shadow-sm">
+              <div className="flex items-center gap-2 mb-2">
+                <Layers className="w-3.5 h-3.5 text-[#10b981]" />
+                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{isRTL ? 'صفحات/جلسة' : 'PAGES/SESSION'}</span>
+              </div>
+              <span className="text-2xl font-black text-slate-800 dark:text-white">{pagesPerSession.toFixed(1)}</span>
+            </div>
+            <div className="p-4 bg-white dark:bg-[#131d31] rounded-2xl border border-slate-100 dark:border-[#1e293b] shadow-sm">
+              <div className="flex items-center gap-2 mb-2">
+                {growth >= 0 ? <TrendingUp className="w-3.5 h-3.5 text-emerald-500" /> : <TrendingDown className="w-3.5 h-3.5 text-rose-500" />}
+                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{isRTL ? 'النمو' : 'GROWTH'}</span>
+              </div>
+              <span className={`text-2xl font-black ${growth >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                {growth >= 0 ? '+' : ''}{growth.toFixed(1)}%
+              </span>
+              <div className="text-[10px] font-bold text-slate-400 mt-0.5">{isRTL ? 'نصف الفترة vs النصف الثاني' : '1st half vs 2nd half'}</div>
+            </div>
+            <div className="p-4 bg-white dark:bg-[#131d31] rounded-2xl border border-slate-100 dark:border-[#1e293b] shadow-sm">
+              <div className="flex items-center gap-2 mb-3">
+                <Activity className="w-3.5 h-3.5 text-amber-500" />
+                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{isRTL ? 'جودة الجلسات' : 'SESSION QUALITY'}</span>
+              </div>
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <div className="h-2 rounded-full bg-rose-200 dark:bg-rose-900/30" style={{ width: `${uniqueSessions > 0 ? bounceSessions / uniqueSessions * 100 : 0}%`, minWidth: bounceSessions > 0 ? '4px' : '0' }} />
+                  <span className="text-[10px] font-bold text-slate-500 shrink-0">{isRTL ? 'ارتداد' : 'Bounce'} {bounceSessions}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="h-2 rounded-full bg-amber-200 dark:bg-amber-900/30" style={{ width: `${uniqueSessions > 0 ? engagedSessions / uniqueSessions * 100 : 0}%`, minWidth: engagedSessions > 0 ? '4px' : '0' }} />
+                  <span className="text-[10px] font-bold text-slate-500 shrink-0">{isRTL ? 'تفاعل' : 'Engaged'} {engagedSessions}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="h-2 rounded-full bg-emerald-200 dark:bg-emerald-900/30" style={{ width: `${uniqueSessions > 0 ? superEngagedSessions / uniqueSessions * 100 : 0}%`, minWidth: superEngagedSessions > 0 ? '4px' : '0' }} />
+                  <span className="text-[10px] font-bold text-slate-500 shrink-0">{isRTL ? 'متفاعل جداً' : 'Super'} {superEngagedSessions}</span>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -225,19 +314,27 @@ const VisitorsTab: React.FC<VisitorsTabProps> = ({ isRTL, products, lang }) => {
               <TopPagesRanking data={topPages} />
             </div>
             <div className="p-6 bg-white dark:bg-[#131d31] rounded-2xl border border-slate-100 dark:border-[#1e293b] shadow-sm">
-              <h4 className={cardTitle + ' mb-4'}><Clock className="w-4 h-4 text-[#10b981]" />{isRTL ? 'آخر النشاطات' : 'Recent Activity'}</h4>
-              <div className="space-y-2">
-                {recentEvents.map((ev, i) => (
-                  <div key={i} className="flex items-center gap-3 p-2.5 bg-slate-50 dark:bg-[#1a2744] rounded-xl">
-                    <div className={`w-2 h-2 rounded-full shrink-0 ${ev.eventType === 'pageview' ? 'bg-[#0f639e]' : ev.eventType === 'whatsapp_click' ? 'bg-[#10b981]' : ev.eventType === 'phone_click' ? 'bg-[#f59e0b]' : 'bg-[#df4d21]'}`} />
-                    <div className="min-w-0 flex-1">
-                      <div className="text-[11px] font-bold text-slate-700 dark:text-slate-300 truncate">{ev.page}</div>
-                      <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{ev.eventType}{ev.meta ? ` / ${ev.meta}` : ''}</div>
+              <h4 className={cardTitle + ' mb-4'}><MousePointerClick className="w-4 h-4 text-[#df4d21]" />{isRTL ? 'الصفحات المحولة' : 'Converting Pages'}</h4>
+              {convertingPages.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-xs font-bold text-slate-400">{isRTL ? 'لا توجد تفاعلات بعد' : 'No interactions yet'}</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {convertingPages.map((p, i) => (
+                    <div key={i} className="flex items-center gap-3 p-2.5 bg-slate-50 dark:bg-[#1a2744] rounded-xl">
+                      <span className="w-5 text-center text-[11px] font-black text-slate-400">{i + 1}</span>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-[11px] font-bold text-slate-700 dark:text-slate-300 truncate capitalize">{p.page.replace(/-/g, ' ')}</div>
+                        <div className="w-full h-1.5 bg-slate-200 dark:bg-[#1e293b] rounded-full mt-1 overflow-hidden">
+                          <div className="h-full bg-gradient-to-r from-[#df4d21] to-[#f87171] rounded-full" style={{ width: `${convertingPages.length > 0 ? p.count / convertingPages[0].count * 100 : 0}%` }} />
+                        </div>
+                      </div>
+                      <span className="text-xs font-black text-slate-500 dark:text-slate-400 shrink-0">{p.count}</span>
                     </div>
-                    <span className="text-[9px] font-bold text-slate-400 shrink-0">{ev.timestamp ? new Date(ev.timestamp).toLocaleTimeString() : ''}</span>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
