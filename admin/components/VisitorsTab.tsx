@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { collection, getDocs, query, orderBy, limit, startAfter } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, limit, startAfter, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../firebase';
-import { Eye, Users, MousePointerClick, Smartphone, BarChart3, MessageCircle, Phone, Loader2 } from 'lucide-react';
+import { Eye, Users, MousePointerClick, Smartphone, BarChart3, MessageCircle, Phone, Loader2, Play } from 'lucide-react';
 import type { VisitorEvent } from '../../types';
 import { SectionHeader } from './FormComponents';
 import { VisitorsLineChart, TopPagesBarChart, DevicePieChart } from './VisitorsCharts';
@@ -23,6 +23,34 @@ const VisitorsTab: React.FC<VisitorsTabProps> = ({ isRTL }) => {
   const [daysFilter, setDaysFilter] = useState(7);
   const [lastDoc, setLastDoc] = useState<any>(null);
   const [hasMore, setHasMore] = useState(true);
+  const [testStatus, setTestStatus] = useState<string | null>(null);
+  const [writeError, setWriteError] = useState<string | null>(null);
+
+  const writeTestEvent = async () => {
+    setTestStatus('writing...');
+    setWriteError(null);
+    try {
+      const col = collection(db, 'visitorEvents');
+      await addDoc(col, {
+        timestamp: new Date().toISOString(),
+        page: 'admin-test',
+        referrer: 'direct',
+        userAgent: navigator.userAgent,
+        language: document.documentElement.lang || 'ar',
+        sessionId: 'test-' + Date.now(),
+        eventType: 'pageview',
+        deviceType: 'desktop',
+        createdAt: serverTimestamp(),
+      });
+      setTestStatus('success!');
+      fetchEvents(false);
+    } catch (err: any) {
+      setTestStatus('failed');
+      setWriteError(err.code || err.message || String(err));
+    }
+  };
+
+  useEffect(() => { writeTestEvent(); }, []);
 
   const fetchEvents = useCallback(async (loadMore = false) => {
     if (loadMore) setLoadingMore(true); else setLoading(true);
@@ -87,14 +115,32 @@ const VisitorsTab: React.FC<VisitorsTabProps> = ({ isRTL }) => {
     <div className="space-y-10">
       <SectionHeader icon={BarChart3} title={isRTL ? 'زوار الموقع' : 'Site Visitors'} subtitle="Real-time visitor analytics and engagement metrics" isRTL={isRTL} />
 
-      <div className="flex gap-2">
-        {[1, 7, 14, 30].map(d => (
-          <button key={d} onClick={() => setDaysFilter(d)}
-            className={`px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all ${daysFilter === d ? 'bg-[#0f639e] text-white' : 'bg-slate-100 dark:bg-[#1a2744] text-slate-400 hover:text-[#0f639e]'}`}>
-            {isRTL ? (d === 1 ? 'آخر 24 ساعة' : `آخر ${d} أيام`) : (d === 1 ? 'Last 24h' : `Last ${d}d`)}
+      <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex gap-2">
+          {[1, 7, 14, 30].map(d => (
+            <button key={d} onClick={() => setDaysFilter(d)}
+              className={`px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all ${daysFilter === d ? 'bg-[#0f639e] text-white' : 'bg-slate-100 dark:bg-[#1a2744] text-slate-400 hover:text-[#0f639e]'}`}>
+              {isRTL ? (d === 1 ? 'آخر 24 ساعة' : `آخر ${d} أيام`) : (d === 1 ? 'Last 24h' : `Last ${d}d`)}
+            </button>
+          ))}
+        </div>
+        <div className="flex items-center gap-2">
+          <button onClick={writeTestEvent}
+            className="flex items-center gap-2 px-4 py-2 bg-[#0f639e]/10 text-[#0f639e] rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-[#0f639e] hover:text-white transition-all">
+            <Play className="w-3 h-3" /> {isRTL ? 'اختبار الكتابة' : 'TEST WRITE'}
           </button>
-        ))}
+          {testStatus && (
+            <span className={`text-[10px] font-bold ${testStatus === 'success!' ? 'text-emerald-500' : testStatus === 'failed' ? 'text-rose-500' : 'text-slate-400'}`}>
+              {testStatus}
+            </span>
+          )}
+        </div>
       </div>
+      {writeError && (
+        <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl">
+          <p className="text-[11px] font-bold text-rose-500">{writeError}</p>
+        </div>
+      )}
 
       {loading ? (
         <div className="flex items-center justify-center py-20">
