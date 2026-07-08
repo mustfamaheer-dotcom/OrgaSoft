@@ -19,13 +19,13 @@ const ChartTooltip = ({ active, payload, label }: any) => {
 
 export const VisitorsLineChart: React.FC<{ data: DailyStat[] }> = ({ data }) => (
   <ResponsiveContainer width="100%" height={300}>
-    <AreaChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 30 }}>
+    <AreaChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 5 }}>
       <defs>
         <linearGradient id="pvGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#0f639e" stopOpacity={0.25}/><stop offset="100%" stopColor="#0f639e" stopOpacity={0}/></linearGradient>
         <linearGradient id="visGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#df4d21" stopOpacity={0.15}/><stop offset="100%" stopColor="#df4d21" stopOpacity={0}/></linearGradient>
       </defs>
       <CartesianGrid strokeDasharray="4 4" stroke="#e2e8f0" strokeOpacity={0.5} />
-      <XAxis dataKey="date" tick={{ fontSize: 9, fill: '#94a3b8', angle: -45, textAnchor: 'end' }} axisLine={true} tickLine={true} interval={0} />
+      <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 700 }} axisLine={false} tickLine={false} interval={0} />
       <YAxis tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
       <Tooltip content={<ChartTooltip />} />
       <Area type="monotone" dataKey="pageviews" stroke="#0f639e" strokeWidth={2.5} fill="url(#pvGrad)" dot={{ fill: '#0f639e', strokeWidth: 2, r: 3 }} activeDot={{ r: 5, strokeWidth: 0 }} />

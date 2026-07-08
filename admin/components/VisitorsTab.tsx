@@ -112,24 +112,32 @@ const VisitorsTab: React.FC<VisitorsTabProps> = ({ isRTL, products, lang }) => {
     return { page, views };
   });
 
-  const hourMap = publicEvents.filter(e => e.eventType === 'pageview')
-    .reduce<Record<string, { pageviews: number; visitors: Set<string> }>>((acc, e) => {
-      const hour = e.timestamp?.slice(11, 13) || '00';
-      if (!acc[hour]) acc[hour] = { pageviews: 0, visitors: new Set() };
-      acc[hour].pageviews++; acc[hour].visitors.add(e.sessionId); return acc;
-    }, {});
-  const to12Hour = (h: number) => {
-    if (h === 0) return '12AM';
-    if (h < 12) return `${h}AM`;
-    if (h === 12) return '12PM';
-    return `${h - 12}PM`;
+  const EGYPT_OFFSET = 2;
+  const periods = [
+    { key: 'dawn', labelAr: 'الفجر', labelEn: 'Dawn', range: [0, 5], icon: '🌙' },
+    { key: 'morning', labelAr: 'الصباح', labelEn: 'Morning', range: [6, 11], icon: '☀️' },
+    { key: 'noon', labelAr: 'الظهر', labelEn: 'Noon', range: [12, 14], icon: '🌤️' },
+    { key: 'afternoon', labelAr: 'العصر', labelEn: 'Afternoon', range: [15, 17], icon: '🌅' },
+    { key: 'evening', labelAr: 'المساء', labelEn: 'Evening', range: [18, 20], icon: '🌆' },
+    { key: 'night', labelAr: 'الليل', labelEn: 'Night', range: [21, 23], icon: '🌃' },
+  ];
+  const getEgyptHour = (ts: string) => {
+    const d = new Date(ts);
+    return (d.getUTCHours() + EGYPT_OFFSET) % 24;
   };
-  const chartData = Array.from({ length: 24 }, (_, i) => {
-    const h = String(i).padStart(2, '0');
-    const d = hourMap[h] || { pageviews: 0, visitors: new Set() };
-    return { date: to12Hour(i), hour: i, pageviews: d.pageviews, visitors: d.visitors.size };
+  const periodMap = publicEvents.filter(e => e.eventType === 'pageview')
+    .reduce<Record<string, { pageviews: number; visitors: Set<string> }>>((acc, e) => {
+      const hour = e.timestamp ? getEgyptHour(e.timestamp) : 0;
+      const period = periods.find(p => hour >= p.range[0] && hour <= p.range[1]);
+      const key = period?.key || 'night';
+      if (!acc[key]) acc[key] = { pageviews: 0, visitors: new Set() };
+      acc[key].pageviews++; acc[key].visitors.add(e.sessionId); return acc;
+    }, {});
+  const chartData = periods.map(p => {
+    const d = periodMap[p.key] || { pageviews: 0, visitors: new Set() };
+    return { date: isRTL ? p.labelAr : p.labelEn, pageviews: d.pageviews, visitors: d.visitors.size };
   });
-  const peakHour = [...chartData].sort((a, b) => b.visitors - a.visitors)[0];
+  const peakPeriod = [...chartData].sort((a, b) => b.visitors - a.visitors)[0];
 
   const totalActions = ctaClicks + whatsappClicks + phoneClicks;
   const conversionRate = totalPageViews > 0 ? (totalActions / totalPageViews * 100) : 0;
@@ -332,9 +340,9 @@ const VisitorsTab: React.FC<VisitorsTabProps> = ({ isRTL, products, lang }) => {
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
                   <h4 className={cardTitle}><TrendingUp className="w-4 h-4 text-[#0f639e]" />{isRTL ? 'الزوار خلال اليوم' : 'Hourly Visitors'}</h4>
-                  {peakHour && peakHour.visitors > 0 && (
+                  {peakPeriod && peakPeriod.visitors > 0 && (
                     <span className="text-[9px] font-black text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-md uppercase tracking-widest">
-                      {isRTL ? `الذروة ${peakHour.date}` : `PEAK ${peakHour.date}`}
+                      {isRTL ? `الذروة ${peakPeriod.date}` : `PEAK ${peakPeriod.date}`}
                     </span>
                   )}
                 </div>
