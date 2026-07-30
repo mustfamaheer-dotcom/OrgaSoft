@@ -74,26 +74,22 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
 
   const homeProducts = products.filter(p => p.showOnHome !== false);
   const [productIdx, setProductIdx] = useState(0);
-  const [productDirection, setProductDirection] = useState<'left' | 'right'>('right');
   const touchStartX = useRef(0);
   const [animating, setAnimating] = useState(false);
 
-  const goToProduct = useCallback((idx: number, dir: 'left' | 'right') => {
+  const goToProduct = useCallback((idx: number) => {
     if (animating || idx < 0 || idx >= homeProducts.length) return;
-    setProductDirection(dir);
     setAnimating(true);
     setProductIdx(idx);
     setTimeout(() => setAnimating(false), 500);
   }, [animating, homeProducts.length]);
 
   const prevProduct = useCallback(() => {
-    const next = productIdx === 0 ? homeProducts.length - 1 : productIdx - 1;
-    goToProduct(next, 'left');
+    goToProduct(productIdx === 0 ? homeProducts.length - 1 : productIdx - 1);
   }, [productIdx, homeProducts.length, goToProduct]);
 
   const nextProduct = useCallback(() => {
-    const next = productIdx === homeProducts.length - 1 ? 0 : productIdx + 1;
-    goToProduct(next, 'right');
+    goToProduct(productIdx === homeProducts.length - 1 ? 0 : productIdx + 1);
   }, [productIdx, homeProducts.length, goToProduct]);
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => { touchStartX.current = e.touches[0].clientX; }, []);
@@ -101,8 +97,6 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
     const diff = touchStartX.current - e.changedTouches[0].clientX;
     if (Math.abs(diff) > 50) diff > 0 ? nextProduct() : prevProduct();
   }, [nextProduct, prevProduct]);
-
-  const swipeArrowsClass = isRTL ? 'flex-row-reverse' : '';
 
   const filteredPartners = activePartnerCat
     ? partners.filter(p => p.categoryId === activePartnerCat)
@@ -197,114 +191,112 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
           <div className="relative"
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}>
-            <div className="relative overflow-hidden rounded-2xl" style={{ perspective: '1200px' }}>
-              <div className="relative mx-auto max-w-[420px]">
-                {homeProducts.map((product, idx) => {
-                  const isActive = idx === productIdx;
-                  const isPrev = idx === (productIdx === 0 ? homeProducts.length - 1 : productIdx - 1);
-                  const isNext = idx === (productIdx === homeProducts.length - 1 ? 0 : productIdx + 1);
-                  let transform = '';
-                  let opacity = 0;
-                  let zIndex = 0;
-                  let pointerEvents: React.CSSProperties['pointerEvents'] = 'none';
-                  if (isActive) {
-                    transform = 'translateX(0) rotateY(0) scale(1)';
-                    opacity = 1;
-                    zIndex = 3;
-                    pointerEvents = 'auto';
-                  } else if (isPrev) {
-                    transform = productDirection === 'right'
-                      ? 'translateX(-120%) rotateY(25deg) scale(0.85)'
-                      : 'translateX(-120%) rotateY(25deg) scale(0.85)';
-                    opacity = animating ? 0.5 : 0;
-                    zIndex = 1;
-                  } else if (isNext) {
-                    transform = productDirection === 'left'
-                      ? 'translateX(120%) rotateY(-25deg) scale(0.85)'
-                      : 'translateX(120%) rotateY(-25deg) scale(0.85)';
-                    opacity = animating ? 0.5 : 0;
-                    zIndex = 1;
-                  } else {
-                    opacity = 0;
-                    zIndex = 0;
-                  }
-                  return (
-                    <div key={product.id}
-                      className="w-full transition-all duration-500 ease-out absolute inset-0"
-                      style={{
-                        transform,
-                        opacity,
-                        zIndex,
-                        pointerEvents,
-                        transformStyle: 'preserve-3d',
-                        backfaceVisibility: 'hidden',
-                        position: isActive ? 'relative' as const : 'absolute' as const,
-                      }}>
-                      <TiltCard
-                        onClick={() => onNavigate(`product-${product.id}`)}
-                        className="group bg-white dark:bg-[#131d31] rounded-2xl overflow-hidden border border-slate-100 dark:border-[#1e293b] hover:border-[#df4d21]/30 hover:shadow-xl transition-all duration-300 cursor-pointer active:scale-[0.98]">
-                        <div className="tilt-inner flex flex-col">
-                          <div className="relative w-full aspect-[480/462.8] overflow-hidden bg-slate-100 dark:bg-[#1e293b]">
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent z-10" />
-                            {product.image ? (
-                              <KitImage src={product.image} alt={product.name[lang]} className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700" width={480} height={463} />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center"><Grid3X3 className="w-12 h-12 text-slate-300 dark:text-slate-500" /></div>
-                            )}
-                          </div>
-                          <div className="p-5 sm:p-6 flex flex-col flex-grow">
-                            <h3 className="text-lg sm:text-xl font-black text-[#0f639e] dark:text-white mb-2 group-hover:text-[#df4d21] transition-colors">{product.name[lang]}</h3>
-                            <p className="text-slate-600 dark:text-slate-400 font-medium text-xs sm:text-sm leading-relaxed line-clamp-2 mb-3">{product.description[lang]}</p>
-                            <div className="flex flex-wrap gap-1.5 mb-3">
-                              {(product.keyFeatures || []).slice(0, 2).map((kf, i) => (
-                                <span key={i} className="px-3 py-1.5 bg-slate-100 dark:bg-[#1e293b] rounded-full text-xs font-semibold text-slate-600 dark:text-slate-400">{kf.text[lang]}</span>
-                              ))}
-                            </div>
-                            <div className="flex items-center gap-2 mt-auto">
-                              <div className={`flex items-center gap-1.5 text-[#df4d21] font-bold uppercase tracking-[0.15em] text-xs ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
-                                {uiStrings.ctaMore[lang]}
-                                {isRTL ? <MoveLeft className="w-3.5 h-3.5" /> : <MoveRight className="w-3.5 h-3.5" />}
-                              </div>
-                              {product.demoUrl && (
-                                <a href={product.demoUrl} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
-                                  className="mr-auto flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-[#df4d21] to-[#0f639e] text-white font-bold text-xs uppercase tracking-widest rounded-lg hover:shadow-lg hover:-translate-y-0.5 transition-all active:scale-95">
-                                  <PlayCircle className="w-4 h-4" />
-                                  <span>{lang === 'ar' ? 'نسخه تجريبيه' : 'Demo'}</span>
-                                </a>
+            <div className="relative mx-auto max-w-[420px] flex items-center">
+              <button onClick={prevProduct}
+                className={`shrink-0 ${isRTL ? 'order-2 mr-1 sm:mr-3' : 'order-1 ml-1 sm:ml-3'} z-10 w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-[#334155] flex items-center justify-center text-[#0f639e] dark:text-white shadow-lg hover:shadow-xl hover:scale-110 hover:border-[#df4d21]/50 active:scale-90 transition-all disabled:opacity-30 disabled:cursor-not-allowed ${isRTL ? '-mr-10 sm:-mr-14' : '-ml-10 sm:-ml-14'}`}
+                disabled={animating}>
+                {isRTL ? <MoveRight className="w-5 h-5 sm:w-6 sm:h-6" /> : <MoveLeft className="w-5 h-5 sm:w-6 sm:h-6" />}
+              </button>
+              <div className="overflow-hidden rounded-2xl flex-1" style={{ perspective: '1200px' }}>
+                <div className="relative mx-auto max-w-[420px]">
+                  {homeProducts.map((product, idx) => {
+                    const isActive = idx === productIdx;
+                    const isPrev = idx === (productIdx === 0 ? homeProducts.length - 1 : productIdx - 1);
+                    const isNext = idx === (productIdx === homeProducts.length - 1 ? 0 : productIdx + 1);
+                    let transform = '';
+                    let opacity = 0;
+                    let zIndex = 0;
+                    let pointerEvents: React.CSSProperties['pointerEvents'] = 'none';
+                    if (isActive) {
+                      transform = 'translateX(0) rotateY(0) scale(1)';
+                      opacity = 1;
+                      zIndex = 3;
+                      pointerEvents = 'auto';
+                    } else if (isPrev) {
+                      transform = 'translateX(-120%) rotateY(25deg) scale(0.85)';
+                      opacity = animating ? 0.5 : 0;
+                      zIndex = 1;
+                    } else if (isNext) {
+                      transform = 'translateX(120%) rotateY(-25deg) scale(0.85)';
+                      opacity = animating ? 0.5 : 0;
+                      zIndex = 1;
+                    } else {
+                      opacity = 0;
+                      zIndex = 0;
+                    }
+                    return (
+                      <div key={product.id}
+                        className="w-full transition-all duration-500 ease-out absolute inset-0"
+                        style={{
+                          transform,
+                          opacity,
+                          zIndex,
+                          pointerEvents,
+                          transformStyle: 'preserve-3d',
+                          backfaceVisibility: 'hidden',
+                          position: isActive ? 'relative' as const : 'absolute' as const,
+                        }}>
+                        <TiltCard
+                          onClick={() => onNavigate(`product-${product.id}`)}
+                          className="group bg-white dark:bg-[#131d31] rounded-2xl overflow-hidden border border-slate-100 dark:border-[#1e293b] hover:border-[#df4d21]/30 hover:shadow-xl transition-all duration-300 cursor-pointer active:scale-[0.98]">
+                          <div className="tilt-inner flex flex-col">
+                            <div className="relative w-full aspect-[480/462.8] overflow-hidden bg-slate-100 dark:bg-[#1e293b]">
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent z-10" />
+                              {product.image ? (
+                                <KitImage src={product.image} alt={product.name[lang]} className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700" width={480} height={463} />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center"><Grid3X3 className="w-12 h-12 text-slate-300 dark:text-slate-500" /></div>
                               )}
                             </div>
+                            <div className="p-5 sm:p-6 flex flex-col flex-grow">
+                              <h3 className="text-lg sm:text-xl font-black text-[#0f639e] dark:text-white mb-2 group-hover:text-[#df4d21] transition-colors">{product.name[lang]}</h3>
+                              <p className="text-slate-600 dark:text-slate-400 font-medium text-xs sm:text-sm leading-relaxed line-clamp-2 mb-3">{product.description[lang]}</p>
+                              <div className="flex flex-wrap gap-1.5 mb-3">
+                                {(product.keyFeatures || []).slice(0, 2).map((kf, i) => (
+                                  <span key={i} className="px-3 py-1.5 bg-slate-100 dark:bg-[#1e293b] rounded-full text-xs font-semibold text-slate-600 dark:text-slate-400">{kf.text[lang]}</span>
+                                ))}
+                              </div>
+                              <div className="flex items-center gap-2 mt-auto">
+                                <div className={`flex items-center gap-1.5 text-[#df4d21] font-bold uppercase tracking-[0.15em] text-xs ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
+                                  {uiStrings.ctaMore[lang]}
+                                  {isRTL ? <MoveLeft className="w-3.5 h-3.5" /> : <MoveRight className="w-3.5 h-3.5" />}
+                                </div>
+                                {product.demoUrl && (
+                                  <a href={product.demoUrl} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
+                                    className="mr-auto flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-[#df4d21] to-[#0f639e] text-white font-bold text-xs uppercase tracking-widest rounded-lg hover:shadow-lg hover:-translate-y-0.5 transition-all active:scale-95">
+                                    <PlayCircle className="w-4 h-4" />
+                                    <span>{lang === 'ar' ? 'نسخه تجريبيه' : 'Demo'}</span>
+                                  </a>
+                                )}
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      </TiltCard>
-                    </div>
-                  );
-                })}
+                        </TiltCard>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
+              <button onClick={nextProduct}
+                className={`shrink-0 ${isRTL ? 'order-0 -ml-10 sm:-ml-14' : 'order-3 -mr-10 sm:-mr-14'} z-10 w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-[#334155] flex items-center justify-center text-[#0f639e] dark:text-white shadow-lg hover:shadow-xl hover:scale-110 hover:border-[#df4d21]/50 active:scale-90 transition-all disabled:opacity-30 disabled:cursor-not-allowed`}
+                disabled={animating}>
+                {isRTL ? <MoveLeft className="w-5 h-5 sm:w-6 sm:h-6" /> : <MoveRight className="w-5 h-5 sm:w-6 sm:h-6" />}
+              </button>
             </div>
 
-            <div className={`flex items-center justify-center gap-3 mt-6 ${swipeArrowsClass}`}>
-              <button onClick={prevProduct}
-                className="w-12 h-12 rounded-full bg-white dark:bg-[#1e293b] border border-slate-100 dark:border-[#334155] flex items-center justify-center text-[#0f639e] dark:text-white shadow-md hover:shadow-lg hover:-translate-y-0.5 hover:border-[#df4d21]/50 active:scale-90 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-                disabled={animating}>
-                {isRTL ? <MoveRight className="w-5 h-5" /> : <MoveLeft className="w-5 h-5" />}
-              </button>
+            <div className="flex items-center justify-center gap-3 mt-6">
               <div className="flex items-center gap-2">
                 {homeProducts.map((_, idx) => (
-                  <button key={idx} onClick={() => goToProduct(idx, idx > productIdx ? 'right' : 'left')}
+                  <button key={idx} onClick={() => goToProduct(idx)}
                     className={`rounded-full transition-all duration-300 ${idx === productIdx
                       ? 'w-8 h-2.5 bg-gradient-to-r from-[#0f639e] to-[#df4d21] shadow-md'
                       : 'w-2.5 h-2.5 bg-slate-300 dark:bg-slate-600 hover:bg-slate-400 dark:hover:bg-slate-500'}`} />
                 ))}
               </div>
-              <button onClick={nextProduct}
-                className="w-12 h-12 rounded-full bg-white dark:bg-[#1e293b] border border-slate-100 dark:border-[#334155] flex items-center justify-center text-[#0f639e] dark:text-white shadow-md hover:shadow-lg hover:-translate-y-0.5 hover:border-[#df4d21]/50 active:scale-90 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-                disabled={animating}>
-                {isRTL ? <MoveLeft className="w-5 h-5" /> : <MoveRight className="w-5 h-5" />}
-              </button>
             </div>
           </div>
 
-          <div className="text-center mt-6">
+          <div className="text-center mt-4">
             <p className="text-slate-500 dark:text-slate-400 text-xs font-medium">
               {productIdx + 1} / {homeProducts.length}
             </p>
