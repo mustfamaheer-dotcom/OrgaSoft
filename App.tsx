@@ -11,6 +11,7 @@ import CookieConsent from './components/CookieConsent';
 import Footer from './components/Footer';
 import { ArrowUp } from 'lucide-react';
 import { visitorTracker } from './lib/visitorTracker';
+import ChatBot from './components/ChatBot';
 
 const AdminDashboard = lazy(() => import('./views/AdminDashboard'));
 const ProductDetail = lazy(() => import('./views/ProductDetail'));
@@ -147,6 +148,7 @@ const AppContent: React.FC = () => {
         {!isAdmin && <Footer onNavigate={handleNavigate} />}
         {!isAdmin && <ScrollToTop />}
         {!isAdmin && <CookieConsent />}
+        {!isAdmin && <ChatBot onNavigate={handleNavigate} />}
       </div>
     </>
   );
