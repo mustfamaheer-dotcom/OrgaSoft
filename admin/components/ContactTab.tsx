@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Map, Plus, Trash2, ChevronLeft, ChevronRight, ChevronUp, ChevronDown, Building2 } from 'lucide-react';
+import { Map, Plus, Trash2, ChevronLeft, ChevronRight, ChevronUp, ChevronDown, Building2, FileText } from 'lucide-react';
 import type { SiteContent, Branch } from '../../types';
 import { SectionHeader, InputField, FieldGroup, ToggleField } from './FormComponents';
 
@@ -9,8 +9,6 @@ interface ContactTabProps {
   setData: (d: SiteContent) => void;
   isRTL: boolean;
 }
-
-const fieldBase = 'w-full px-5 py-4 rounded-xl border-2 border-slate-200 dark:border-[#1e293b] bg-white dark:bg-[#131d31] text-slate-900 dark:text-white font-medium text-sm focus:ring-2 focus:ring-blue-500/10 focus:border-[#0f639e] outline-none transition-all duration-200';
 
 const sectionTitle = 'text-lg font-black text-[#0f639e] dark:text-white tracking-tight flex items-center gap-3';
 
@@ -26,7 +24,7 @@ const ContactTab: React.FC<ContactTabProps> = ({ data, updateNestedField, isRTL 
 
   return (
     <div className="space-y-10">
-      <SectionHeader icon={Map} title={isRTL ? 'روابط الاتصال' : 'Contact Hub'} subtitle="Support channels, branches, and physical locations" isRTL={isRTL} />
+      <SectionHeader icon={Map} title={isRTL ? 'روابط الاتصال' : 'Contact Hub'} subtitle="Support channels, branches, social links, and policy" isRTL={isRTL} />
 
       <div className="pt-6 border-t border-slate-100 dark:border-[#1e293b] space-y-6">
         <div className="flex items-center justify-between">
@@ -155,8 +153,10 @@ const ContactTab: React.FC<ContactTabProps> = ({ data, updateNestedField, isRTL 
           <div className="space-y-5">
             <InputField label="Map Embed URL" placeholder="https://www.google.com/maps/embed?pb=!1m18..." value={data.contacts.mapEmbedUrl} onChange={v => updateNestedField('contacts.mapEmbedUrl', v)} />
             <InputField label="Facebook URL" value={data.contacts.facebook} onChange={v => updateNestedField('contacts.facebook', v)} />
-            <InputField label="Twitter URL" value={data.contacts.twitter} onChange={v => updateNestedField('contacts.twitter', v)} />
+            <InputField label="Twitter / X URL" value={data.contacts.twitter} onChange={v => updateNestedField('contacts.twitter', v)} />
             <InputField label="YouTube URL" value={data.contacts.youtube} onChange={v => updateNestedField('contacts.youtube', v)} />
+            <InputField label="Instagram URL" value={data.contacts.instagram} onChange={v => updateNestedField('contacts.instagram', v)} />
+            <InputField label="TikTok URL" value={data.contacts.tiktok} onChange={v => updateNestedField('contacts.tiktok', v)} />
           </div>
         </div>
 
@@ -164,22 +164,35 @@ const ContactTab: React.FC<ContactTabProps> = ({ data, updateNestedField, isRTL 
           <div className="flex items-center gap-2 px-1 mb-5">
             <div className="w-1 h-5 bg-[#0f639e] rounded-full shrink-0" />
             <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.15em]">
-              {isRTL ? 'ظهور أيقونات التواصل في التذييل' : 'Footer Social Icon Visibility'}
+              {isRTL ? 'ظهور أيقونات التواصل' : 'Social Icon Visibility'}
             </label>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <ToggleField label={isRTL ? 'فيسبوك' : 'Facebook'} description={isRTL ? 'إظهار أيقونة فيسبوك في التذييل' : 'Show Facebook icon in footer'}
+            <ToggleField label={isRTL ? 'فيسبوك' : 'Facebook'} description={isRTL ? 'إظهار أيقونة فيسبوك' : 'Show Facebook icon'}
               checked={data.contacts.showFacebook !== false} onChange={v => updateNestedField('contacts.showFacebook', v)} />
-            <ToggleField label={isRTL ? 'تويتر' : 'Twitter / X'} description={isRTL ? 'إظهار أيقونة تويتر في التذييل' : 'Show Twitter icon in footer'}
+            <ToggleField label={isRTL ? 'تويتر / إكس' : 'Twitter / X'} description={isRTL ? 'إظهار أيقونة تويتر' : 'Show Twitter icon'}
               checked={data.contacts.showTwitter !== false} onChange={v => updateNestedField('contacts.showTwitter', v)} />
-            <ToggleField label={isRTL ? 'يوتيوب' : 'YouTube'} description={isRTL ? 'إظهار أيقونة يوتيوب في التذييل' : 'Show YouTube icon in footer'}
+            <ToggleField label={isRTL ? 'يوتيوب' : 'YouTube'} description={isRTL ? 'إظهار أيقونة يوتيوب' : 'Show YouTube icon'}
               checked={data.contacts.showYoutube !== false} onChange={v => updateNestedField('contacts.showYoutube', v)} />
-            <ToggleField label={isRTL ? 'واتساب' : 'WhatsApp'} description={isRTL ? 'إظهار أيقونة واتساب في التذييل' : 'Show WhatsApp icon in footer'}
+            <ToggleField label={isRTL ? 'واتساب' : 'WhatsApp'} description={isRTL ? 'إظهار أيقونة واتساب' : 'Show WhatsApp icon'}
               checked={data.contacts.showWhatsapp !== false} onChange={v => updateNestedField('contacts.showWhatsapp', v)} />
+            <ToggleField label={isRTL ? 'إنستغرام' : 'Instagram'} description={isRTL ? 'إظهار أيقونة إنستغرام' : 'Show Instagram icon'}
+              checked={data.contacts.showInstagram !== false} onChange={v => updateNestedField('contacts.showInstagram', v)} />
+            <ToggleField label={isRTL ? 'تيك توك' : 'TikTok'} description={isRTL ? 'إظهار أيقونة تيك توك' : 'Show TikTok icon'}
+              checked={data.contacts.showTiktok !== false} onChange={v => updateNestedField('contacts.showTiktok', v)} />
           </div>
         </div>
 
         <FieldGroup label="Physical Address" valueEn={data.contacts.address.en} valueAr={data.contacts.address.ar} onUpdateEn={v => updateNestedField('contacts.address.en', v)} onUpdateAr={v => updateNestedField('contacts.address.ar', v)} isTextArea isRTL={isRTL} />
+      </div>
+
+      <div className="pt-6 border-t border-slate-100 dark:border-[#1e293b] space-y-6">
+        <h4 className={sectionTitle}>
+          <FileText className="w-5 h-5 text-[#df4d21]" /> {isRTL ? 'سياسة الشركة' : 'Company Policy'}
+        </h4>
+        <ToggleField label={isRTL ? 'إظهار سياسة الشركة' : 'Show Company Policy'} description={isRTL ? 'عرض سياسة الشركة في قسم الاتصال' : 'Display company policy in contact section'}
+          checked={data.contacts.showCompanyPolicy !== false} onChange={v => updateNestedField('contacts.showCompanyPolicy', v)} />
+        <FieldGroup label={isRTL ? 'نص سياسة الشركة' : 'POLICY TEXT'} valueEn={data.contacts.companyPolicy?.en || ''} valueAr={data.contacts.companyPolicy?.ar || ''} onUpdateEn={v => updateNestedField('contacts.companyPolicy.en', v)} onUpdateAr={v => updateNestedField('contacts.companyPolicy.ar', v)} isTextArea isRTL={isRTL} />
       </div>
     </div>
   );

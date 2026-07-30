@@ -12,6 +12,13 @@ export interface Partner {
   name: Record<Language, string>;
   location: Record<Language, string>;
   logo?: string;
+  categoryId?: string;
+}
+
+export interface PartnerCategory {
+  id: string;
+  name: Record<Language, string>;
+  icon?: string;
 }
 
 export interface SiteContent {
@@ -68,6 +75,7 @@ export interface SiteContent {
     items: Service[];
   };
   partners: Array<Partner>;
+  partnerCategories: PartnerCategory[];
   announcement: {
     enabled: boolean;
     messages: AnnouncementMessage[];
@@ -83,10 +91,16 @@ export interface SiteContent {
     facebook: string;
     twitter: string;
     youtube: string;
+    instagram: string;
+    tiktok: string;
     showFacebook?: boolean;
     showTwitter?: boolean;
     showYoutube?: boolean;
     showWhatsapp?: boolean;
+    showInstagram?: boolean;
+    showTiktok?: boolean;
+    companyPolicy?: Record<Language, string>;
+    showCompanyPolicy?: boolean;
     branches?: Branch[];
   };
 }

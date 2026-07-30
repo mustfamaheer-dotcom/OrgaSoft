@@ -1,11 +1,11 @@
 import React from 'react';
 import { useSite } from '../context/SiteContext';
-import { Facebook, Twitter, Youtube, MessageCircle, Terminal, Mail, Phone, MapPin, ArrowRight, ArrowLeft, Building2 } from 'lucide-react';
+import { Facebook, Twitter, Youtube, MessageCircle, Terminal, Mail, Phone, MapPin, ArrowRight, ArrowLeft, Building2, Instagram, Music } from 'lucide-react';
 import { visitorTracker } from '../lib/visitorTracker';
 
 const Footer: React.FC<{ onNavigate: (page: string) => void }> = React.memo(({ onNavigate }) => {
   const { lang, siteData, isRTL } = useSite();
-  const { products, contacts, uiStrings } = siteData;
+  const { contacts, uiStrings } = siteData;
   const mainBranch = (contacts.branches || [])[0];
 
   const navItems = [
@@ -54,6 +54,12 @@ const Footer: React.FC<{ onNavigate: (page: string) => void }> = React.memo(({ o
             )}
             {contacts.showWhatsapp !== false && contacts.whatsapp && (
               <a href={`https://wa.me/${contacts.whatsapp}`} target="_blank" rel="noopener noreferrer" onClick={() => visitorTracker.trackCTAClick('cta_click', 'footer', 'whatsapp')} className="w-11 h-11 sm:w-12 sm:h-12 bg-white/5 backdrop-blur-md border border-white/10 rounded-xl sm:rounded-2xl flex items-center justify-center text-slate-300 hover:bg-[#25D366] hover:text-white hover:border-[#25D366] hover:-translate-y-1 transition-all duration-300 shadow-xl active:scale-90"><MessageCircle className="w-[18px] h-[18px] sm:w-5 sm:h-5" /></a>
+            )}
+            {contacts.showInstagram !== false && contacts.instagram && (
+              <a href={contacts.instagram} target="_blank" rel="noopener noreferrer" onClick={() => visitorTracker.trackCTAClick('cta_click', 'footer', 'instagram')} className="w-11 h-11 sm:w-12 sm:h-12 bg-white/5 backdrop-blur-md border border-white/10 rounded-xl sm:rounded-2xl flex items-center justify-center text-slate-300 hover:bg-[#E4405F] hover:text-white hover:border-[#E4405F] hover:-translate-y-1 transition-all duration-300 shadow-xl active:scale-90"><Instagram className="w-[18px] h-[18px] sm:w-5 sm:h-5" /></a>
+            )}
+            {contacts.showTiktok !== false && contacts.tiktok && (
+              <a href={contacts.tiktok} target="_blank" rel="noopener noreferrer" onClick={() => visitorTracker.trackCTAClick('cta_click', 'footer', 'tiktok')} className="w-11 h-11 sm:w-12 sm:h-12 bg-white/5 backdrop-blur-md border border-white/10 rounded-xl sm:rounded-2xl flex items-center justify-center text-slate-300 hover:bg-[#000] hover:text-white hover:border-[#000] hover:-translate-y-1 transition-all duration-300 shadow-xl active:scale-90"><Music className="w-[18px] h-[18px] sm:w-5 sm:h-5" /></a>
             )}
           </div>
         </div>

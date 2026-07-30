@@ -69,6 +69,7 @@ export const INITIAL_SITE_DATA: SiteContent = {
     items: [],
   },
   partners: [],
+  partnerCategories: [],
   contacts: {
     address: { en: '', ar: '' },
     mapEmbedUrl: '',
@@ -79,10 +80,15 @@ export const INITIAL_SITE_DATA: SiteContent = {
     facebook: '',
     twitter: '',
     youtube: '',
+    instagram: '',
+    tiktok: '',
     showFacebook: true,
     showTwitter: true,
     showYoutube: true,
     showWhatsapp: true,
+    showInstagram: true,
+    showTiktok: true,
+    showCompanyPolicy: true,
     branches: []
   }
 };

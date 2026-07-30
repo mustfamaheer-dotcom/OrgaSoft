@@ -11,7 +11,7 @@ interface AdminLayoutProps {
   onSave: () => void;
   isSaving: boolean;
   isSyncing: boolean;
-  deleteTarget: { id: string; type: 'product' | 'partner' | 'service' } | null;
+  deleteTarget: { id: string; type: 'product' | 'partner' | 'service' | 'partnerCategory' } | null;
   setDeleteTarget: (t: { id: string; type: 'product' | 'partner' | 'service' } | null) => void;
   confirmDelete: () => void;
   showSuccessModal: boolean;

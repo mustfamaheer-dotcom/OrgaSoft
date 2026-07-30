@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useSite } from '../context/SiteContext';
 import Hero from '../components/Hero';
@@ -6,7 +6,7 @@ import KitImage from '../components/KitImage';
 import AnimatedCounter from '../components/AnimatedCounter';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import ServicesSection from '../components/ServicesSection';
-import { Pill, Building2, Store, Users, Clock, Award, MapPin, Activity, Database, MoveRight, MoveLeft, Mail, PhoneCall, Globe, Info, Handshake, Shield, Rocket, Grid3X3, ArrowUpRight, PlayCircle, ExternalLink } from 'lucide-react';
+import { Pill, Building2, Store, Users, Clock, Award, MapPin, Activity, Database, MoveRight, MoveLeft, Mail, PhoneCall, Globe, Handshake, Shield, Rocket, Grid3X3, ArrowUpRight, PlayCircle, Facebook, Twitter, Youtube, MessageCircle, Instagram, Music, Tag } from 'lucide-react';
 
 const iconMap: Record<string, any> = {
   users: Users, clock: Clock, activity: Activity, pill: Pill,
@@ -30,8 +30,27 @@ const TiltCard: React.FC<{ children: React.ReactNode; className?: string; onClic
     const inner = e.currentTarget.querySelector('.tilt-inner') as HTMLElement;
     if (inner) inner.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1,1,1)';
   }, []);
+  const handleTouchMove = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    const card = e.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const touch = e.touches[0];
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
+    const cx = rect.width / 2;
+    const cy = rect.height / 2;
+    const rotateX = ((y - cy) / cy) * -8;
+    const rotateY = ((x - cx) / cx) * 8;
+    const inner = card.querySelector('.tilt-inner') as HTMLElement;
+    if (inner) inner.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02,1.02,1.02)`;
+  }, []);
+  const handleTouchEnd = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    const inner = e.currentTarget.querySelector('.tilt-inner') as HTMLElement;
+    if (inner) inner.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1,1,1)';
+  }, []);
   return (
-    <div className={className} onClick={onClick} onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave}>
+    <div className={className} onClick={onClick}
+      onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave}
+      onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}>
       {children}
     </div>
   );
@@ -43,13 +62,39 @@ const Section: React.FC<{ id?: string; className?: string; children: React.React
 
 const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) => {
   const { lang, siteData, isRTL, isLoading } = useSite();
-  const { about, products, partners, contacts, uiStrings } = siteData;
+  const { about, products, partners, partnerCategories, contacts, uiStrings } = siteData;
+  const categories = partnerCategories || [];
 
   const branches = contacts.branches || [];
   const [activeBranchIdx, setActiveBranchIdx] = useState(0);
   const activeBranch = branches.length > 0 ? branches[activeBranchIdx] : null;
 
+  const [activePartnerCat, setActivePartnerCat] = useState<string | null>(null);
+  const [partnerDropdown, setPartnerDropdown] = useState(false);
+
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const handleScroll = () => {
+      const maxScroll = el.scrollWidth - el.clientWidth;
+      setScrollProgress(maxScroll > 0 ? (el.scrollLeft / maxScroll) * 100 : 0);
+    };
+    el.addEventListener('scroll', handleScroll);
+    return () => el.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const filteredPartners = activePartnerCat
+    ? partners.filter(p => p.categoryId === activePartnerCat)
+    : partners;
+
   if (isLoading) return <LoadingSkeleton />;
+
+  const policyText = contacts.companyPolicy && contacts.showCompanyPolicy !== false
+    ? contacts.companyPolicy[lang]
+    : null;
 
   return (
     <div className="bg-[#fcfdfe] dark:bg-[#0b1121] overflow-x-hidden">
@@ -68,7 +113,7 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
               const Icon = iconMap[stat.icon] || Activity;
               return (
                 <div key={idx} className="relative group">
-                    <div className="relative bg-white/70 dark:bg-[#131d31]/70 backdrop-blur-xl p-4 rounded-2xl shadow-lg border border-white/50 dark:border-white/10 flex items-center gap-3">
+                  <div className="relative bg-white/70 dark:bg-[#131d31]/70 backdrop-blur-xl p-4 rounded-2xl shadow-lg border border-white/50 dark:border-white/10 flex items-center gap-3">
                     <div className="w-12 h-12 bg-gradient-to-br from-[#0f639e] to-[#3292ca] text-white rounded-xl flex items-center justify-center shadow-lg shrink-0">
                       <Icon className="w-6 h-6" />
                     </div>
@@ -100,7 +145,7 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
           </div>
           <div className="max-w-4xl mx-auto">
             <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed font-medium text-center mb-8 sm:mb-10">{about.content[lang]}</p>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
               {[
                 { icon: Award, en: 'ISO Certified', ar: 'معايير دولية' },
                 { icon: Clock, en: 'Since 2006', ar: 'منذ 2006' },
@@ -108,8 +153,8 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
                 { icon: Rocket, en: 'Fast Support', ar: 'دعم سريع' },
               ].map((item, idx) => (
                 <div key={idx} className="flex flex-col items-center gap-2 p-4 bg-slate-50 dark:bg-[#1a2744] rounded-xl border border-slate-100 dark:border-[#1e293b] hover:border-[#df4d21]/30 hover:shadow-md transition-all duration-200 group text-center">
-                    <div className="w-10 h-10 bg-white dark:bg-[#131d31] rounded-xl flex items-center justify-center text-[#df4d21] shadow-sm group-hover:bg-[#df4d21] group-hover:text-white transition-all shrink-0">
-                      <item.icon className="w-5 h-5" />
+                  <div className="w-10 h-10 bg-white dark:bg-[#131d31] rounded-xl flex items-center justify-center text-[#df4d21] shadow-sm group-hover:bg-[#df4d21] group-hover:text-white transition-all shrink-0">
+                    <item.icon className="w-5 h-5" />
                   </div>
                   <div className="font-bold text-[#0f639e] dark:text-white text-xs leading-tight">{item[lang]}</div>
                 </div>
@@ -131,44 +176,55 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
             <p className="text-slate-500 dark:text-slate-400 font-medium text-sm max-w-lg mx-auto">{uiStrings.productsSubtitle[lang]}</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {products.filter(p => p.showOnHome !== false).map((product) => (
-              <TiltCard key={product.id}
-                onClick={() => onNavigate(`product-${product.id}`)}
-                className="group bg-white dark:bg-[#131d31] rounded-2xl overflow-hidden border border-slate-100 dark:border-[#1e293b] hover:border-[#df4d21]/30 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 sm:h-[580px] flex flex-col cursor-pointer active:scale-[0.98]">
-                <div className="tilt-inner flex flex-col h-full">
-                  <div className="relative w-full aspect-[480/462.8] shrink-0 overflow-hidden bg-slate-100 dark:bg-[#1e293b]">
-                    {product.image ? (
-                      <KitImage src={product.image} alt={product.name[lang]} className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-500" width={480} height={463} />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center"><Grid3X3 className="w-12 h-12 text-slate-300 dark:text-slate-500" /></div>
-                    )}
-                  </div>
-                  <div className="p-4 sm:p-5 flex flex-col flex-grow">
-                    <h3 className="text-base sm:text-lg font-black text-[#0f639e] dark:text-white mb-2 group-hover:text-[#df4d21] transition-colors">{product.name[lang]}</h3>
-                    <p className="text-slate-600 dark:text-slate-400 font-medium text-xs sm:text-sm leading-relaxed line-clamp-2 mb-3">{product.description[lang]}</p>
-                    <div className="flex flex-wrap gap-1.5 mb-3">
-                      {(product.keyFeatures || []).slice(0, 2).map((kf, i) => (
-                        <span key={i} className="px-3 py-1.5 bg-slate-100 dark:bg-[#1e293b] rounded-full text-xs font-semibold text-slate-600 dark:text-slate-400">{kf.text[lang]}</span>
-                      ))}
-                    </div>
-                    <div className="flex items-center gap-2 mt-auto">
-                      <div className={`flex items-center gap-1.5 text-[#df4d21] font-bold uppercase tracking-[0.15em] text-xs ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
-                        {uiStrings.ctaMore[lang]}
-                        {isRTL ? <MoveLeft className="w-3.5 h-3.5" /> : <MoveRight className="w-3.5 h-3.5" />}
+          <div className="relative">
+            <div ref={scrollRef}
+              className="flex overflow-x-auto gap-4 sm:gap-6 pb-6 snap-x snap-mandatory scrollbar-hide"
+              style={{ scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+              {products.filter(p => p.showOnHome !== false).map((product) => (
+                <div key={product.id} className="snap-start shrink-0 w-[85vw] sm:w-[360px]" style={{ scrollSnapAlign: 'start' }}>
+                  <TiltCard
+                    onClick={() => onNavigate(`product-${product.id}`)}
+                    className="group bg-white dark:bg-[#131d31] rounded-2xl overflow-hidden border border-slate-100 dark:border-[#1e293b] hover:border-[#df4d21]/30 hover:shadow-lg transition-all duration-300 h-full flex flex-col cursor-pointer active:scale-[0.98]">
+                    <div className="tilt-inner flex flex-col h-full">
+                      <div className="relative w-full aspect-[480/462.8] shrink-0 overflow-hidden bg-slate-100 dark:bg-[#1e293b]">
+                        {product.image ? (
+                          <KitImage src={product.image} alt={product.name[lang]} className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-500" width={480} height={463} />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center"><Grid3X3 className="w-12 h-12 text-slate-300 dark:text-slate-500" /></div>
+                        )}
                       </div>
-                      {product.demoUrl && (
-                        <a href={product.demoUrl} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
-                          className="mr-auto flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-[#df4d21] to-[#0f639e] text-white font-bold text-xs uppercase tracking-widest rounded-lg hover:shadow-lg hover:-translate-y-0.5 transition-all active:scale-95">
-                          <PlayCircle className="w-4 h-4" />
-                          <span>{lang === 'ar' ? 'نسخه تجريبيه' : 'Demo'}</span>
-                        </a>
-                      )}
+                      <div className="p-4 sm:p-5 flex flex-col flex-grow">
+                        <h3 className="text-base sm:text-lg font-black text-[#0f639e] dark:text-white mb-2 group-hover:text-[#df4d21] transition-colors">{product.name[lang]}</h3>
+                        <p className="text-slate-600 dark:text-slate-400 font-medium text-xs sm:text-sm leading-relaxed line-clamp-2 mb-3">{product.description[lang]}</p>
+                        <div className="flex flex-wrap gap-1.5 mb-3">
+                          {(product.keyFeatures || []).slice(0, 2).map((kf, i) => (
+                            <span key={i} className="px-3 py-1.5 bg-slate-100 dark:bg-[#1e293b] rounded-full text-xs font-semibold text-slate-600 dark:text-slate-400">{kf.text[lang]}</span>
+                          ))}
+                        </div>
+                        <div className="flex items-center gap-2 mt-auto">
+                          <div className={`flex items-center gap-1.5 text-[#df4d21] font-bold uppercase tracking-[0.15em] text-xs ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
+                            {uiStrings.ctaMore[lang]}
+                            {isRTL ? <MoveLeft className="w-3.5 h-3.5" /> : <MoveRight className="w-3.5 h-3.5" />}
+                          </div>
+                          {product.demoUrl && (
+                            <a href={product.demoUrl} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
+                              className="mr-auto flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-[#df4d21] to-[#0f639e] text-white font-bold text-xs uppercase tracking-widest rounded-lg hover:shadow-lg hover:-translate-y-0.5 transition-all active:scale-95">
+                              <PlayCircle className="w-4 h-4" />
+                              <span>{lang === 'ar' ? 'نسخه تجريبيه' : 'Demo'}</span>
+                            </a>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  </TiltCard>
                 </div>
-              </TiltCard>
-            ))}
+              ))}
+            </div>
+            {scrollProgress > 0 && (
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-slate-100 dark:bg-[#1e293b] rounded-full overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-[#0f639e] to-[#df4d21] rounded-full transition-all duration-150" style={{ width: `${scrollProgress}%` }} />
+              </div>
+            )}
           </div>
 
           <div className="text-center mt-10 sm:mt-14">
@@ -198,23 +254,61 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
             <h2 className="text-2xl sm:text-4xl font-black text-[#0f639e] dark:text-white tracking-tight">{uiStrings.partnersTitle[lang]}</h2>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
-            {partners.map((partner) => (
-              <div key={partner.id}
-                className="group p-4 sm:p-4 bg-slate-50 dark:bg-[#1a2744] rounded-xl border border-slate-100 dark:border-[#1e293b] hover:border-[#0f639e]/20 hover:bg-[#0f639e] hover:-translate-y-1 transition-all duration-200 cursor-pointer active:scale-95">
-                {partner.logo ? (
-                  <KitImage src={partner.logo} alt={partner.name[lang]} className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg mb-2 sm:mb-3 object-cover" width={40} height={40} />
-                ) : (
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-white dark:bg-[#131d31] rounded-lg flex items-center justify-center text-[#df4d21] mb-2 sm:mb-3 shadow-sm group-hover:bg-[#df4d21] group-hover:text-white transition-all">
-                    <Handshake className="w-[18px] h-[18px] sm:w-5 sm:h-5" />
-                  </div>
-                )}
-                <h4 className="font-black text-[#0f639e] dark:text-white group-hover:text-white text-xs sm:text-sm leading-tight mb-0.5 truncate">{partner.name[lang]}</h4>
-                <p className="text-[10px] text-slate-500 dark:text-slate-400 group-hover:text-white font-semibold uppercase truncate">{partner.location[lang]}</p>
-              </div>
+          <div className="flex overflow-x-auto gap-2 pb-4 mb-6 snap-x snap-mandatory scrollbar-hide"
+            style={{ scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            <button onClick={() => { setActivePartnerCat(null); setPartnerDropdown(false); }}
+              className={`snap-start shrink-0 px-5 py-2.5 rounded-xl font-black text-[11px] uppercase tracking-widest transition-all whitespace-nowrap ${!activePartnerCat ? 'bg-[#0f639e] text-white shadow-lg shadow-[#0f639e]/20' : 'bg-slate-100 dark:bg-[#1a2744] text-slate-500 dark:text-slate-400 hover:bg-[#0f639e]/10 hover:text-[#0f639e]'}`}>
+              {isRTL ? 'الكل' : 'All'} ({partners.length})
+            </button>
+            {categories.map(cat => (
+              <button key={cat.id} onClick={() => { setActivePartnerCat(cat.id); setPartnerDropdown(true); }}
+                className={`snap-start shrink-0 px-5 py-2.5 rounded-xl font-black text-[11px] uppercase tracking-widest transition-all whitespace-nowrap flex items-center gap-2 ${activePartnerCat === cat.id ? 'bg-[#0f639e] text-white shadow-lg shadow-[#0f639e]/20' : 'bg-slate-100 dark:bg-[#1a2744] text-slate-500 dark:text-slate-400 hover:bg-[#0f639e]/10 hover:text-[#0f639e]'}`}>
+                <Tag className="w-3.5 h-3.5" />
+                {cat.name[lang]}
+                <span className="text-[10px] opacity-70">({partners.filter(p => p.categoryId === cat.id).length})</span>
+              </button>
             ))}
-
           </div>
+
+          <div className={`transition-all duration-500 ease-out origin-top ${partnerDropdown && filteredPartners.length > 0 ? 'scale-y-100 opacity-100 max-h-[2000px]' : 'scale-y-0 opacity-0 max-h-0 overflow-hidden'}`}
+            style={{ transformStyle: 'preserve-3d' }}>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 pt-4">
+              {filteredPartners.map((partner) => (
+                <div key={partner.id}
+                  className="group p-4 sm:p-4 bg-slate-50 dark:bg-[#1a2744] rounded-xl border border-slate-100 dark:border-[#1e293b] hover:border-[#0f639e]/20 hover:bg-[#0f639e] hover:-translate-y-1 hover:shadow-xl transition-all duration-300 cursor-pointer active:scale-95"
+                  style={{ animation: `fadeInUp 0.4s ease-out forwards` }}>
+                  {partner.logo ? (
+                    <KitImage src={partner.logo} alt={partner.name[lang]} className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg mb-2 sm:mb-3 object-cover" width={40} height={40} />
+                  ) : (
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 bg-white dark:bg-[#131d31] rounded-lg flex items-center justify-center text-[#df4d21] mb-2 sm:mb-3 shadow-sm group-hover:bg-[#df4d21] group-hover:text-white transition-all">
+                      <Handshake className="w-[18px] h-[18px] sm:w-5 sm:h-5" />
+                    </div>
+                  )}
+                  <h4 className="font-black text-[#0f639e] dark:text-white group-hover:text-white text-xs sm:text-sm leading-tight mb-0.5 truncate">{partner.name[lang]}</h4>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 group-hover:text-white font-semibold uppercase truncate">{partner.location[lang]}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {!partnerDropdown && (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+              {filteredPartners.slice(0, 10).map((partner) => (
+                <div key={partner.id}
+                  className="group p-4 sm:p-4 bg-slate-50 dark:bg-[#1a2744] rounded-xl border border-slate-100 dark:border-[#1e293b] hover:border-[#0f639e]/20 hover:bg-[#0f639e] hover:-translate-y-1 hover:shadow-xl transition-all duration-200 cursor-pointer active:scale-95">
+                  {partner.logo ? (
+                    <KitImage src={partner.logo} alt={partner.name[lang]} className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg mb-2 sm:mb-3 object-cover" width={40} height={40} />
+                  ) : (
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 bg-white dark:bg-[#131d31] rounded-lg flex items-center justify-center text-[#df4d21] mb-2 sm:mb-3 shadow-sm group-hover:bg-[#df4d21] group-hover:text-white transition-all">
+                      <Handshake className="w-[18px] h-[18px] sm:w-5 sm:h-5" />
+                    </div>
+                  )}
+                  <h4 className="font-black text-[#0f639e] dark:text-white group-hover:text-white text-xs sm:text-sm leading-tight mb-0.5 truncate">{partner.name[lang]}</h4>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 group-hover:text-white font-semibold uppercase truncate">{partner.location[lang]}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </Section>
 
@@ -245,8 +339,8 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
           )}
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div className="lg:col-span-5">
-              <div className="bg-[#0f639e] rounded-2xl p-5 sm:p-6 text-white relative overflow-hidden h-full">
+            <div className="lg:col-span-5 space-y-6">
+              <div className="bg-[#0f639e] rounded-2xl p-5 sm:p-6 text-white relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full blur-2xl" />
                 <div className="relative space-y-4">
                   {activeBranch ? (
@@ -317,11 +411,50 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
                     </>
                   )}
                 </div>
-                <div className="mt-5 pt-4 border-t border-white/10 flex items-center gap-3">
-                  <div className="w-8 h-8 bg-[#0a743c] rounded-xl flex items-center justify-center shrink-0"><Info className="w-4 h-4 text-white" /></div>
-                  <div className="text-sm font-semibold text-white/70">{uiStrings.contactSubtitle[lang]}</div>
+
+                <div className="mt-5 pt-4 border-t border-white/10">
+                  <div className="flex items-center gap-3 mb-3">
+                    <Globe className="w-4 h-4 text-[#df4d21]" />
+                    <span className="text-xs font-black text-white/80">{lang === 'ar' ? 'تواصل معنا' : 'Follow Us'}</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {contacts.showWhatsapp !== false && contacts.whatsapp && (
+                      <a href={`https://wa.me/${contacts.whatsapp}`} target="_blank" rel="noopener noreferrer"
+                        className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white hover:bg-[#25D366] hover:-translate-y-1 transition-all"><MessageCircle className="w-5 h-5" /></a>
+                    )}
+                    {contacts.showFacebook !== false && contacts.facebook && (
+                      <a href={contacts.facebook} target="_blank" rel="noopener noreferrer"
+                        className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white hover:bg-[#1877F2] hover:-translate-y-1 transition-all"><Facebook className="w-5 h-5" /></a>
+                    )}
+                    {contacts.showInstagram !== false && contacts.instagram && (
+                      <a href={contacts.instagram} target="_blank" rel="noopener noreferrer"
+                        className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white hover:bg-[#E4405F] hover:-translate-y-1 transition-all"><Instagram className="w-5 h-5" /></a>
+                    )}
+                    {contacts.showTwitter !== false && contacts.twitter && (
+                      <a href={contacts.twitter} target="_blank" rel="noopener noreferrer"
+                        className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white hover:bg-[#000] hover:-translate-y-1 transition-all"><Twitter className="w-5 h-5" /></a>
+                    )}
+                    {contacts.showYoutube !== false && contacts.youtube && (
+                      <a href={contacts.youtube} target="_blank" rel="noopener noreferrer"
+                        className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white hover:bg-[#FF0000] hover:-translate-y-1 transition-all"><Youtube className="w-5 h-5" /></a>
+                    )}
+                    {contacts.showTiktok !== false && contacts.tiktok && (
+                      <a href={contacts.tiktok} target="_blank" rel="noopener noreferrer"
+                        className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white hover:bg-[#000] hover:-translate-y-1 transition-all"><Music className="w-5 h-5" /></a>
+                    )}
+                  </div>
                 </div>
               </div>
+
+              {policyText && (
+                <div className="bg-[#131d31] dark:bg-[#0b1121] rounded-2xl p-5 sm:p-6 border border-slate-100 dark:border-[#1e293b]">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Shield className="w-4 h-4 text-[#df4d21]" />
+                    <span className="text-xs font-black text-[#0f639e] dark:text-white uppercase tracking-widest">{lang === 'ar' ? 'سياسة الشركة' : 'Company Policy'}</span>
+                  </div>
+                  <p className="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed">{policyText}</p>
+                </div>
+              )}
             </div>
             {(activeBranch?.mapEmbedUrl || contacts.mapEmbedUrl) && (
               <div className="lg:col-span-7 rounded-2xl overflow-hidden shadow-lg relative h-[300px] sm:h-[350px] lg:h-auto">
@@ -334,6 +467,14 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
           </div>
         </div>
       </Section>
+
+      <style>{`
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(20px) scale(0.95); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+      `}</style>
     </div>
   );
 };
