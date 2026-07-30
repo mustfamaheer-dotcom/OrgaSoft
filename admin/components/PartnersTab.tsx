@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Handshake, Plus, Trash2, Edit3, ChevronLeft, ChevronRight, ArrowUp, ArrowDown, FolderOpen, Tag, X, Building2, Store, Hospital, GraduationCap, DollarSign, Building, Factory, ShoppingBag, Stethoscope, Globe, Truck, HardHat, UtensilsCrossed, TreePalm, Laptop, Users, HeartHandshake, Landmark, Car, FlaskConical } from 'lucide-react';
+import { Handshake, Plus, Trash2, Edit3, ChevronLeft, ChevronRight, ArrowUp, ArrowDown, FolderOpen, Tag, X, Building2, Store, Hospital, GraduationCap, DollarSign, Building, Factory, ShoppingBag, Stethoscope, Globe, Truck, HardHat, UtensilsCrossed, TreePalm, Laptop, Users, HeartHandshake, Landmark, Car, FlaskConical, Crown, Gem, Award, Rocket, Ship, Plane, Bus, Tractor, ConciergeBell, Wine, Shirt, Watch, Armchair, Gamepad2, Music, Palette, Camera, Newspaper, BookOpen, HeartPulse, Leaf, Sun, Zap, Droplets, Mountain, Compass, Map, Radio, Cpu, HardDrive, Printer, Scan, Baby, Dog, Syringe, Bike } from 'lucide-react';
 import type { Partner, PartnerCategory, SiteContent } from '../../types';
 import { SectionHeader, FieldGroup, CloudImageUploader, InputField } from './FormComponents';
 
@@ -24,6 +24,42 @@ const CATEGORY_ICONS: { value: string; component: React.ComponentType<{ classNam
   { value: 'landmark', component: Landmark },
   { value: 'car', component: Car },
   { value: 'flask-conical', component: FlaskConical },
+  { value: 'crown', component: Crown },
+  { value: 'gem', component: Gem },
+  { value: 'award', component: Award },
+  { value: 'rocket', component: Rocket },
+  { value: 'ship', component: Ship },
+  { value: 'plane', component: Plane },
+  { value: 'bus', component: Bus },
+  { value: 'tractor', component: Tractor },
+  { value: 'concierge-bell', component: ConciergeBell },
+  { value: 'wine', component: Wine },
+  { value: 'shirt', component: Shirt },
+  { value: 'watch', component: Watch },
+  { value: 'armchair', component: Armchair },
+  { value: 'gamepad-2', component: Gamepad2 },
+  { value: 'music', component: Music },
+  { value: 'palette', component: Palette },
+  { value: 'camera', component: Camera },
+  { value: 'newspaper', component: Newspaper },
+  { value: 'book-open', component: BookOpen },
+  { value: 'heart-pulse', component: HeartPulse },
+  { value: 'leaf', component: Leaf },
+  { value: 'sun', component: Sun },
+  { value: 'zap', component: Zap },
+  { value: 'droplets', component: Droplets },
+  { value: 'mountain', component: Mountain },
+  { value: 'compass', component: Compass },
+  { value: 'map', component: Map },
+  { value: 'radio', component: Radio },
+  { value: 'cpu', component: Cpu },
+  { value: 'hard-drive', component: HardDrive },
+  { value: 'printer', component: Printer },
+  { value: 'scan', component: Scan },
+  { value: 'baby', component: Baby },
+  { value: 'dog', component: Dog },
+  { value: 'syringe', component: Syringe },
+  { value: 'bike', component: Bike },
 ];
 
 const iconLookup: Record<string, React.ComponentType<{ className?: string }>> = {};

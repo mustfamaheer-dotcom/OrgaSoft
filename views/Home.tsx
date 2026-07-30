@@ -6,7 +6,7 @@ import KitImage from '../components/KitImage';
 import AnimatedCounter from '../components/AnimatedCounter';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import ServicesSection from '../components/ServicesSection';
-import { Pill, Building2, Store, Users, Clock, Award, MapPin, Activity, Database, MoveRight, MoveLeft, Mail, PhoneCall, Globe, Handshake, Shield, Rocket, Grid3X3, ArrowUpRight, PlayCircle, Facebook, Twitter, Youtube, MessageCircle, Instagram, Music, Tag, Hospital, GraduationCap, DollarSign, Building, Factory, ShoppingBag, Stethoscope, Truck, HardHat, UtensilsCrossed, TreePalm, Laptop, HeartHandshake, Landmark, Car, FlaskConical } from 'lucide-react';
+import { Pill, Building2, Store, Users, Clock, Award, MapPin, Activity, Database, MoveRight, MoveLeft, Mail, PhoneCall, Globe, Handshake, Shield, Rocket, Grid3X3, ArrowUpRight, PlayCircle, Facebook, Twitter, Youtube, MessageCircle, Instagram, Music, Tag, Hospital, GraduationCap, DollarSign, Building, Factory, ShoppingBag, Stethoscope, Truck, HardHat, UtensilsCrossed, TreePalm, Laptop, HeartHandshake, Landmark, Car, FlaskConical, Crown, Gem, Ship, Plane, Bus, Tractor, ConciergeBell, Wine, Shirt, Watch, Armchair, Gamepad2, Palette, Camera, Newspaper, BookOpen, HeartPulse, Leaf, Sun, Zap, Droplets, Mountain, Compass, Map, Radio, Cpu, HardDrive, Printer, Scan, Baby, Dog, Syringe, Bike } from 'lucide-react';
 
 const iconMap: Record<string, any> = {
   users: Users, clock: Clock, activity: Activity, pill: Pill,
@@ -19,7 +19,14 @@ const categoryIconLookup: Record<string, React.ComponentType<{ className?: strin
   stethoscope: Stethoscope, globe: Globe, truck: Truck, 'hard-hat': HardHat,
   'utensils-crossed': UtensilsCrossed, 'tree-palm': TreePalm, laptop: Laptop,
   users: Users, 'heart-handshake': HeartHandshake, landmark: Landmark, car: Car,
-  'flask-conical': FlaskConical,
+  'flask-conical': FlaskConical, crown: Crown, gem: Gem, award: Award, rocket: Rocket,
+  ship: Ship, plane: Plane, bus: Bus, tractor: Tractor, 'concierge-bell': ConciergeBell,
+  wine: Wine, shirt: Shirt, watch: Watch, armchair: Armchair, 'gamepad-2': Gamepad2,
+  music: Music, palette: Palette, camera: Camera, newspaper: Newspaper, 'book-open': BookOpen,
+  'heart-pulse': HeartPulse, leaf: Leaf, sun: Sun, zap: Zap, droplets: Droplets,
+  mountain: Mountain, compass: Compass, map: Map, radio: Radio, cpu: Cpu,
+  'hard-drive': HardDrive, printer: Printer, scan: Scan, baby: Baby, dog: Dog,
+  syringe: Syringe, bike: Bike,
 };
 
 const TiltCard: React.FC<{ children: React.ReactNode; className?: string; onClick?: () => void }> = ({ children, className, onClick }) => {
