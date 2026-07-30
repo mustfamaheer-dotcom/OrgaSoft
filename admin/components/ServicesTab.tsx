@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Cloud, Plus, Trash2, Edit3, ChevronLeft, ChevronRight, CheckCircle2, Eye, EyeOff, Code2, Server, Shield, Globe, Network, Smartphone, Database, Settings, Headphones, ArrowUp, ArrowDown } from 'lucide-react';
 import type { Service, SiteContent, ServiceIcon } from '../../types';
-import { SectionHeader, FieldGroup } from './FormComponents';
+import { SectionHeader, FieldGroup, CloudImageUploader } from './FormComponents';
 
 interface ServicesTabProps {
   data: SiteContent;
@@ -183,6 +183,8 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ data, setData, isRTL, lang, s
           ))}
         </div>
       </div>
+
+      <CloudImageUploader label={isRTL ? 'صورة الخدمة' : 'Service Image'} value={editingService.image || ''} onChange={url => setEditingService({ ...editingService, image: url })} />
 
       <div className="p-5 bg-slate-50/50 dark:bg-[#1a2744]/50 rounded-xl border-2 border-slate-200 dark:border-[#1e293b]">
         <div className="flex items-center justify-between">

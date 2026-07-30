@@ -135,6 +135,7 @@ export interface Service {
   name: Record<Language, string>;
   description: Record<Language, string>;
   icon: ServiceIcon;
+  image?: string;
   enabled: boolean;
 }
 
