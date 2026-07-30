@@ -59,18 +59,17 @@ const ServiceCard: React.FC<{ service: Service; lang: Language; idx?: number }> 
     <TiltCard className="group h-full">
       <div className={`tilt-inner relative h-full rounded-2xl overflow-hidden bg-white dark:bg-[#131d31] border border-slate-100 dark:border-[#1e293b] hover:border-[#0f639e]/30 hover:shadow-xl transition-all duration-500 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
         style={{ transitionDelay: `${idx * 80}ms` }}>
-        <div className="relative h-48 sm:h-52 overflow-hidden bg-slate-100 dark:bg-[#1e293b]">
+        <div className="relative h-56 sm:h-64 overflow-hidden bg-slate-100 dark:bg-[#1e293b]">
           {service.image ? (
-            <KitImage src={service.image} alt={service.name[lang]} className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700" width={480} height={210} />
+            <KitImage src={service.image} alt={service.name[lang]} className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700" width={480} height={256} />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#0f639e]/10 to-[#df4d21]/5 dark:from-[#0f639e]/20 dark:to-[#df4d21]/10">
               <IconComp className="w-14 h-14 text-[#0f639e]/30 dark:text-white/20" />
             </div>
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-white/60 dark:from-[#131d31]/60 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-br from-[#0f639e]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         </div>
-        <div className="relative px-5 sm:px-6 pb-5 sm:pb-6 pt-14 sm:pt-16">
+        <div className="relative px-5 sm:px-6 pb-5 sm:pb-6 pt-16">
           <div className="absolute -top-7 left-5 sm:left-6 z-10">
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#0f639e] to-[#3292ca] flex items-center justify-center text-white shadow-lg shadow-[#0f639e]/30 group-hover:shadow-xl group-hover:shadow-[#0f639e]/40 group-hover:-translate-y-1 transition-all duration-300">
               <IconComp className="w-6 h-6" />
@@ -167,7 +166,7 @@ const ServicesSection: React.FC = () => {
               {isRTL ? <MoveRight className="w-5 h-5" /> : <MoveLeft className="w-5 h-5" />}
             </button>
             <div className="overflow-hidden rounded-2xl flex-1" style={{ perspective: '1200px' }}>
-              <div className="relative mx-auto min-h-[400px] sm:min-h-[420px]">
+              <div className="relative mx-auto min-h-[460px] sm:min-h-[480px]">
                 {visibleItems.map((service, idx) => {
                   const isActive = idx === page;
                   const isPrev = idx === (page === 0 ? visibleItems.length - 1 : page - 1);
