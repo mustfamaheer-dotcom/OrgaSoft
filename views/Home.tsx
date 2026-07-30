@@ -6,6 +6,7 @@ import KitImage from '../components/KitImage';
 import AnimatedCounter from '../components/AnimatedCounter';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import ServicesSection from '../components/ServicesSection';
+import OrgaProServicesSection from '../components/OrgaProServicesSection';
 import { Pill, Building2, Store, Users, Clock, Award, MapPin, Activity, Database, MoveRight, MoveLeft, Mail, PhoneCall, Globe, Handshake, Shield, Rocket, Grid3X3, ArrowUpRight, PlayCircle, Facebook, Twitter, Youtube, MessageCircle, Instagram, Music, Tag, Hospital, GraduationCap, DollarSign, Building, Factory, ShoppingBag, Stethoscope, Truck, HardHat, UtensilsCrossed, TreePalm, Laptop, HeartHandshake, Landmark, Car, FlaskConical, Crown, Gem, Ship, Plane, Bus, Tractor, ConciergeBell, Wine, Shirt, Watch, Armchair, Gamepad2, Palette, Camera, Newspaper, BookOpen, HeartPulse, Leaf, Sun, Zap, Droplets, Mountain, Compass, Map, Radio, Cpu, HardDrive, Printer, Scan, Baby, Dog, Syringe, Bike, Smartphone, Monitor } from 'lucide-react';
 
 const iconMap: Record<string, any> = {
@@ -148,7 +149,7 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
     if (animating || p < 0 || p >= totalPages) return;
     setAnimating(true);
     setPage(p);
-    setTimeout(() => setAnimating(false), 500);
+    setTimeout(() => setAnimating(false), 750);
   }, [animating, totalPages]);
 
   const prevPage = useCallback(() => {
@@ -264,9 +265,9 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
             onTouchEnd={handleTouchEnd}>
             <div className="flex items-center gap-0 sm:gap-2 max-w-[420px] mx-auto">
               <button onClick={prevPage}
-                className="shrink-0 w-11 h-11 sm:w-12 sm:h-12 rounded-xl border-2 border-[#0f639e]/20 dark:border-[#0f639e]/40 bg-transparent flex items-center justify-center text-[#0f639e] dark:text-[#3292ca] hover:bg-gradient-to-br hover:from-[#0f639e] hover:to-[#3292ca] hover:text-white hover:border-transparent hover:shadow-lg hover:shadow-[#0f639e]/20 hover:scale-110 active:scale-90 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed"
+                className="shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-[#0f639e]/20 dark:border-[#0f639e]/40 bg-transparent flex items-center justify-center text-[#0f639e] dark:text-[#3292ca] hover:bg-gradient-to-br hover:from-[#0f639e] hover:to-[#3292ca] hover:text-white hover:border-transparent hover:shadow-lg hover:shadow-[#0f639e]/20 hover:scale-110 active:scale-90 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed"
                 disabled={animating}>
-                <span className="font-mono font-black text-xl leading-none">{isRTL ? '>' : '<'}</span>
+                <span className="font-mono font-black text-xl leading-none">{'<'}</span>
               </button>
               <div className="overflow-hidden rounded-2xl flex-1" style={{ perspective: '1200px' }}>
                 <div className="relative mx-auto max-w-[320px]">
@@ -277,22 +278,23 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
                     let transform = '';
                     let opacity = 0;
                     let zIndex = 0;
+                    let filter = 'blur(0px)';
                     let pointerEvents: React.CSSProperties['pointerEvents'] = 'none';
                     if (isActive) {
-                      transform = 'translateX(0) rotateY(0) scale(1)';
-                      opacity = 1; zIndex = 3; pointerEvents = 'auto';
+                      transform = 'translateX(0) rotateY(0deg) scale(1) translateZ(0)';
+                      opacity = 1; zIndex = 3; pointerEvents = 'auto'; filter = 'blur(0px)';
                     } else if (isPrev) {
-                      transform = 'translateX(-120%) rotateY(25deg) scale(0.85)';
-                      opacity = animating ? 0.5 : 0; zIndex = 1;
+                      transform = 'translateX(-150%) rotateY(-45deg) scale(0.35) translateZ(-350px)';
+                      opacity = animating ? 0.4 : 0; zIndex = 1; filter = animating ? 'blur(6px)' : 'blur(0px)';
                     } else if (isNext) {
-                      transform = 'translateX(120%) rotateY(-25deg) scale(0.85)';
-                      opacity = animating ? 0.5 : 0; zIndex = 1;
+                      transform = 'translateX(150%) rotateY(45deg) scale(0.35) translateZ(-350px)';
+                      opacity = animating ? 0.4 : 0; zIndex = 1; filter = animating ? 'blur(6px)' : 'blur(0px)';
                     } else { opacity = 0; zIndex = 0; }
                     return (
                       <div key={product.id}
-                        className="w-full transition-all duration-500 ease-out absolute inset-0"
+                        className="w-full transition-all duration-700 ease-out absolute inset-0"
                         style={{
-                          transform, opacity, zIndex, pointerEvents,
+                          transform, opacity, zIndex, pointerEvents, filter,
                           transformStyle: 'preserve-3d', backfaceVisibility: 'hidden',
                           position: isActive ? 'relative' as const : 'absolute' as const,
                         }}>
@@ -303,9 +305,9 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
                 </div>
               </div>
               <button onClick={nextPage}
-                className="shrink-0 w-11 h-11 sm:w-12 sm:h-12 rounded-xl border-2 border-[#0f639e]/20 dark:border-[#0f639e]/40 bg-transparent flex items-center justify-center text-[#0f639e] dark:text-[#3292ca] hover:bg-gradient-to-br hover:from-[#0f639e] hover:to-[#3292ca] hover:text-white hover:border-transparent hover:shadow-lg hover:shadow-[#0f639e]/20 hover:scale-110 active:scale-90 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed"
+                className="shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-[#0f639e]/20 dark:border-[#0f639e]/40 bg-transparent flex items-center justify-center text-[#0f639e] dark:text-[#3292ca] hover:bg-gradient-to-br hover:from-[#0f639e] hover:to-[#3292ca] hover:text-white hover:border-transparent hover:shadow-lg hover:shadow-[#0f639e]/20 hover:scale-110 active:scale-90 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed"
                 disabled={animating}>
-                <span className="font-mono font-black text-xl leading-none">{isRTL ? '<' : '>'}</span>
+                <span className="font-mono font-black text-xl leading-none">{'>'}</span>
               </button>
             </div>
             <div className="flex items-center justify-center gap-2 mt-5">
@@ -325,22 +327,30 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
           <div className="hidden md:block relative">
             <div className="flex items-start gap-4 lg:gap-6">
               <button onClick={prevPage}
-                className="shrink-0 mt-[15%] w-12 h-12 sm:w-14 sm:h-14 rounded-xl border-2 border-[#0f639e]/20 dark:border-[#0f639e]/40 bg-transparent flex items-center justify-center text-[#0f639e] dark:text-[#3292ca] hover:bg-gradient-to-br hover:from-[#0f639e] hover:to-[#3292ca] hover:text-white hover:border-transparent hover:shadow-lg hover:shadow-[#0f639e]/20 hover:scale-110 active:scale-90 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed"
+                className="shrink-0 mt-[15%] w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-[#0f639e]/20 dark:border-[#0f639e]/40 bg-transparent flex items-center justify-center text-[#0f639e] dark:text-[#3292ca] hover:bg-gradient-to-br hover:from-[#0f639e] hover:to-[#3292ca] hover:text-white hover:border-transparent hover:shadow-lg hover:shadow-[#0f639e]/20 hover:scale-110 active:scale-90 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed"
                 disabled={animating}>
-                <span className="font-mono font-black text-2xl leading-none">{isRTL ? '>' : '<'}</span>
+                <span className="font-mono font-black text-2xl leading-none">{'<'}</span>
               </button>
-              <div className="flex-1 overflow-hidden rounded-2xl">
-                <div key={page}
-                  className="grid grid-cols-3 gap-5 animate-fadeIn">
-                  {visibleProducts.map(product => (
-                    <ProductCard key={product.id} product={product} onNavigate={onNavigate} uiStrings={uiStrings} lang={lang} isRTL={isRTL} />
+              <div className="flex-1 overflow-hidden rounded-2xl" style={{ perspective: '1200px' }}>
+                <div key={page} className="grid grid-cols-3 gap-5" style={{ transformStyle: 'preserve-3d' }}>
+                  {visibleProducts.map((product, idx) => (
+                    <div key={product.id}
+                      className="transition-all duration-700 ease-out"
+                      style={{
+                        opacity: animating ? 0 : 1,
+                        transform: animating ? 'translateY(40px) rotateX(8deg) scale(0.9)' : 'translateY(0) rotateX(0deg) scale(1)',
+                        filter: animating ? 'blur(2px)' : 'blur(0px)',
+                        transitionDelay: `${idx * 100}ms`,
+                      }}>
+                      <ProductCard product={product} onNavigate={onNavigate} uiStrings={uiStrings} lang={lang} isRTL={isRTL} />
+                    </div>
                   ))}
                 </div>
               </div>
               <button onClick={nextPage}
-                className="shrink-0 mt-[15%] w-12 h-12 sm:w-14 sm:h-14 rounded-xl border-2 border-[#0f639e]/20 dark:border-[#0f639e]/40 bg-transparent flex items-center justify-center text-[#0f639e] dark:text-[#3292ca] hover:bg-gradient-to-br hover:from-[#0f639e] hover:to-[#3292ca] hover:text-white hover:border-transparent hover:shadow-lg hover:shadow-[#0f639e]/20 hover:scale-110 active:scale-90 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed"
+                className="shrink-0 mt-[15%] w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-[#0f639e]/20 dark:border-[#0f639e]/40 bg-transparent flex items-center justify-center text-[#0f639e] dark:text-[#3292ca] hover:bg-gradient-to-br hover:from-[#0f639e] hover:to-[#3292ca] hover:text-white hover:border-transparent hover:shadow-lg hover:shadow-[#0f639e]/20 hover:scale-110 active:scale-90 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed"
                 disabled={animating}>
-                <span className="font-mono font-black text-2xl leading-none">{isRTL ? '<' : '>'}</span>
+                <span className="font-mono font-black text-2xl leading-none">{'>'}</span>
               </button>
             </div>
             <div className="flex items-center justify-center gap-2 mt-6">
@@ -371,6 +381,8 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
       </Section>
 
       <ServicesSection />
+
+      <OrgaProServicesSection />
 
       <Section id="partners" className="py-12 sm:py-20 bg-white dark:bg-[#131d31]">
         <div className="max-w-6xl mx-auto px-4">

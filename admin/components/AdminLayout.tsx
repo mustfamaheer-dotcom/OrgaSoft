@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Terminal, Eye, Lock, Image, Menu, Globe, ShieldCheck, Database, Handshake, Map, PanelBottom, Type, Sun, Moon, ChevronLeft, ChevronRight, CheckCircle2, Cloud, BarChart3 } from 'lucide-react';
+import { Terminal, Eye, Lock, Image, Menu, Globe, ShieldCheck, Database, Handshake, Map, PanelBottom, Type, Sun, Moon, ChevronLeft, ChevronRight, CheckCircle2, Cloud, BarChart3, Rocket } from 'lucide-react';
 import { useSite } from '../../context/SiteContext';
 import { ConfirmationModal } from './FormComponents';
 
@@ -11,8 +11,8 @@ interface AdminLayoutProps {
   onSave: () => void;
   isSaving: boolean;
   isSyncing: boolean;
-  deleteTarget: { id: string; type: 'product' | 'partner' | 'service' | 'partnerCategory' } | null;
-  setDeleteTarget: (t: { id: string; type: 'product' | 'partner' | 'service' } | null) => void;
+  deleteTarget: { id: string; type: 'product' | 'partner' | 'service' | 'orgaProService' | 'partnerCategory' } | null;
+  setDeleteTarget: (t: { id: string; type: 'product' | 'partner' | 'service' | 'orgaProService' } | null) => void;
   confirmDelete: () => void;
   showSuccessModal: boolean;
   setShowSuccessModal: (v: boolean) => void;
@@ -28,6 +28,7 @@ const tabs = [
   { id: 'about', icon: ShieldCheck, labelEn: 'Ecosystem Legacy', labelAr: 'إرث الشركة' },
   { id: 'products', icon: Database, labelEn: 'System Stack', labelAr: 'المنظومة التقنية' },
   { id: 'services', icon: Cloud, labelEn: 'IT Services', labelAr: 'الخدمات التقنية' },
+  { id: 'orgaproservices', icon: Rocket, labelEn: 'Orga Pro', labelAr: 'أورجا المتطورة' },
   { id: 'partners', icon: Handshake, labelEn: 'Partner Network', labelAr: 'الشركاء والعملاء' },
   { id: 'contact', icon: Map, labelEn: 'Contact Hub', labelAr: 'روابط الاتصال' },
   { id: 'footer', icon: PanelBottom, labelEn: 'Footer Workspace', labelAr: 'تذييل الموقع' },

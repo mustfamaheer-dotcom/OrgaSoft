@@ -74,6 +74,12 @@ export interface SiteContent {
     subtitle: Record<Language, string>;
     items: Service[];
   };
+  orgaProServices: {
+    enabled: boolean;
+    title: Record<Language, string>;
+    subtitle: Record<Language, string>;
+    items: OrgaProService[];
+  };
   partners: Array<Partner>;
   partnerCategories: PartnerCategory[];
   announcement: {
@@ -114,6 +120,14 @@ export interface Branch {
   phoneAdmin: string;
   email: string;
   whatsapp: string;
+}
+
+export interface OrgaProService {
+  id: string;
+  name: Record<Language, string>;
+  description: Record<Language, string>;
+  image?: string;
+  enabled: boolean;
 }
 
 export interface AnnouncementMessage {

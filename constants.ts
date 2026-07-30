@@ -68,6 +68,12 @@ export const INITIAL_SITE_DATA: SiteContent = {
     subtitle: { en: '', ar: '' },
     items: [],
   },
+  orgaProServices: {
+    enabled: false,
+    title: { en: 'Orga Pro Services', ar: 'أورجا المتطورة' },
+    subtitle: { en: '', ar: '' },
+    items: [],
+  },
   partners: [],
   partnerCategories: [],
   contacts: {

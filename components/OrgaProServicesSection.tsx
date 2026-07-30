@@ -1,13 +1,8 @@
 import React, { useCallback, useRef, useState, useEffect } from 'react';
 import { useSite } from '../context/SiteContext';
-import { Code2, Server, Shield, Cloud, Network, Smartphone, Globe, Database, Settings, Headphones } from 'lucide-react';
-import type { Service, ServiceIcon, Language } from '../types';
+import { Rocket } from 'lucide-react';
+import type { OrgaProService, Language } from '../types';
 import KitImage from './KitImage';
-
-const ICON_MAP: Record<ServiceIcon, React.ComponentType<{ className?: string }>> = {
-  code: Code2, server: Server, shield: Shield, cloud: Cloud, network: Network,
-  smartphone: Smartphone, globe: Globe, database: Database, settings: Settings, headphones: Headphones,
-};
 
 const TiltCard: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className }) => {
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
@@ -50,8 +45,7 @@ const TiltCard: React.FC<{ children: React.ReactNode; className?: string }> = ({
   );
 };
 
-const ServiceCard: React.FC<{ service: Service; lang: Language; idx?: number }> = ({ service, lang, idx = 0 }) => {
-  const IconComp = ICON_MAP[service.icon] || Code2;
+const OrgaProCard: React.FC<{ service: OrgaProService; lang: Language; idx?: number }> = ({ service, lang, idx = 0 }) => {
   const [loaded, setLoaded] = useState(false);
   useEffect(() => { const t = setTimeout(() => setLoaded(true), idx * 80); return () => clearTimeout(t); }, [idx]);
 
@@ -64,19 +58,12 @@ const ServiceCard: React.FC<{ service: Service; lang: Language; idx?: number }> 
             <KitImage src={service.image} alt={service.name[lang]} className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700" width={480} height={463} />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#0f639e]/10 to-[#df4d21]/5 dark:from-[#0f639e]/20 dark:to-[#df4d21]/10">
-              <IconComp className="w-14 h-14 text-[#0f639e]/30 dark:text-white/20" />
+              <Rocket className="w-14 h-14 text-[#0f639e]/30 dark:text-white/20" />
             </div>
           )}
           <div className="absolute inset-0 bg-gradient-to-br from-[#0f639e]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         </div>
-        <div className="relative px-5 sm:px-6 pb-5 sm:pb-6 pt-16">
-          {!service.image && (
-            <div className="absolute -top-7 left-5 sm:left-6 z-10">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#0f639e] to-[#3292ca] flex items-center justify-center text-white shadow-lg shadow-[#0f639e]/30 group-hover:shadow-xl group-hover:shadow-[#0f639e]/40 group-hover:-translate-y-1 transition-all duration-300">
-                <IconComp className="w-6 h-6" />
-              </div>
-            </div>
-          )}
+        <div className="relative px-5 sm:px-6 pb-5 sm:pb-6 pt-5 sm:pt-6">
           <h3 className="text-lg sm:text-xl font-black text-[#0f639e] dark:text-white mb-2 group-hover:text-[#df4d21] transition-colors">{service.name[lang]}</h3>
           <p className="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-3">{service.description[lang]}</p>
         </div>
@@ -86,89 +73,111 @@ const ServiceCard: React.FC<{ service: Service; lang: Language; idx?: number }> 
   );
 };
 
-const ServicesSection: React.FC = () => {
+const OrgaProServicesSection: React.FC = () => {
   const { lang, siteData, isRTL } = useSite();
-  const services = siteData.services;
+  const section = siteData.orgaProServices;
 
-  if (!services.enabled) return null;
+  if (!section.enabled) return null;
 
-  const visibleItems = services.items.filter(s => s.enabled);
+  const visibleItems = section.items.filter(s => s.enabled);
   if (visibleItems.length === 0) return null;
 
   const [perPage, setPerPage] = useState(1);
   const totalPages = Math.ceil(visibleItems.length / perPage);
   const [page, setPage] = useState(0);
-  const touchStartX = useRef(0);
   const [animating, setAnimating] = useState(false);
 
+  const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
+  const [dir, setDir] = useState<'ltr' | 'rtl'>('ltr');
+
+  useEffect(() => { setDir(isRTL ? 'rtl' : 'ltr'); }, [isRTL]);
+  useEffect(() => { setPage(0); }, [visibleItems.length]);
+
   useEffect(() => {
-    const check = () => setPerPage(window.innerWidth >= 1024 ? 3 : 1);
-    check();
-    window.addEventListener('resize', check);
-    return () => window.removeEventListener('resize', check);
+    const handleResize = () => setPerPage(window.innerWidth >= 1024 ? 3 : 1);
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  useEffect(() => { setPage(0); }, [perPage]);
-
   const goToPage = useCallback((p: number) => {
-    if (animating || p < 0 || p >= totalPages) return;
+    if (animating) return;
     setAnimating(true);
     setPage(p);
     setTimeout(() => setAnimating(false), 750);
+  }, [animating]);
+
+  const prevPage = useCallback(() => {
+    if (animating) return;
+    setAnimating(true);
+    setPage(p => p === 0 ? totalPages - 1 : p - 1);
+    setTimeout(() => setAnimating(false), 500);
   }, [animating, totalPages]);
 
-  const prevPage = useCallback(() => goToPage(page === 0 ? totalPages - 1 : page - 1), [page, totalPages, goToPage]);
-  const nextPage = useCallback(() => goToPage(page === totalPages - 1 ? 0 : page + 1), [page, totalPages, goToPage]);
+  const nextPage = useCallback(() => {
+    if (animating) return;
+    setAnimating(true);
+    setPage(p => p === totalPages - 1 ? 0 : p + 1);
+    setTimeout(() => setAnimating(false), 500);
+  }, [animating, totalPages]);
 
-  const handleTouchStart = useCallback((e: React.TouchEvent) => { touchStartX.current = e.touches[0].clientX; }, []);
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  }, []);
+
   const handleTouchEnd = useCallback((e: React.TouchEvent) => {
-    if (perPage !== 1) return;
-    const diff = touchStartX.current - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 50) diff > 0 ? nextPage() : prevPage();
-  }, [nextPage, prevPage, perPage]);
-
-  const visiblePage = visibleItems.slice(page * perPage, (page + 1) * perPage);
-
-  const renderCard = (service: Service, idx?: number) => <ServiceCard key={service.id} service={service} lang={lang as Language} idx={idx} />;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    const dy = e.changedTouches[0].clientY - touchStartY.current;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
+      if (dir === 'rtl') { if (dx > 0) nextPage(); else prevPage(); }
+      else { if (dx > 0) prevPage(); else nextPage(); }
+    }
+  }, [dir, prevPage, nextPage]);
 
   const renderDots = () => (
     <div className="flex items-center justify-center gap-2">
       {Array.from({ length: totalPages }).map((_, idx) => (
         <button key={idx} onClick={() => goToPage(idx)}
-          className={`rounded-full transition-all duration-500 ${idx === page
-            ? 'w-8 h-2.5 bg-gradient-to-r from-[#0f639e] to-[#df4d21] shadow-md shadow-[#0f639e]/30'
+          className={`rounded-full transition-all duration-300 ${idx === page
+            ? 'w-7 h-2.5 bg-gradient-to-r from-[#0f639e] to-[#df4d21] shadow-md'
             : 'w-2.5 h-2.5 bg-slate-300 dark:bg-slate-600 hover:bg-slate-400 dark:hover:bg-slate-500'}`} />
       ))}
     </div>
   );
 
+  const visiblePage = visibleItems.slice(page * perPage, (page + 1) * perPage);
+
+  const renderCard = (service: OrgaProService, idx?: number) => (
+    <OrgaProCard key={service.id} service={service} lang={lang} idx={idx} />
+  );
+
   return (
-    <section id="services" className="py-12 sm:py-20 bg-gradient-to-b from-white to-slate-50 dark:from-[#131d31] dark:to-[#0b1121]">
+    <section id="orga-pro-services" className="py-12 sm:py-20 bg-gradient-to-b from-slate-50 to-white dark:from-[#0b1121] dark:to-[#131d31]">
       <div className="max-w-6xl mx-auto px-4">
-        <div className="text-center mb-8 sm:mb-12">
+        <div className="text-center mb-8 sm:mb-10">
           <div className="flex items-center justify-center gap-2 mb-3">
             <div className="h-[2px] w-8 bg-[#df4d21]" />
-            <span className="text-[#df4d21] font-black tracking-[0.5em] uppercase text-[10px]">{lang === 'ar' ? 'خدماتنا' : 'Our Services'}</span>
+            <span className="text-[#df4d21] font-black tracking-[0.5em] uppercase text-[10px]">{section.title[lang]}</span>
             <div className="h-[2px] w-8 bg-[#df4d21]" />
           </div>
-          <h2 className="text-2xl sm:text-4xl font-black text-[#0f639e] dark:text-white tracking-tight mb-2">{services.title[lang]}</h2>
-          {services.subtitle[lang] && (
-            <p className="text-slate-500 dark:text-slate-400 font-medium text-sm max-w-lg mx-auto">{services.subtitle[lang]}</p>
+          <h2 className="text-2xl sm:text-4xl font-black text-[#0f639e] dark:text-white tracking-tight">{section.title[lang]}</h2>
+          {section.subtitle[lang] && (
+            <p className="text-slate-500 dark:text-slate-400 text-sm sm:text-base font-medium mt-3 max-w-xl mx-auto">{section.subtitle[lang]}</p>
           )}
         </div>
 
-        {/* Mobile: single-card 3D carousel */}
-        <div className="lg:hidden relative"
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}>
-          <div className="flex items-center gap-0 sm:gap-2 max-w-[420px] mx-auto">
+        {/* Mobile (< lg): single-card 3D carousel */}
+        <div className="lg:hidden">
+          <div className="flex items-center gap-0 sm:gap-2 max-w-[420px] mx-auto" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
             <button onClick={prevPage}
               className="shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-[#0f639e]/20 dark:border-[#0f639e]/40 bg-transparent flex items-center justify-center text-[#0f639e] dark:text-[#3292ca] hover:bg-gradient-to-br hover:from-[#0f639e] hover:to-[#3292ca] hover:text-white hover:border-transparent hover:shadow-lg hover:shadow-[#0f639e]/20 hover:scale-110 active:scale-90 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed"
-              disabled={animating || totalPages <= 1}>
+              disabled={animating}>
               <span className="font-mono font-black text-xl leading-none">{'<'}</span>
             </button>
             <div className="overflow-hidden rounded-2xl flex-1" style={{ perspective: '1200px' }}>
-              <div className="relative mx-auto min-h-[460px] sm:min-h-[480px]">
+              <div className="relative mx-auto min-h-[420px] sm:min-h-[440px]">
                 {visibleItems.map((service, idx) => {
                   const isActive = idx === page;
                   const isPrev = idx === (page === 0 ? visibleItems.length - 1 : page - 1);
@@ -191,7 +200,7 @@ const ServicesSection: React.FC = () => {
             </div>
             <button onClick={nextPage}
               className="shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-[#0f639e]/20 dark:border-[#0f639e]/40 bg-transparent flex items-center justify-center text-[#0f639e] dark:text-[#3292ca] hover:bg-gradient-to-br hover:from-[#0f639e] hover:to-[#3292ca] hover:text-white hover:border-transparent hover:shadow-lg hover:shadow-[#0f639e]/20 hover:scale-110 active:scale-90 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed"
-              disabled={animating || totalPages <= 1}>
+              disabled={animating}>
               <span className="font-mono font-black text-xl leading-none">{'>'}</span>
             </button>
           </div>
@@ -234,7 +243,7 @@ const ServicesSection: React.FC = () => {
           </div>
           <div className="mt-6">{renderDots()}</div>
           <div className="text-center mt-3">
-            <p className="text-slate-500 dark:text-slate-400 text-xs font-medium">{lang === 'ar' ? `الصفحة ${page + 1} من ${totalPages}` : `Page ${page + 1} of ${totalPages}`}</p>
+            <p className="text-slate-500 dark:text-slate-400 text-xs font-medium">{page + 1} / {totalPages}</p>
           </div>
         </div>
       </div>
@@ -242,4 +251,4 @@ const ServicesSection: React.FC = () => {
   );
 };
 
-export default ServicesSection;
+export default OrgaProServicesSection;

@@ -9,6 +9,7 @@ import HeroTab from '../admin/components/HeroTab';
 import AboutTab from '../admin/components/AboutTab';
 import ProductsTab from '../admin/components/ProductsTab';
 import ServicesTab from '../admin/components/ServicesTab';
+import OrgaProServicesTab from '../admin/components/OrgaProServicesTab';
 import PartnersTab from '../admin/components/PartnersTab';
 import ContactTab from '../admin/components/ContactTab';
 import FooterTab from '../admin/components/FooterTab';
@@ -43,7 +44,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   const [data, setData] = useState<SiteContent>(siteData);
   const [activeTab, setActiveTab] = useState<string>('general');
   const [dirtyTabs, setDirtyTabs] = useState<Set<string>>(new Set());
-  const [deleteTarget, setDeleteTarget] = useState<{ id: string; type: 'product' | 'partner' | 'service' | 'partnerCategory' } | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; type: 'product' | 'partner' | 'service' | 'orgaProService' | 'partnerCategory' } | null>(null);
 
   useEffect(() => { setData(siteData); }, [siteData]);
 
@@ -109,6 +110,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
     if (deleteTarget.type === 'product') setDataAndMarkDirty({ ...data, products: data.products.filter(p => p.id !== deleteTarget.id) });
     else if (deleteTarget.type === 'partner') setDataAndMarkDirty({ ...data, partners: data.partners.filter(p => p.id !== deleteTarget.id) });
     else if (deleteTarget.type === 'service') setDataAndMarkDirty({ ...data, services: { ...data.services, items: data.services.items.filter(s => s.id !== deleteTarget.id) } });
+    else if (deleteTarget.type === 'orgaProService') setDataAndMarkDirty({ ...data, orgaProServices: { ...data.orgaProServices, items: data.orgaProServices.items.filter(s => s.id !== deleteTarget.id) } });
     else if (deleteTarget.type === 'partnerCategory') setDataAndMarkDirty({ ...data, partnerCategories: data.partnerCategories.filter(c => c.id !== deleteTarget.id), partners: data.partners.map(p => p.categoryId === deleteTarget.id ? { ...p, categoryId: undefined } : p) });
     setDeleteTarget(null);
   };
@@ -148,6 +150,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
       case 'about': return <AboutTab {...tabProps} />;
       case 'products': return <ProductsTab {...tabProps} />;
       case 'services': return <ServicesTab {...tabProps} />;
+      case 'orgaproservices': return <OrgaProServicesTab {...tabProps} />;
       case 'partners': return <PartnersTab {...tabProps} />;
       case 'contact': return <ContactTab {...tabProps} />;
       case 'footer': return <FooterTab {...tabProps} />;
