@@ -70,11 +70,13 @@ const ServiceCard: React.FC<{ service: Service; lang: Language; idx?: number }> 
           <div className="absolute inset-0 bg-gradient-to-br from-[#0f639e]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         </div>
         <div className="relative px-5 sm:px-6 pb-5 sm:pb-6 pt-16">
-          <div className="absolute -top-7 left-5 sm:left-6 z-10">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#0f639e] to-[#3292ca] flex items-center justify-center text-white shadow-lg shadow-[#0f639e]/30 group-hover:shadow-xl group-hover:shadow-[#0f639e]/40 group-hover:-translate-y-1 transition-all duration-300">
-              <IconComp className="w-6 h-6" />
+          {!service.image && (
+            <div className="absolute -top-7 left-5 sm:left-6 z-10">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#0f639e] to-[#3292ca] flex items-center justify-center text-white shadow-lg shadow-[#0f639e]/30 group-hover:shadow-xl group-hover:shadow-[#0f639e]/40 group-hover:-translate-y-1 transition-all duration-300">
+                <IconComp className="w-6 h-6" />
+              </div>
             </div>
-          </div>
+          )}
           <h3 className="text-lg sm:text-xl font-black text-[#0f639e] dark:text-white mb-2 group-hover:text-[#df4d21] transition-colors">{service.name[lang]}</h3>
           <p className="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-3">{service.description[lang]}</p>
         </div>
@@ -161,7 +163,7 @@ const ServicesSection: React.FC = () => {
           onTouchEnd={handleTouchEnd}>
           <div className="flex items-center gap-0 sm:gap-2 max-w-[420px] mx-auto">
             <button onClick={prevPage}
-              className="shrink-0 w-11 h-11 rounded-full bg-white/80 dark:bg-[#1e293b]/80 backdrop-blur border border-slate-200 dark:border-[#334155] flex items-center justify-center text-[#0f639e] dark:text-white shadow-lg hover:shadow-xl hover:scale-110 hover:bg-white dark:hover:bg-[#1e293b] hover:border-[#df4d21]/50 active:scale-90 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+              className="shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-[#0f639e] to-[#3292ca] flex items-center justify-center text-white shadow-lg shadow-[#0f639e]/30 hover:shadow-xl hover:shadow-[#0f639e]/40 hover:scale-110 active:scale-90 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
               disabled={animating || totalPages <= 1}>
               {isRTL ? <MoveRight className="w-5 h-5" /> : <MoveLeft className="w-5 h-5" />}
             </button>
@@ -188,7 +190,7 @@ const ServicesSection: React.FC = () => {
               </div>
             </div>
             <button onClick={nextPage}
-              className="shrink-0 w-11 h-11 rounded-full bg-white/80 dark:bg-[#1e293b]/80 backdrop-blur border border-slate-200 dark:border-[#334155] flex items-center justify-center text-[#0f639e] dark:text-white shadow-lg hover:shadow-xl hover:scale-110 hover:bg-white dark:hover:bg-[#1e293b] hover:border-[#df4d21]/50 active:scale-90 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+              className="shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-[#0f639e] to-[#3292ca] flex items-center justify-center text-white shadow-lg shadow-[#0f639e]/30 hover:shadow-xl hover:shadow-[#0f639e]/40 hover:scale-110 active:scale-90 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
               disabled={animating || totalPages <= 1}>
               {isRTL ? <MoveLeft className="w-5 h-5" /> : <MoveRight className="w-5 h-5" />}
             </button>
@@ -203,9 +205,9 @@ const ServicesSection: React.FC = () => {
         <div className="hidden lg:block relative">
           <div className="flex items-start gap-4 xl:gap-6">
             <button onClick={prevPage}
-              className="shrink-0 mt-[15%] w-14 h-14 rounded-full bg-white/80 dark:bg-[#1e293b]/80 backdrop-blur border border-slate-200 dark:border-[#334155] flex items-center justify-center text-[#0f639e] dark:text-white shadow-lg hover:shadow-xl hover:scale-110 hover:bg-white dark:hover:bg-[#1e293b] hover:border-[#df4d21]/50 active:scale-90 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+              className="shrink-0 mt-[15%] w-12 h-12 rounded-xl bg-gradient-to-br from-[#0f639e] to-[#3292ca] flex items-center justify-center text-white shadow-lg shadow-[#0f639e]/30 hover:shadow-xl hover:shadow-[#0f639e]/40 hover:scale-110 active:scale-90 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
               disabled={animating || totalPages <= 1}>
-              {isRTL ? <MoveRight className="w-6 h-6" /> : <MoveLeft className="w-6 h-6" />}
+              {isRTL ? <MoveRight className="w-5 h-5" /> : <MoveLeft className="w-5 h-5" />}
             </button>
             <div className="flex-1 overflow-hidden rounded-2xl" style={{ perspective: '1200px' }}>
               <div key={page} className="grid grid-cols-3 gap-5"
@@ -224,9 +226,9 @@ const ServicesSection: React.FC = () => {
               </div>
             </div>
             <button onClick={nextPage}
-              className="shrink-0 mt-[15%] w-14 h-14 rounded-full bg-white/80 dark:bg-[#1e293b]/80 backdrop-blur border border-slate-200 dark:border-[#334155] flex items-center justify-center text-[#0f639e] dark:text-white shadow-lg hover:shadow-xl hover:scale-110 hover:bg-white dark:hover:bg-[#1e293b] hover:border-[#df4d21]/50 active:scale-90 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+              className="shrink-0 mt-[15%] w-12 h-12 rounded-xl bg-gradient-to-br from-[#0f639e] to-[#3292ca] flex items-center justify-center text-white shadow-lg shadow-[#0f639e]/30 hover:shadow-xl hover:shadow-[#0f639e]/40 hover:scale-110 active:scale-90 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
               disabled={animating || totalPages <= 1}>
-              {isRTL ? <MoveLeft className="w-6 h-6" /> : <MoveRight className="w-6 h-6" />}
+              {isRTL ? <MoveLeft className="w-5 h-5" /> : <MoveRight className="w-5 h-5" />}
             </button>
           </div>
           <div className="mt-6">{renderDots()}</div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Handshake, Plus, Trash2, Edit3, ChevronLeft, ChevronRight, ArrowUp, ArrowDown, FolderOpen, Tag, X, Building2, Store, Hospital, GraduationCap, DollarSign, Building, Factory, ShoppingBag, Stethoscope, Globe, Truck, HardHat, UtensilsCrossed, TreePalm, Laptop, Users, HeartHandshake, Landmark, Car, FlaskConical, Crown, Gem, Award, Rocket, Ship, Plane, Bus, Tractor, ConciergeBell, Wine, Shirt, Watch, Armchair, Gamepad2, Music, Palette, Camera, Newspaper, BookOpen, HeartPulse, Leaf, Sun, Zap, Droplets, Mountain, Compass, Map, Radio, Cpu, HardDrive, Printer, Scan, Baby, Dog, Syringe, Bike } from 'lucide-react';
+import { Handshake, Plus, Trash2, Edit3, ChevronLeft, ChevronRight, ArrowUp, ArrowDown, FolderOpen, Tag, X, Building2, Store, Hospital, GraduationCap, DollarSign, Building, Factory, ShoppingBag, Stethoscope, Globe, Truck, HardHat, UtensilsCrossed, TreePalm, Laptop, Users, HeartHandshake, Landmark, Car, FlaskConical, Crown, Gem, Award, Rocket, Ship, Plane, Bus, Tractor, ConciergeBell, Wine, Shirt, Watch, Armchair, Gamepad2, Music, Palette, Camera, Newspaper, BookOpen, HeartPulse, Leaf, Sun, Zap, Droplets, Mountain, Compass, Map, Radio, Cpu, HardDrive, Printer, Scan, Baby, Dog, Syringe, Bike, Pill, Smartphone, Monitor } from 'lucide-react';
 import type { Partner, PartnerCategory, SiteContent } from '../../types';
 import { SectionHeader, FieldGroup, CloudImageUploader, InputField } from './FormComponents';
 
@@ -60,6 +60,9 @@ const CATEGORY_ICONS: { value: string; component: React.ComponentType<{ classNam
   { value: 'dog', component: Dog },
   { value: 'syringe', component: Syringe },
   { value: 'bike', component: Bike },
+  { value: 'pill', component: Pill },
+  { value: 'smartphone', component: Smartphone },
+  { value: 'monitor', component: Monitor },
 ];
 
 const iconLookup: Record<string, React.ComponentType<{ className?: string }>> = {};
