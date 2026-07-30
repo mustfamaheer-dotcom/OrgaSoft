@@ -76,7 +76,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
       const newData = JSON.parse(JSON.stringify(prev));
       const keys = path.split('.');
       let current: any = newData;
-      for (let i = 0; i < keys.length - 1; i++) current = current[keys[i]];
+      for (let i = 0; i < keys.length - 1; i++) {
+        if (!current[keys[i]]) current[keys[i]] = {};
+        current = current[keys[i]];
+      }
       current[keys[keys.length - 1]] = value;
       return newData;
     });
