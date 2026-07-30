@@ -1,7 +1,33 @@
 import React, { useState } from 'react';
-import { Handshake, Plus, Trash2, Edit3, ChevronLeft, ChevronRight, ArrowUp, ArrowDown, FolderOpen, Tag, X } from 'lucide-react';
+import { Handshake, Plus, Trash2, Edit3, ChevronLeft, ChevronRight, ArrowUp, ArrowDown, FolderOpen, Tag, X, Building2, Store, Hospital, GraduationCap, DollarSign, Building, Factory, ShoppingBag, Stethoscope, Globe, Truck, HardHat, UtensilsCrossed, TreePalm, Laptop, Users, HeartHandshake, Landmark, Car, FlaskConical } from 'lucide-react';
 import type { Partner, PartnerCategory, SiteContent } from '../../types';
 import { SectionHeader, FieldGroup, CloudImageUploader, InputField } from './FormComponents';
+
+const CATEGORY_ICONS: { value: string; component: React.ComponentType<{ className?: string }> }[] = [
+  { value: 'building2', component: Building2 },
+  { value: 'store', component: Store },
+  { value: 'hospital', component: Hospital },
+  { value: 'graduation-cap', component: GraduationCap },
+  { value: 'dollar-sign', component: DollarSign },
+  { value: 'building', component: Building },
+  { value: 'factory', component: Factory },
+  { value: 'shopping-bag', component: ShoppingBag },
+  { value: 'stethoscope', component: Stethoscope },
+  { value: 'globe', component: Globe },
+  { value: 'truck', component: Truck },
+  { value: 'hard-hat', component: HardHat },
+  { value: 'utensils-crossed', component: UtensilsCrossed },
+  { value: 'tree-palm', component: TreePalm },
+  { value: 'laptop', component: Laptop },
+  { value: 'users', component: Users },
+  { value: 'heart-handshake', component: HeartHandshake },
+  { value: 'landmark', component: Landmark },
+  { value: 'car', component: Car },
+  { value: 'flask-conical', component: FlaskConical },
+];
+
+const iconLookup: Record<string, React.ComponentType<{ className?: string }>> = {};
+CATEGORY_ICONS.forEach(ic => { iconLookup[ic.value] = ic.component; });
 
 interface PartnersTabProps {
   data: SiteContent;
@@ -42,6 +68,21 @@ const PartnersTab: React.FC<PartnersTabProps> = ({ data, setData, isRTL, lang, s
           <InputField label="Category Name (EN)" value={editingCategory.name.en} onChange={v => setEditingCategory({ ...editingCategory, name: { ...editingCategory.name, en: v } })} />
           <InputField label="Category Name (AR)" value={editingCategory.name.ar} onChange={v => setEditingCategory({ ...editingCategory, name: { ...editingCategory.name, ar: v } })} />
         </div>
+        <div>
+          <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mb-3 block">{isRTL ? 'أيقونة التصنيف' : 'CATEGORY ICON'}</label>
+          <div className="flex flex-wrap gap-2">
+            {CATEGORY_ICONS.map(ic => {
+              const Icon = ic.component;
+              const selected = editingCategory.icon === ic.value;
+              return (
+                <button key={ic.value} onClick={() => setEditingCategory({ ...editingCategory, icon: ic.value })}
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${selected ? 'bg-[#0f639e] text-white shadow-md shadow-[#0f639e]/30 scale-110' : 'bg-slate-100 dark:bg-[#1a2744] text-slate-400 hover:bg-[#0f639e]/10 hover:text-[#0f639e]'}`}>
+                  <Icon className="w-5 h-5" />
+                </button>
+              );
+            })}
+          </div>
+        </div>
         <div className="flex gap-4">
           <button onClick={() => {
             setData({ ...data, partnerCategories: categories.map(c => c.id === editingCategory.id ? editingCategory : c) });
@@ -62,7 +103,7 @@ const PartnersTab: React.FC<PartnersTabProps> = ({ data, setData, isRTL, lang, s
           <div className="flex items-center justify-between mb-4">
             <h4 className="text-sm font-black text-[#0f639e] dark:text-white flex items-center gap-2"><FolderOpen className="w-4 h-4 text-[#df4d21]" />{isRTL ? 'التصنيفات' : 'Categories'}</h4>
             <button onClick={() => {
-              const newCat: PartnerCategory = { id: `cat-${Date.now()}`, name: { en: 'New Category', ar: 'تصنيف جديد' } };
+              const newCat: PartnerCategory = { id: `cat-${Date.now()}`, name: { en: 'New Category', ar: 'تصنيف جديد' }, icon: 'building2' };
               setData({ ...data, partnerCategories: [...categories, newCat] });
               setEditingCategory(newCat);
             }} className="flex items-center gap-2 px-4 py-2 bg-[#0f639e]/10 text-[#0f639e] rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-[#0f639e] hover:text-white transition-all">
@@ -74,16 +115,19 @@ const PartnersTab: React.FC<PartnersTabProps> = ({ data, setData, isRTL, lang, s
               className={`px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all ${!activeCatId ? 'bg-[#0f639e] text-white shadow-md' : 'bg-slate-100 dark:bg-[#1a2744] text-slate-500 hover:bg-[#0f639e]/10 hover:text-[#0f639e]'}`}>
               {isRTL ? 'بدون تصنيف' : 'Uncategorized'} ({data.partners.filter(p => !p.categoryId).length})
             </button>
-            {categories.map(cat => (
-              <div key={cat.id} className={`group flex items-center gap-1 px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all cursor-pointer ${activeCatId === cat.id ? 'bg-[#0f639e] text-white shadow-md' : 'bg-slate-100 dark:bg-[#1a2744] text-slate-500 hover:bg-[#0f639e]/10 hover:text-[#0f639e]'}`}
-                onClick={() => setActiveCatId(cat.id)}>
-                <Tag className="w-3 h-3" />
-                <span>{cat.name[lang]}</span>
-                <span className="text-[9px] opacity-60">({data.partners.filter(p => p.categoryId === cat.id).length})</span>
-                <button onClick={e => { e.stopPropagation(); setEditingCategory(cat); }} className="ml-1 w-5 h-5 bg-white/20 rounded-md flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-white/40 transition-all"><Edit3 className="w-2.5 h-2.5" /></button>
-                <button onClick={e => { e.stopPropagation(); setDeleteTarget({ id: cat.id, type: 'partnerCategory' }); }} className="w-5 h-5 bg-white/20 rounded-md flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-rose-400 transition-all"><X className="w-2.5 h-2.5" /></button>
-              </div>
-            ))}
+            {categories.map(cat => {
+              const CatIcon = iconLookup[cat.icon || ''] || Tag;
+              return (
+                <div key={cat.id} className={`group flex items-center gap-1 px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all cursor-pointer ${activeCatId === cat.id ? 'bg-[#0f639e] text-white shadow-md' : 'bg-slate-100 dark:bg-[#1a2744] text-slate-500 hover:bg-[#0f639e]/10 hover:text-[#0f639e]'}`}
+                  onClick={() => setActiveCatId(cat.id)}>
+                  <CatIcon className="w-3 h-3" />
+                  <span>{cat.name[lang]}</span>
+                  <span className="text-[9px] opacity-60">({data.partners.filter(p => p.categoryId === cat.id).length})</span>
+                  <button onClick={e => { e.stopPropagation(); setEditingCategory(cat); }} className="ml-1 w-5 h-5 bg-white/20 rounded-md flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-white/40 transition-all"><Edit3 className="w-2.5 h-2.5" /></button>
+                  <button onClick={e => { e.stopPropagation(); setDeleteTarget({ id: cat.id, type: 'partnerCategory' }); }} className="w-5 h-5 bg-white/20 rounded-md flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-rose-400 transition-all"><X className="w-2.5 h-2.5" /></button>
+                </div>
+              );
+            })}
           </div>
         </div>
 

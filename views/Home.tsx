@@ -6,11 +6,20 @@ import KitImage from '../components/KitImage';
 import AnimatedCounter from '../components/AnimatedCounter';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import ServicesSection from '../components/ServicesSection';
-import { Pill, Building2, Store, Users, Clock, Award, MapPin, Activity, Database, MoveRight, MoveLeft, Mail, PhoneCall, Globe, Handshake, Shield, Rocket, Grid3X3, ArrowUpRight, PlayCircle, Facebook, Twitter, Youtube, MessageCircle, Instagram, Music, Tag } from 'lucide-react';
+import { Pill, Building2, Store, Users, Clock, Award, MapPin, Activity, Database, MoveRight, MoveLeft, Mail, PhoneCall, Globe, Handshake, Shield, Rocket, Grid3X3, ArrowUpRight, PlayCircle, Facebook, Twitter, Youtube, MessageCircle, Instagram, Music, Tag, Hospital, GraduationCap, DollarSign, Building, Factory, ShoppingBag, Stethoscope, Truck, HardHat, UtensilsCrossed, TreePalm, Laptop, HeartHandshake, Landmark, Car, FlaskConical } from 'lucide-react';
 
 const iconMap: Record<string, any> = {
   users: Users, clock: Clock, activity: Activity, pill: Pill,
   hospital: Building2, store: Store, database: Database, award: Award,
+};
+
+const categoryIconLookup: Record<string, React.ComponentType<{ className?: string }>> = {
+  building2: Building2, store: Store, hospital: Hospital, 'graduation-cap': GraduationCap,
+  'dollar-sign': DollarSign, building: Building, factory: Factory, 'shopping-bag': ShoppingBag,
+  stethoscope: Stethoscope, globe: Globe, truck: Truck, 'hard-hat': HardHat,
+  'utensils-crossed': UtensilsCrossed, 'tree-palm': TreePalm, laptop: Laptop,
+  users: Users, 'heart-handshake': HeartHandshake, landmark: Landmark, car: Car,
+  'flask-conical': FlaskConical,
 };
 
 const TiltCard: React.FC<{ children: React.ReactNode; className?: string; onClick?: () => void }> = ({ children, className, onClick }) => {
@@ -372,14 +381,17 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
               className={`snap-start shrink-0 px-5 py-2.5 rounded-xl font-black text-[11px] uppercase tracking-widest transition-all whitespace-nowrap ${!activePartnerCat ? 'bg-[#0f639e] text-white shadow-lg shadow-[#0f639e]/20' : 'bg-slate-100 dark:bg-[#1a2744] text-slate-500 dark:text-slate-400 hover:bg-[#0f639e]/10 hover:text-[#0f639e]'}`}>
               {isRTL ? 'الكل' : 'All'} ({partners.length})
             </button>
-            {categories.map(cat => (
+            {categories.map(cat => {
+              const CatIcon = categoryIconLookup[cat.icon || ''] || Tag;
+              return (
               <button key={cat.id} onClick={() => { setActivePartnerCat(cat.id); setPartnerDropdown(true); }}
                 className={`snap-start shrink-0 px-5 py-2.5 rounded-xl font-black text-[11px] uppercase tracking-widest transition-all whitespace-nowrap flex items-center gap-2 ${activePartnerCat === cat.id ? 'bg-[#0f639e] text-white shadow-lg shadow-[#0f639e]/20' : 'bg-slate-100 dark:bg-[#1a2744] text-slate-500 dark:text-slate-400 hover:bg-[#0f639e]/10 hover:text-[#0f639e]'}`}>
-                <Tag className="w-3.5 h-3.5" />
+                <CatIcon className="w-3.5 h-3.5" />
                 {cat.name[lang]}
                 <span className="text-[10px] opacity-70">({partners.filter(p => p.categoryId === cat.id).length})</span>
               </button>
-            ))}
+            );
+            })}
           </div>
 
           <div className={`transition-all duration-500 ease-out origin-top ${partnerDropdown && filteredPartners.length > 0 ? 'scale-y-100 opacity-100 max-h-[2000px]' : 'scale-y-0 opacity-0 max-h-0 overflow-hidden'}`}
