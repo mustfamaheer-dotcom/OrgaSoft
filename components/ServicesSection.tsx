@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, useState, useEffect } from 'react';
 import { useSite } from '../context/SiteContext';
-import { Code2, Server, Shield, Cloud, Network, Smartphone, Globe, Database, Settings, Headphones, MoveRight, MoveLeft } from 'lucide-react';
+import { Code2, Server, Shield, Cloud, Network, Smartphone, Globe, Database, Settings, Headphones } from 'lucide-react';
 import type { Service, ServiceIcon, Language } from '../types';
 import KitImage from './KitImage';
 
@@ -165,7 +165,7 @@ const ServicesSection: React.FC = () => {
             <button onClick={prevPage}
               className="shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-xl border-2 border-[#0f639e]/20 dark:border-[#0f639e]/40 bg-transparent flex items-center justify-center text-[#0f639e] dark:text-[#3292ca] hover:bg-gradient-to-br hover:from-[#0f639e] hover:to-[#3292ca] hover:text-white hover:border-transparent hover:shadow-lg hover:shadow-[#0f639e]/20 hover:scale-110 active:scale-90 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed"
               disabled={animating || totalPages <= 1}>
-              {isRTL ? <MoveRight className="w-5 h-5" /> : <MoveLeft className="w-5 h-5" />}
+              <span className="font-mono font-black text-xl leading-none">{isRTL ? '>' : '<'}</span>
             </button>
             <div className="overflow-hidden rounded-2xl flex-1" style={{ perspective: '1200px' }}>
               <div className="relative mx-auto min-h-[460px] sm:min-h-[480px]">
@@ -192,7 +192,7 @@ const ServicesSection: React.FC = () => {
             <button onClick={nextPage}
               className="shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-xl border-2 border-[#0f639e]/20 dark:border-[#0f639e]/40 bg-transparent flex items-center justify-center text-[#0f639e] dark:text-[#3292ca] hover:bg-gradient-to-br hover:from-[#0f639e] hover:to-[#3292ca] hover:text-white hover:border-transparent hover:shadow-lg hover:shadow-[#0f639e]/20 hover:scale-110 active:scale-90 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed"
               disabled={animating || totalPages <= 1}>
-              {isRTL ? <MoveLeft className="w-5 h-5" /> : <MoveRight className="w-5 h-5" />}
+              <span className="font-mono font-black text-xl leading-none">{isRTL ? '<' : '>'}</span>
             </button>
           </div>
           <div className="mt-5">{renderDots()}</div>
@@ -207,7 +207,7 @@ const ServicesSection: React.FC = () => {
             <button onClick={prevPage}
               className="shrink-0 mt-[15%] w-12 h-12 sm:w-14 sm:h-14 rounded-xl border-2 border-[#0f639e]/20 dark:border-[#0f639e]/40 bg-transparent flex items-center justify-center text-[#0f639e] dark:text-[#3292ca] hover:bg-gradient-to-br hover:from-[#0f639e] hover:to-[#3292ca] hover:text-white hover:border-transparent hover:shadow-lg hover:shadow-[#0f639e]/20 hover:scale-110 active:scale-90 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed"
               disabled={animating || totalPages <= 1}>
-              {isRTL ? <MoveRight className="w-5 h-5 sm:w-6 sm:h-6" /> : <MoveLeft className="w-5 h-5 sm:w-6 sm:h-6" />}
+              <span className="font-mono font-black text-2xl leading-none">{isRTL ? '>' : '<'}</span>
             </button>
             <div className="flex-1 overflow-hidden rounded-2xl" style={{ perspective: '1200px' }}>
               <div key={page} className="grid grid-cols-3 gap-5"
@@ -228,7 +228,7 @@ const ServicesSection: React.FC = () => {
             <button onClick={nextPage}
               className="shrink-0 mt-[15%] w-12 h-12 sm:w-14 sm:h-14 rounded-xl border-2 border-[#0f639e]/20 dark:border-[#0f639e]/40 bg-transparent flex items-center justify-center text-[#0f639e] dark:text-[#3292ca] hover:bg-gradient-to-br hover:from-[#0f639e] hover:to-[#3292ca] hover:text-white hover:border-transparent hover:shadow-lg hover:shadow-[#0f639e]/20 hover:scale-110 active:scale-90 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed"
               disabled={animating || totalPages <= 1}>
-              {isRTL ? <MoveLeft className="w-5 h-5" /> : <MoveRight className="w-5 h-5" />}
+              <span className="font-mono font-black text-2xl leading-none">{isRTL ? '<' : '>'}</span>
             </button>
           </div>
           <div className="mt-6">{renderDots()}</div>

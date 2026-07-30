@@ -266,7 +266,7 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
               <button onClick={prevPage}
                 className="shrink-0 w-11 h-11 sm:w-12 sm:h-12 rounded-xl border-2 border-[#0f639e]/20 dark:border-[#0f639e]/40 bg-transparent flex items-center justify-center text-[#0f639e] dark:text-[#3292ca] hover:bg-gradient-to-br hover:from-[#0f639e] hover:to-[#3292ca] hover:text-white hover:border-transparent hover:shadow-lg hover:shadow-[#0f639e]/20 hover:scale-110 active:scale-90 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed"
                 disabled={animating}>
-                {isRTL ? <MoveRight className="w-5 h-5" /> : <MoveLeft className="w-5 h-5" />}
+                <span className="font-mono font-black text-xl leading-none">{isRTL ? '>' : '<'}</span>
               </button>
               <div className="overflow-hidden rounded-2xl flex-1" style={{ perspective: '1200px' }}>
                 <div className="relative mx-auto max-w-[320px]">
@@ -305,7 +305,7 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
               <button onClick={nextPage}
                 className="shrink-0 w-11 h-11 sm:w-12 sm:h-12 rounded-xl border-2 border-[#0f639e]/20 dark:border-[#0f639e]/40 bg-transparent flex items-center justify-center text-[#0f639e] dark:text-[#3292ca] hover:bg-gradient-to-br hover:from-[#0f639e] hover:to-[#3292ca] hover:text-white hover:border-transparent hover:shadow-lg hover:shadow-[#0f639e]/20 hover:scale-110 active:scale-90 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed"
                 disabled={animating}>
-                {isRTL ? <MoveLeft className="w-5 h-5" /> : <MoveRight className="w-5 h-5" />}
+                <span className="font-mono font-black text-xl leading-none">{isRTL ? '<' : '>'}</span>
               </button>
             </div>
             <div className="flex items-center justify-center gap-2 mt-5">
@@ -327,7 +327,7 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
               <button onClick={prevPage}
                 className="shrink-0 mt-[15%] w-12 h-12 sm:w-14 sm:h-14 rounded-xl border-2 border-[#0f639e]/20 dark:border-[#0f639e]/40 bg-transparent flex items-center justify-center text-[#0f639e] dark:text-[#3292ca] hover:bg-gradient-to-br hover:from-[#0f639e] hover:to-[#3292ca] hover:text-white hover:border-transparent hover:shadow-lg hover:shadow-[#0f639e]/20 hover:scale-110 active:scale-90 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed"
                 disabled={animating}>
-                {isRTL ? <MoveRight className="w-5 h-5 sm:w-6 sm:h-6" /> : <MoveLeft className="w-5 h-5 sm:w-6 sm:h-6" />}
+                <span className="font-mono font-black text-2xl leading-none">{isRTL ? '>' : '<'}</span>
               </button>
               <div className="flex-1 overflow-hidden rounded-2xl">
                 <div key={page}
@@ -340,7 +340,7 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
               <button onClick={nextPage}
                 className="shrink-0 mt-[15%] w-12 h-12 sm:w-14 sm:h-14 rounded-xl border-2 border-[#0f639e]/20 dark:border-[#0f639e]/40 bg-transparent flex items-center justify-center text-[#0f639e] dark:text-[#3292ca] hover:bg-gradient-to-br hover:from-[#0f639e] hover:to-[#3292ca] hover:text-white hover:border-transparent hover:shadow-lg hover:shadow-[#0f639e]/20 hover:scale-110 active:scale-90 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed"
                 disabled={animating}>
-                {isRTL ? <MoveLeft className="w-6 h-6" /> : <MoveRight className="w-6 h-6" />}
+                <span className="font-mono font-black text-2xl leading-none">{isRTL ? '<' : '>'}</span>
               </button>
             </div>
             <div className="flex items-center justify-center gap-2 mt-6">
