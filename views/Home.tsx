@@ -264,7 +264,7 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
             onTouchEnd={handleTouchEnd}>
             <div className="flex items-center gap-0 sm:gap-2 max-w-[420px] mx-auto">
               <button onClick={prevPage}
-                className="shrink-0 w-11 h-11 rounded-full bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-[#334155] flex items-center justify-center text-[#0f639e] dark:text-white shadow-lg hover:shadow-xl hover:scale-110 hover:border-[#df4d21]/50 active:scale-90 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                className="shrink-0 w-11 h-11 sm:w-12 sm:h-12 rounded-xl border-2 border-[#0f639e]/20 dark:border-[#0f639e]/40 bg-transparent flex items-center justify-center text-[#0f639e] dark:text-[#3292ca] hover:bg-gradient-to-br hover:from-[#0f639e] hover:to-[#3292ca] hover:text-white hover:border-transparent hover:shadow-lg hover:shadow-[#0f639e]/20 hover:scale-110 active:scale-90 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed"
                 disabled={animating}>
                 {isRTL ? <MoveRight className="w-5 h-5" /> : <MoveLeft className="w-5 h-5" />}
               </button>
@@ -303,7 +303,7 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
                 </div>
               </div>
               <button onClick={nextPage}
-                className="shrink-0 w-11 h-11 rounded-full bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-[#334155] flex items-center justify-center text-[#0f639e] dark:text-white shadow-lg hover:shadow-xl hover:scale-110 hover:border-[#df4d21]/50 active:scale-90 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                className="shrink-0 w-11 h-11 sm:w-12 sm:h-12 rounded-xl border-2 border-[#0f639e]/20 dark:border-[#0f639e]/40 bg-transparent flex items-center justify-center text-[#0f639e] dark:text-[#3292ca] hover:bg-gradient-to-br hover:from-[#0f639e] hover:to-[#3292ca] hover:text-white hover:border-transparent hover:shadow-lg hover:shadow-[#0f639e]/20 hover:scale-110 active:scale-90 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed"
                 disabled={animating}>
                 {isRTL ? <MoveLeft className="w-5 h-5" /> : <MoveRight className="w-5 h-5" />}
               </button>
@@ -325,9 +325,9 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
           <div className="hidden md:block relative">
             <div className="flex items-start gap-4 lg:gap-6">
               <button onClick={prevPage}
-                className="shrink-0 mt-[15%] w-14 h-14 rounded-full bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-[#334155] flex items-center justify-center text-[#0f639e] dark:text-white shadow-lg hover:shadow-xl hover:scale-110 hover:border-[#df4d21]/50 active:scale-90 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                className="shrink-0 mt-[15%] w-12 h-12 sm:w-14 sm:h-14 rounded-xl border-2 border-[#0f639e]/20 dark:border-[#0f639e]/40 bg-transparent flex items-center justify-center text-[#0f639e] dark:text-[#3292ca] hover:bg-gradient-to-br hover:from-[#0f639e] hover:to-[#3292ca] hover:text-white hover:border-transparent hover:shadow-lg hover:shadow-[#0f639e]/20 hover:scale-110 active:scale-90 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed"
                 disabled={animating}>
-                {isRTL ? <MoveRight className="w-6 h-6" /> : <MoveLeft className="w-6 h-6" />}
+                {isRTL ? <MoveRight className="w-5 h-5 sm:w-6 sm:h-6" /> : <MoveLeft className="w-5 h-5 sm:w-6 sm:h-6" />}
               </button>
               <div className="flex-1 overflow-hidden rounded-2xl">
                 <div key={page}
@@ -338,7 +338,7 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
                 </div>
               </div>
               <button onClick={nextPage}
-                className="shrink-0 mt-[15%] w-14 h-14 rounded-full bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-[#334155] flex items-center justify-center text-[#0f639e] dark:text-white shadow-lg hover:shadow-xl hover:scale-110 hover:border-[#df4d21]/50 active:scale-90 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                className="shrink-0 mt-[15%] w-12 h-12 sm:w-14 sm:h-14 rounded-xl border-2 border-[#0f639e]/20 dark:border-[#0f639e]/40 bg-transparent flex items-center justify-center text-[#0f639e] dark:text-[#3292ca] hover:bg-gradient-to-br hover:from-[#0f639e] hover:to-[#3292ca] hover:text-white hover:border-transparent hover:shadow-lg hover:shadow-[#0f639e]/20 hover:scale-110 active:scale-90 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed"
                 disabled={animating}>
                 {isRTL ? <MoveLeft className="w-6 h-6" /> : <MoveRight className="w-6 h-6" />}
               </button>
