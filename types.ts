@@ -87,6 +87,13 @@ export interface SiteContent {
     messages: AnnouncementMessage[];
     speed: 'slow' | 'normal' | 'fast';
   };
+  chatbot: {
+    enabled: boolean;
+    name: Record<Language, string>;
+    greeting: Record<Language, string>;
+    position: 'left' | 'right';
+    quickReplies: ChatQuickReply[];
+  };
   contacts: {
     address: Record<Language, string>;
     mapEmbedUrl: string;
@@ -135,6 +142,12 @@ export interface AnnouncementMessage {
   text: Record<Language, string>;
   linkUrl?: string;
   linkLabel?: Record<Language, string>;
+}
+
+export interface ChatQuickReply {
+  id: string;
+  label: Record<Language, string>;
+  value: Record<Language, string>;
 }
 
 export interface ProductSpec {

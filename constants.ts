@@ -61,6 +61,23 @@ export const INITIAL_SITE_DATA: SiteContent = {
     messages: [],
     speed: 'normal',
   },
+  chatbot: {
+    enabled: true,
+    name: { en: 'OrgaBot', ar: 'أورجا بوت' },
+    greeting: {
+      en: "Hi! 👋 I'm **OrgaBot** your smart assistant\nI can help you with:\n• Choosing the right software for your business\n• Information about our services & products\n• Our branches and locations\n• Contact information\n• General company info\n\nJust ask away!",
+      ar: 'مرحباً! 👋 أنا **أورجا بوت** المساعد الذكي\nيمكنني مساعدتك في:\n• اختيار البرنامج المناسب لنشاطك التجاري\n• معلومات عن خدماتنا ومنتجاتنا\n• فروعنا وعناويننا\n• أرقام التواصل\n• معلومات عامة عن الشركة\n\nاكتب استفسارك وسأجيبك فوراً!',
+    },
+    position: 'left',
+    quickReplies: [
+      { id: 'qr-1', label: { en: 'I need a system', ar: 'أريد نظاماً' }, value: { en: 'I need a management system for my business', ar: 'أريد نظاماً لإدارة نشاطي التجاري' } },
+      { id: 'qr-2', label: { en: 'Our Services', ar: 'خدماتنا' }, value: { en: 'What IT services do you offer?', ar: 'ما هي الخدمات التي تقدمونها؟' } },
+      { id: 'qr-3', label: { en: 'Contact', ar: 'اتصال' }, value: { en: 'What is your phone number?', ar: 'ما هو رقم الهاتف؟' } },
+      { id: 'qr-4', label: { en: 'Locations', ar: 'فروعنا' }, value: { en: 'Where are your branches?', ar: 'أين توجد فروعكم؟' } },
+      { id: 'qr-5', label: { en: 'Company Info', ar: 'عن الشركة' }, value: { en: 'Tell me about the company', ar: 'أخبرني عن الشركة' } },
+      { id: 'qr-6', label: { en: 'Partners', ar: 'شركاؤنا' }, value: { en: 'Who are your partners?', ar: 'من هم شركاؤكم؟' } },
+    ],
+  },
   products: [],
   services: {
     enabled: false,

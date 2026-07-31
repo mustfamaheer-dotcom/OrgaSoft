@@ -88,6 +88,9 @@ function mergeWithDefaults(loaded: SiteContent): SiteContent {
   if (!migrated.announcement) {
     migrated.announcement = { enabled: false, messages: [], speed: 'normal' };
   }
+  if (!migrated.chatbot) {
+    migrated.chatbot = INITIAL_SITE_DATA.chatbot;
+  }
   if (!migrated.services) {
     migrated.services = { enabled: false, title: { en: 'IT Services', ar: 'الخدمات التقنية' }, subtitle: { en: '', ar: '' }, items: [] };
   }

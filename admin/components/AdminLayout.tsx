@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Terminal, Eye, Lock, Image, Menu, Globe, ShieldCheck, Database, Handshake, Map, PanelBottom, Type, Sun, Moon, ChevronLeft, ChevronRight, CheckCircle2, Cloud, BarChart3, Rocket } from 'lucide-react';
+import { Terminal, Eye, Lock, Image, Menu, Globe, ShieldCheck, Database, Handshake, Map, PanelBottom, Type, Sun, Moon, ChevronLeft, ChevronRight, CheckCircle2, Cloud, BarChart3, Rocket, Bot } from 'lucide-react';
 import { useSite } from '../../context/SiteContext';
 import { ConfirmationModal } from './FormComponents';
 
@@ -33,6 +33,7 @@ const tabs = [
   { id: 'contact', icon: Map, labelEn: 'Contact Hub', labelAr: 'روابط الاتصال' },
   { id: 'footer', icon: PanelBottom, labelEn: 'Footer Workspace', labelAr: 'تذييل الموقع' },
   { id: 'uistrings', icon: Type, labelEn: 'UI Strings', labelAr: 'النصوص الظاهرة' },
+  { id: 'chatbot', icon: Bot, labelEn: 'ChatBot', labelAr: 'المساعد الذكي' },
   { id: 'visitors', icon: BarChart3, labelEn: 'Visitors', labelAr: 'الزوار' },
 ];
 

@@ -23,22 +23,37 @@ const ChatBot: React.FC<{ onNavigate?: (page: string) => void }> = ({ onNavigate
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const settings = siteData?.chatbot;
+  const botName = settings?.name?.[lang] || (lang === 'ar' ? 'أورجا بوت' : 'OrgaBot');
+
+  const greetingText = settings?.greeting?.[lang] || (lang === 'ar'
+    ? 'مرحباً! 👋 أنا **أورجا بوت** المساعد الذكي\nيمكنني مساعدتك في:\n• اختيار البرنامج المناسب لنشاطك التجاري\n• معلومات عن خدماتنا ومنتجاتنا\n• فروعنا وعناويننا\n• أرقام التواصل\n• معلومات عامة عن الشركة\n\nاكتب استفسارك وسأجيبك فوراً!'
+    : "Hi! 👋 I'm **OrgaBot** your smart assistant\nI can help you with:\n• Choosing the right software for your business\n• Information about our services & products\n• Our branches and locations\n• Contact information\n• General company info\n\nJust ask away!");
+
+  const defaultQuickReplies: Message['quickReplies'] = [
+    { label: 'I need a system', labelAr: 'أريد نظاماً', value: 'I need a management system for my business' },
+    { label: 'Our Services', labelAr: 'خدماتنا', value: 'What IT services do you offer?' },
+    { label: 'Contact', labelAr: 'اتصال', value: 'What is your phone number?' },
+    { label: 'Locations', labelAr: 'فروعنا', value: 'Where are your branches?' },
+  ];
+
+  const quickReplies: Message['quickReplies'] = settings?.quickReplies && settings.quickReplies.length > 0
+    ? settings.quickReplies.map(qr => ({
+        label: qr.label?.en || '',
+        labelAr: qr.label?.ar || '',
+        value: lang === 'ar' ? qr.value?.ar || qr.value?.en || '' : qr.value?.en || qr.value?.ar || '',
+      }))
+    : defaultQuickReplies;
+
   useEffect(() => {
     if (open) {
       inputRef.current?.focus();
       if (messages.length === 0) {
         const greeting: Message = {
           id: 'greeting',
-          text: lang === 'ar'
-            ? 'مرحباً! 👋 أنا **أورجا بوت** المساعد الذكي\nيمكنني مساعدتك في:\n• اختيار البرنامج المناسب لنشاطك التجاري\n• معلومات عن خدماتنا ومنتجاتنا\n• فروعنا وعناويننا\n• أرقام التواصل\n• معلومات عامة عن الشركة\n\nاكتب استفسارك وسأجيبك فوراً!'
-            : "Hi! 👋 I'm **OrgaBot** your smart assistant\nI can help you with:\n• Choosing the right software for your business\n• Information about our services & products\n• Our branches and locations\n• Contact information\n• General company info\n\nJust ask away!",
+          text: greetingText,
           sender: 'bot',
-          quickReplies: [
-            { label: 'I need a system', labelAr: 'أريد نظاماً', value: 'I need a management system for my business' },
-            { label: 'Our Services', labelAr: 'خدماتنا', value: 'What IT services do you offer?' },
-            { label: 'Contact', labelAr: 'اتصال', value: 'What is your phone number?' },
-            { label: 'Locations', labelAr: 'فروعنا', value: 'Where are your branches?' },
-          ],
+          quickReplies,
         };
         setMessages([greeting]);
       }
@@ -146,13 +161,19 @@ const ChatBot: React.FC<{ onNavigate?: (page: string) => void }> = ({ onNavigate
     setInput('');
   };
 
+  if (settings?.enabled === false) return null;
+
+  const positionClass = settings?.position === 'right'
+    ? 'right-4 xs:right-6 sm:right-10'
+    : 'left-4 xs:left-6 sm:left-10';
+
   return (
     <>
       {open && (
         <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[150] md:bg-transparent md:backdrop-blur-none md:pointer-events-none"
           onClick={() => setOpen(false)} />
       )}
-      <div className="fixed bottom-4 left-4 xs:bottom-6 xs:left-6 sm:bottom-10 sm:left-10 z-[200] flex flex-col items-start"
+      <div className={`fixed bottom-4 ${positionClass} xs:bottom-6 sm:bottom-10 z-[200] flex flex-col ${settings?.position === 'right' ? 'items-end' : 'items-start'}`}
         style={{ direction: isRTL ? 'rtl' : 'ltr' }}>
         {open && (
           <div className="mb-3 w-[360px] sm:w-[400px] bg-white dark:bg-[#131d31] rounded-2xl shadow-2xl border border-slate-200 dark:border-[#1e293b] overflow-hidden animate-fadeInUp"
@@ -164,7 +185,7 @@ const ChatBot: React.FC<{ onNavigate?: (page: string) => void }> = ({ onNavigate
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-white font-black text-sm leading-none">{lang === 'ar' ? 'أورجا بوت' : 'OrgaBot'}</h3>
+                    <h3 className="text-white font-black text-sm leading-none">{botName}</h3>
                     <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
                   </div>
                   <p className="text-white/60 text-[9px] font-bold uppercase tracking-[0.2em] mt-0.5">SMART ASSISTANT</p>

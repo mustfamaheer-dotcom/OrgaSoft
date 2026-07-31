@@ -14,6 +14,7 @@ import PartnersTab from '../admin/components/PartnersTab';
 import ContactTab from '../admin/components/ContactTab';
 import FooterTab from '../admin/components/FooterTab';
 import UIStringsTab from '../admin/components/UIStringsTab';
+import ChatBotTab from '../admin/components/ChatBotTab';
 import VisitorsTab from '../admin/components/VisitorsTab';
 import { logoutFromFirebase, onAuthChange, getCurrentUser } from '../lib/auth';
 import logger from '../lib/logger';
@@ -33,6 +34,7 @@ const TAB_SECTIONS: Record<string, (keyof SiteContent)[]> = {
   contact:    ['contacts'],
   footer:     ['uiStrings'],
   uistrings:  ['uiStrings', 'companyName'],
+  chatbot:    ['chatbot'],
 };
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
@@ -126,6 +128,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
     contact:    lang === 'ar' ? 'لوحة التحكم بالنظام' : 'System Control Panel',
     footer:     lang === 'ar' ? 'لوحة التحكم بالنظام' : 'System Control Panel',
     uistrings:  lang === 'ar' ? 'النصوص الظاهرة' : 'UI Strings',
+    chatbot:    lang === 'ar' ? 'المساعد الذكي' : 'ChatBot',
     visitors:   lang === 'ar' ? 'زوار الموقع' : 'Site Visitors',
   };
 
@@ -155,6 +158,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
       case 'contact': return <ContactTab {...tabProps} />;
       case 'footer': return <FooterTab {...tabProps} />;
       case 'uistrings': return <UIStringsTab {...tabProps} />;
+      case 'chatbot': return <ChatBotTab {...tabProps} />;
       case 'visitors': return <VisitorsTab isRTL={isRTL} products={data.products} lang={lang} />;
       default: return <GeneralTab {...tabProps} />;
     }
