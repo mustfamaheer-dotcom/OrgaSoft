@@ -7,3 +7,7 @@ dist/
 
 # Web Deploy
 *.publishSettings
+
+# Local-only data & scripts (never push database exports or local backups)
+*.json.local
+orga4soft-35b70-default-rtdb-export.json

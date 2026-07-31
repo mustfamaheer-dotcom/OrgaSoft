@@ -6,15 +6,13 @@ The admin dashboard now uses Firebase Authentication for secure login.
 
 ### Production Credentials (Firebase)
 
-**Email:** `admin@orga.com`  
-**Password:** `P@ssw0rdoQAa0Jw9qkQ3IiICnbYxj7Mzmcl1`
+**Email:** `admin@orga4soft.com`  
+**Password:** *(set in Firebase Console → Authentication → Users — never commit it to the repository)*
 
 ### Development Fallback Credentials
 
-If Firebase Authentication is not available, the system falls back to:
-
-**Username:** `admin`  
-**Password:** `admin`
+> ⚠️ **Removed for security.** The dev fallback login was never implemented in code
+> and must not be added. All logins go through Firebase Authentication only.
 
 ---
 
@@ -50,8 +48,8 @@ If Firebase Authentication is not available, the system falls back to:
 2. Click "Users" tab
 3. Click "Add user"
 4. Enter:
-   - **Email:** `admin@orga.com`
-   - **Password:** `P@ssw0rdoQAa0Jw9qkQ3IiICnbYxj7Mzmcl1`
+   - **Email:** `admin@orga4soft.com`
+   - **Password:** *(choose a strong password, keep it in your password manager)*
 5. Click "Add user"
 
 ### Step 3: Test Login
@@ -148,8 +146,8 @@ const addAdmin = async (email: string, password: string) => {
 ### "Invalid credentials" error
 
 **Check:**
-- Email is exactly: `admin@orga.com`
-- Password is exactly: `P@ssw0rdoQAa0Jw9qkQ3IiICnbYxj7Mzmcl1`
+- Email is exactly: `admin@orga4soft.com`
+- The Firebase Authentication user has the correct password
 - Email/Password authentication is enabled in Firebase
 - User exists in Firebase Authentication
 
@@ -162,12 +160,9 @@ const addAdmin = async (email: string, password: string) => {
 
 ### Firebase Authentication not working
 
-**Fallback:**
-- Use development credentials:
-  - Username: `admin`
-  - Password: `admin`
 - Check browser console for errors
 - Verify Firebase Authentication is enabled
+- Do NOT add a client-side fallback password — it would be exposed to everyone
 
 ---
 
@@ -251,10 +246,9 @@ Show error message
 
 | Purpose | Email | Password |
 |---------|-------|----------|
-| Production | admin@orga.com | P@ssw0rdoQAa0Jw9qkQ3IiICnbYxj7Mzmcl1 |
-| Development | admin | admin |
+| Production | admin@orga4soft.com | Set in Firebase Console — never commit it |
 
-**⚠️ Keep these credentials secure!**
+**⚠️ Never commit credentials to the repository. This file only documents the login flow.**
 
 ---
 

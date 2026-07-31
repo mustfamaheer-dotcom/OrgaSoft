@@ -25,9 +25,16 @@ function cleanData(obj: any): any {
 
 async function main() {
   try {
+    const email = process.env.FIREBASE_ADMIN_EMAIL;
+    const password = process.env.FIREBASE_ADMIN_PASSWORD;
+    if (!email || !password) {
+      console.error('Missing credentials. Set FIREBASE_ADMIN_EMAIL and FIREBASE_ADMIN_PASSWORD environment variables.');
+      process.exit(1);
+    }
+
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-    await signInWithEmailAndPassword(auth, 'admin@orga4soft.com', 'admin@orga4soft.com');
+    await signInWithEmailAndPassword(auth, email, password);
     const db = getFirestore(app);
     console.log('Authenticated');
 

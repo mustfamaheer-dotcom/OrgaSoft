@@ -1,8 +1,13 @@
 import logger from './logger';
 
 const IMAGEKIT_PUBLIC_KEY = import.meta.env.VITE_IMAGEKIT_PUBLIC_KEY;
-const IMAGEKIT_PRIVATE_KEY = import.meta.env.VITE_IMAGEKIT_PRIVATE_KEY;
 const IMAGEKIT_URL_ENDPOINT = import.meta.env.VITE_IMAGEKIT_URL_ENDPOINT;
+// Server-side signing endpoint (Firebase Cloud Function). When configured,
+// the private key NEVER reaches the browser. In production builds the
+// private key is stripped by vite.config.ts and this endpoint is required.
+const IMAGEKIT_AUTH_ENDPOINT = import.meta.env.VITE_IMAGEKIT_AUTH_ENDPOINT || '';
+// Legacy local fallback (development only — production builds strip this).
+const IMAGEKIT_PRIVATE_KEY: string | undefined = import.meta.env.VITE_IMAGEKIT_PRIVATE_KEY;
 
 async function hmacSha1(key: string, message: string): Promise<string> {
   const keyData = new TextEncoder().encode(key);
@@ -17,11 +22,26 @@ async function hmacSha1(key: string, message: string): Promise<string> {
 }
 
 export async function getImageKitAuthParams(): Promise<{ token: string; expire: number; signature: string }> {
-  const token = crypto.randomUUID();
-  const expire = Math.floor(Date.now() / 1000) + 1800;
-  const signature = await hmacSha1(IMAGEKIT_PRIVATE_KEY, `${token}${expire}`);
+  if (IMAGEKIT_AUTH_ENDPOINT) {
+    try {
+      const res = await fetch(IMAGEKIT_AUTH_ENDPOINT, { method: 'POST' });
+      if (res.ok) {
+        return await res.json();
+      }
+      logger.warn(`ImageKit auth endpoint failed (${res.status}), falling back to local signing`);
+    } catch (error) {
+      logger.warn('ImageKit auth endpoint unreachable, falling back to local signing:', error);
+    }
+  }
 
-  return { token, expire, signature };
+  if (IMAGEKIT_PRIVATE_KEY) {
+    const token = crypto.randomUUID();
+    const expire = Math.floor(Date.now() / 1000) + 1800;
+    const signature = await hmacSha1(IMAGEKIT_PRIVATE_KEY, `${token}${expire}`);
+    return { token, expire, signature };
+  }
+
+  throw new Error('ImageKit signing is not configured. Set VITE_IMAGEKIT_AUTH_ENDPOINT (server-side signing) or VITE_IMAGEKIT_PRIVATE_KEY (development only).');
 }
 
 export async function uploadToImageKit(file: File): Promise<string> {
