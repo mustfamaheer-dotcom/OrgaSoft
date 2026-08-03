@@ -78,7 +78,7 @@ const ServiceCard: React.FC<{ service: Service; lang: Language; idx?: number }> 
             </div>
           )}
           <h3 className="text-lg sm:text-xl font-black text-[#0f639e] dark:text-white mb-2 group-hover:text-[#df4d21] transition-colors">{service.name[lang]}</h3>
-          <p className="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-3">{service.description[lang]}</p>
+          <p className="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed">{service.description[lang]}</p>
         </div>
         <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-slate-100 dark:ring-[#1e293b] group-hover:ring-[#0f639e]/20 transition-all duration-500 pointer-events-none" />
       </div>
