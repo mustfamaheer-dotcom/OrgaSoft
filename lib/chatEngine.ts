@@ -78,7 +78,7 @@ interface WebsiteData {
   };
 }
 
-type Intent = 'product' | 'service' | 'orga-service' | 'location' | 'contact' | 'partner' | 'company' | 'greeting' | 'unknown';
+type Intent = 'product' | 'service' | 'orga-service' | 'location' | 'contact' | 'partner' | 'company' | 'greeting' | 'pricing' | 'product-detail' | 'unknown';
 
 function normalizeArabic(text: string): string {
   return text
@@ -132,9 +132,17 @@ const INTENT_KEYWORDS: Record<Intent, { en: string[]; ar: string[] }> = {
     en: ['about', 'company', 'tell me about', 'who are you', 'what is orga', 'about orga', 'background', 'history', 'mission', 'vision'],
     ar: ['من نحن', 'عن الشركه', 'عن الشركة', 'ما هي اورجا', 'نبذه', 'نبذة', 'تاریخ', 'شركه', 'شركة'],
   },
+  pricing: {
+    en: ['price', 'cost', 'how much', 'pricing', 'quote', 'afford', 'budget', 'subscription', 'monthly', 'annual'],
+    ar: ['سعر', 'ثمن', 'تكلفه', 'تكلفة', 'كم الثمن', 'كم يكلف', 'مجان', 'مجاني', 'اشتراك', 'اشتراكات', 'تقديم عرض', 'عرض سعر'],
+  },
+  'product-detail': {
+    en: ['tell me about', 'details about', 'features of', 'what is', 'describe', 'explain', 'overview of', 'info about'],
+    ar: ['اعرف عن', 'اعرف تفاصيل', 'تفاصيل عن', 'مميزات', 'ايش هو', 'وش هو', 'شرح', 'معلومات عن', 'اختصر'],
+  },
   product: {
-    en: ['product', 'software', 'system', 'program', 'solution', 'manage', 'برنامج', 'نظام'],
-    ar: ['منتج', 'منتجات', 'برنامج', 'نظام', 'حل', 'اداره', 'ادارة', 'سوفت'],
+    en: ['product', 'software', 'system', 'program', 'solution', 'manage'],
+    ar: ['منتج', 'منتجات', 'نظام', 'حل', 'اداره', 'ادارة', 'سوفت'],
   },
   unknown: { en: [], ar: [] },
 };
@@ -654,6 +662,145 @@ function handleGreeting(lang: string): ChatResponse {
   };
 }
 
+function handlePricing(siteData: WebsiteData, lang: string, tokens: string[]): ChatResponse | null {
+  const c = siteData.contacts;
+  const companyName = lang === 'ar'
+    ? siteData.companyName?.ar || siteData.companyName?.en || 'أورجا سوفت'
+    : siteData.companyName?.en || siteData.companyName?.ar || 'Orga Soft';
+
+  if (lang === 'ar') {
+    const parts: string[] = [`للحصول على **أسعار** برامج ${companyName} وعرض سعر مخصص لنشاطك:`];
+    if (c.phoneSupport) parts.push(`📞 اتصل بنا: ${c.phoneSupport}`);
+    if (c.phoneAdmin) parts.push(`📞 الإدارة: ${c.phoneAdmin}`);
+    if (c.whatsapp) parts.push(`💬 واتساب: ${c.whatsapp}`);
+    if (c.email) parts.push(`📧 البريد: ${c.email}`);
+    parts.push('\nفريقنا جاهز لمساعدتك وتقديم عرض السعر المناسب!');
+    return {
+      text: parts.join('\n'),
+      textAr: parts.join('\n'),
+      suggestions: [],
+      confidence: 'high',
+      quickReplies: c.whatsapp
+        ? [{ label: 'WhatsApp', labelAr: 'واتساب', value: `Send a message on WhatsApp` }]
+        : undefined,
+    };
+  }
+
+  const parts: string[] = [`To get **pricing** for ${companyName} programs and a custom quote for your business:`];
+  if (c.phoneSupport) parts.push(`📞 Call us: ${c.phoneSupport}`);
+  if (c.email) parts.push(`📧 Email: ${c.email}`);
+  if (c.whatsapp) parts.push(`💬 WhatsApp: ${c.whatsapp}`);
+  parts.push('\nOur team is ready to help you with the right quote!');
+  return {
+    text: parts.join('\n'),
+    textAr: parts.join('\n'),
+    suggestions: [],
+    confidence: 'high',
+    quickReplies: c.whatsapp
+      ? [{ label: 'WhatsApp', labelAr: 'واتساب', value: `Send a message on WhatsApp` }]
+      : undefined,
+  };
+}
+
+function handleProductDetail(
+  input: string,
+  products: ProductData[],
+  lang: string,
+): ChatResponse | null {
+  const tokens = tokenize(input);
+  const fullTokens = input.toLowerCase().split(/[\s,.\-!?؟:؛]+/).filter(t => t.length > 1);
+  const normInput = normalizeArabic(input.toLowerCase());
+
+  for (const product of products) {
+    const nameEn = (product.name?.en || '').toLowerCase();
+    const nameAr = normalizeArabic(product.name?.ar || '');
+    const nameTokens = nameEn.split(/\s+/).filter(t => t.length > 2);
+    const nameArTokens = nameAr.split(/\s+/).filter(t => t.length > 2);
+
+    // Require full name substring match OR at least 2 name tokens matching
+    const fullMatch = normInput.includes(nameEn) || normInput.includes(nameAr);
+    const tokenMatchCount = nameTokens.filter(t => normInput.includes(t)).length +
+      nameArTokens.filter(t => normInput.includes(t)).length;
+    const stemMatchCount = fullTokens.filter(t => stemMatch(nameEn, t) > 0 || stemMatch(nameAr, t) > 0).length;
+    const nameMatch = fullMatch || tokenMatchCount >= 2 || stemMatchCount >= 2;
+
+    if (nameMatch) {
+      const desc = lang === 'ar' ? product.description?.ar : product.description?.en;
+      const longDesc = lang === 'ar' ? product.longDescription?.ar : product.longDescription?.en;
+      const features = lang === 'ar' ? product.features?.ar : product.features?.en;
+      const kf = product.keyFeatures?.map(k => lang === 'ar' ? k.text?.ar : k.text?.en).filter(Boolean);
+
+      const parts: string[] = [];
+      parts.push(`**${lang === 'ar' ? product.name.ar : product.name.en}**`);
+      if (desc) parts.push(`\n${desc}`);
+      if (longDesc) {
+        const cleaned = longDesc.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+        parts.push(`\n${cleaned}`);
+      }
+      if (features && features.length > 0) {
+        parts.push(`\n\n${lang === 'ar' ? '✨ المميزات:' : '✨ Features:'}`);
+        features.forEach(f => parts.push(`• ${f}`));
+      }
+      if (kf && kf.length > 0) {
+        parts.push(`\n${lang === 'ar' ? '⭐ أبرز المميزات:' : '⭐ Key Features:'}`);
+        kf.forEach(f => parts.push(`• ${f}`));
+      }
+
+      return {
+        text: parts.join('\n'),
+        textAr: parts.join('\n'),
+        suggestions: [{
+          id: `product-${product.id}`,
+          name: product.name,
+          image: product.image,
+          type: 'product' as const,
+          matchScore: 100,
+        }],
+        confidence: 'high',
+        quickReplies: [
+          { label: lang === 'ar' ? 'أريد هذا النظام' : 'I want this system', labelAr: 'أريد هذا النظام', value: `I'm interested in ${product.name.en}` },
+          { label: lang === 'ar' ? 'السعر كم؟' : 'How much?', labelAr: 'السعر كم؟', value: 'How much does this cost?' },
+          { label: lang === 'ar' ? 'برامج أخرى' : 'Other programs', labelAr: 'برامج أخرى', value: 'What other programs do you have?' },
+        ],
+      };
+    }
+  }
+  // If input looks like a product name query but no product matched, show "not found"
+  const looksLikeProductQuery = normInput.includes('orga') || normInput.includes('اورجا') ||
+    tokens.some(t => t.includes('orga') || t.includes('اورجا'));
+  if (looksLikeProductQuery) {
+    const allNames = products.map(p => lang === 'ar' ? p.name.ar : p.name.en).filter(Boolean);
+    if (lang === 'ar') {
+      return {
+        text: `لا يوجد برنامج باسم المذكور. برامجنا المتاحة:\n\n${allNames.map((n, i) => `${i + 1}. **${n}**`).join('\n')}\n\nاختر برنامج أو أخبرني بنوع نشاطك!`,
+        textAr: `لا يوجد برنامج باسم المذكور. برامجنا المتاحة:\n\n${allNames.map((n, i) => `${i + 1}. **${n}**`).join('\n')}\n\nاختر برنامج أو أخبرني بنوع نشاطك!`,
+        suggestions: products.slice(0, 3).map(p => ({
+          id: `product-${p.id}`, name: p.name, image: p.image, type: 'product' as const, matchScore: 0,
+        })),
+        confidence: 'low',
+        quickReplies: [
+          { label: 'السعر', labelAr: 'السعر', value: 'How much does it cost?' },
+          { label: 'اتصال', labelAr: 'اتصال', value: 'What is your phone number?' },
+        ],
+      };
+    }
+    return {
+      text: `No program found with that name. Our available programs:\n\n${allNames.map((n, i) => `${i + 1}. **${n}**`).join('\n')}\n\nPick one or tell me about your business!`,
+      textAr: `لا يوجد برنامج باسم المذكور. برامجنا المتاحة:\n\n${allNames.map((n, i) => `${i + 1}. **${n}**`).join('\n')}\n\nاختر برنامج أو أخبرني بنوع نشاطك!`,
+      suggestions: products.slice(0, 3).map(p => ({
+        id: `product-${p.id}`, name: p.name, image: p.image, type: 'product' as const, matchScore: 0,
+      })),
+      confidence: 'low',
+      quickReplies: [
+        { label: 'Pricing', labelAr: 'السعر', value: 'How much does it cost?' },
+        { label: 'Contact', labelAr: 'اتصال', value: 'What is your phone number?' },
+      ],
+    };
+  }
+
+  return null;
+}
+
 // ── Product-specific handlers (existing logic, adapted) ─────────────
 
 interface DistinguishResult {
@@ -752,14 +899,18 @@ function handleProductQuery(
 
   // ── Follow-up: check if user is confirming/accepting previous recommendation ──
   const confirmPatterns = [
-    'تمام', 'ممتاز', 'نعم', 'ناوي', 'موافق', 'اريد هذا', 'اريد هذا النظام',
-    'هذا هو', 'هذا الحل', 'الحل الامثل', 'حل ممتاز', 'مقبول', 'بالتوفيق',
-    'تمام شكرا', 'تمام شكراً', 'شكرا', 'شكراً', 'this is it', 'perfect',
-    'sounds good', 'yes', 'i want this', 'great', 'nice', 'ok',
-    'تمام كده', 'تمام كدا', 'هذا مناسب', 'مناسب', 'حلو', 'جميل',
+    'تمام', 'ممتاز', 'موافق', 'اريد هذا', 'اريد هذا النظام',
+    'هذا هو', 'هذا الحل', 'الحل الامثل', 'حل ممتاز',
+    'تمام شكرا', 'تمام شكراً', 'شكرا', 'شكراً',
+    'this is it', 'perfect', 'sounds good', 'i want this',
+    'تمام كده', 'تمام كدا', 'هذا مناسب', 'مناسب',
   ];
   const norm = normalizeArabic(input.toLowerCase());
-  const isConfirm = confirmPatterns.some(p => norm.includes(normalizeArabic(p)));
+  const normWords = norm.split(/\s+/);
+  const isConfirm = confirmPatterns.some(p => {
+    const np = normalizeArabic(p);
+    return normWords.some(w => w === np) || norm.includes(np);
+  });
   if (isConfirm && session.lastSuggestions && session.lastSuggestions.length > 0) {
     const prev = session.lastSuggestions[0];
     const name = lang === 'ar' ? prev.name.ar : prev.name.en;
@@ -770,9 +921,9 @@ function handleProductQuery(
         suggestions: [],
         confidence: 'high',
         quickReplies: [
-          { label: 'Services', labelAr: 'خدماتنا', value: 'What services do you offer?' },
-          { label: 'Contact', labelAr: 'اتصال', value: 'What is your phone number?' },
-          { label: 'Locations', labelAr: 'فروعنا', value: 'Where are your branches?' },
+          { label: 'الخدمات', labelAr: 'خدماتنا', value: 'What services do you offer?' },
+          { label: 'السعر', labelAr: 'السعر', value: 'How much does it cost?' },
+          { label: 'اتصال', labelAr: 'اتصال', value: 'What is your phone number?' },
         ],
       };
     }
@@ -783,8 +934,8 @@ function handleProductQuery(
       confidence: 'high',
       quickReplies: [
         { label: 'Services', labelAr: 'خدماتنا', value: 'What services do you offer?' },
+        { label: 'Pricing', labelAr: 'السعر', value: 'How much does it cost?' },
         { label: 'Contact', labelAr: 'اتصال', value: 'What is your phone number?' },
-        { label: 'Locations', labelAr: 'فروعنا', value: 'Where are your branches?' },
       ],
     };
   }
@@ -831,6 +982,7 @@ function handleProductQuery(
     }
   }
 
+  // ── Strong match: show single recommendation ──
   if (topSuggestions.length > 0 && (
     confidence === 'high' ||
     (confidence === 'medium' && session.messages.length >= 2) ||
@@ -841,21 +993,39 @@ function handleProductQuery(
 
     if (confidence === 'high') {
       session.lastSuggestions = [top];
+      if (lang === 'ar') {
+        return {
+          text: `بناءً على وصف نشاطك، أنا متأكد أن **${topName}** هو الحل الأمثل لك!`,
+          textAr: `بناءً على وصف نشاطك، أنا متأكد أن **${topName}** هو الحل الأمثل لك!`,
+          suggestions: [top],
+          confidence,
+          quickReplies: [
+            { label: 'أريد هذا النظام', labelAr: 'أريد هذا النظام', value: `I want ${top.name.en}` },
+            { label: 'السعر كم؟', labelAr: 'السعر كم؟', value: 'How much does it cost?' },
+            { label: 'برامج أخرى', labelAr: 'برامج أخرى', value: 'What other programs do you have?' },
+          ],
+        };
+      }
       return {
-        text: `I'm confident **${topName}** is the ideal solution for you!`,
-        textAr: `أنا متأكد أن ${topName} هو الحل الأمثل لك!`,
+        text: `Based on your business description, I'm confident **${topName}** is the ideal solution for you!`,
+        textAr: `بناءً على وصف نشاطك، أنا متأكد أن **${topName}** هو الحل الأمثل لك!`,
         suggestions: [top],
         confidence,
+        quickReplies: [
+          { label: 'I want this', labelAr: 'أريد هذا النظام', value: `I want ${top.name.en}` },
+          { label: 'How much?', labelAr: 'السعر كم؟', value: 'How much does it cost?' },
+          { label: 'Other programs', labelAr: 'برامج أخرى', value: 'What other programs do you have?' },
+        ],
       };
     }
 
     let text: string, textAr: string;
     if (confidence === 'medium') {
       text = `Based on your needs, I recommend **${topName}**.`;
-      textAr = `بناءً على احتياجاتك، أوصي بـ ${topName}`;
+      textAr = `بناءً على احتياجاتك، أوصي بـ **${topName}**.`;
     } else {
       text = `You might want to check **${topName}**.`;
-      textAr = `قد ترغب في الاطلاع على ${topName}`;
+      textAr = `قد ترغب في الاطلاع على **${topName}**.`;
     }
 
     if (topSuggestions.length > 1) {
@@ -878,6 +1048,52 @@ function handleProductQuery(
     };
   }
 
+  // ── No strong match: show available programs as options ──
+  if (topSuggestions.length > 0 && confidence !== 'high') {
+    const allProducts = products.filter(p => p.showOnHome !== false);
+    if (lang === 'ar') {
+      const list = allProducts.map((p, i) => `${i + 1}. **${p.name.ar}** — ${p.description?.ar || ''}`).join('\n');
+      return {
+        text: `لم أجد تطابقاً تاماً لنشاطك. هذه برامجنا المتاحة:\n\n${list}\n\nأخبرني بنوع نشاطك وسأساعدك في اختيار الأنسب!`,
+        textAr: `لم أجد تطابقاً تاماً لنشاطك. هذه برامجنا المتاحة:\n\n${list}\n\nأخبرني بنوع نشاطك وسأساعدك في اختيار الأنسب!`,
+        suggestions: allProducts.slice(0, 3).map(p => ({
+          id: `product-${p.id}`,
+          name: p.name,
+          image: p.image,
+          type: 'product' as const,
+          matchScore: 0,
+        })),
+        confidence: 'low',
+        quickReplies: [
+          { label: 'صيدلية', labelAr: 'صيدلية', value: 'I have a pharmacy' },
+          { label: 'محل', labelAr: 'محل', value: 'I have a shop' },
+          { label: 'مصنع', labelAr: 'مصنع', value: 'I have a factory' },
+          { label: 'السعر', labelAr: 'السعر', value: 'How much does it cost?' },
+        ],
+      };
+    }
+    const list = allProducts.map((p, i) => `${i + 1}. **${p.name.en}** — ${p.description?.en || ''}`).join('\n');
+    return {
+      text: `I don't have an exact match for your business type. Here are our available programs:\n\n${list}\n\nTell me more about your business and I'll help you choose!`,
+      textAr: `لم أجد تطابقاً تاماً لنشاطك. هذه برامجنا المتاحة:\n\n${list}\n\nأخبرني بنوع نشاطك وسأساعدك في اختيار الأنسب!`,
+      suggestions: allProducts.slice(0, 3).map(p => ({
+        id: `product-${p.id}`,
+        name: p.name,
+        image: p.image,
+        type: 'product' as const,
+        matchScore: 0,
+      })),
+      confidence: 'low',
+      quickReplies: [
+        { label: 'Pharmacy', labelAr: 'صيدلية', value: 'I have a pharmacy' },
+        { label: 'Shop', labelAr: 'محل', value: 'I have a shop' },
+        { label: 'Factory', labelAr: 'مصنع', value: 'I have a factory' },
+        { label: 'Pricing', labelAr: 'السعر', value: 'How much does it cost?' },
+      ],
+    };
+  }
+
+  // ── No match at all: ask for clarification ──
   const question = generateProductQuestion(allIndustries, allNeeds, session.askedTopics, lang);
   if (question) {
     const quickReplies = allIndustries.length === 0
@@ -967,9 +1183,21 @@ export function processMessage(
     case 'company':
       return handleCompany(siteData, lang) || handleProductQuery(input, siteData.products, session, lang);
 
+    case 'pricing':
+      return handlePricing(siteData, lang, tokens);
+
+    case 'product-detail': {
+      const detail = handleProductDetail(input, siteData.products, lang);
+      if (detail) return detail;
+      return handleProductQuery(input, siteData.products, session, lang);
+    }
+
     case 'product':
     case 'unknown':
-    default:
+    default: {
+      const detail = handleProductDetail(input, siteData.products, lang);
+      if (detail) return detail;
       return handleProductQuery(input, siteData.products, session, lang);
+    }
   }
 }
