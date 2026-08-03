@@ -113,8 +113,8 @@ const INTENT_KEYWORDS: Record<Intent, { en: string[]; ar: string[] }> = {
     ar: ['عنوان', 'موقع', 'فرع', 'فروع', 'مكان', 'اين', 'أين', 'المقر', 'مقر', 'الفرع'],
   },
   contact: {
-    en: ['phone', 'call', 'contact', 'email', 'whatsapp', 'number', 'mobile', 'telephone', 'reach', 'get in touch', 'support'],
-    ar: ['هاتف', 'اتصال', 'اتصل', 'رقم', 'موبايل', 'جوال', 'واتس', 'ايميل', 'بريد', 'تواصل'],
+    en: ['phone', 'call', 'contact', 'email', 'whatsapp', 'number', 'mobile number', 'telephone', 'reach', 'get in touch', 'support number', 'phone number'],
+    ar: ['هاتف', 'اتصال', 'اتصل', 'رقم هاتف', 'رقم الجوال', 'واتس', 'ايميل', 'بريد', 'تواصل', 'رقم التواصل', 'اتصل بنا'],
   },
   partner: {
     en: ['partner', 'partners', 'client', 'clients', 'customer', 'customers', 'collaboration', 'who work with', 'trusted'],
@@ -211,7 +211,7 @@ const INDUSTRIES: IndustryCategory[] = [
   { name: 'cosmetics', keywords: ['cosmetic', 'beauty', 'makeup', 'perfume', 'skincare', 'haircare'], keywordsAr: ['تجميل', 'عطور', 'مكياج', 'تجميلي', 'تجميليه'] },
   { name: 'hospital', keywords: ['hospital', 'clinic', 'medical', 'healthcare', 'patient', 'doctor', 'nurse', 'ward', 'surgery', 'clinical', 'diagnosis', 'inpatient'], keywordsAr: ['مستشفى', 'مستوصف', 'مركز طبي', 'عياده', 'عيادة', 'رعايه'] },
   { name: 'restaurant', keywords: ['restaurant', 'cafe', 'coffee', 'kitchen', 'menu', 'dine', 'food', 'beverage', 'chef', 'catering', 'dining'], keywordsAr: ['مطعم', 'مقهى', 'كافيه', 'اكل', 'طعام', 'مطبخ', 'بقاله', 'سوبر ماركت', 'مأكولات'] },
-  { name: 'retail', keywords: ['store', 'shop', 'retail', 'boutique', 'mall', 'ecommerce', 'e-commerce', 'supermarket', 'grocery', 'merchandise', 'checkout', 'accessories', 'gift', 'toy'], keywordsAr: ['متجر', 'محل', 'متاجر', 'مول', 'تجاره', 'تجارة', 'بيع', 'سوبر', 'اكسسوارات', 'هدايا', 'هديه', 'لعاب', 'العاب', 'اطفال'] },
+  { name: 'retail', keywords: ['store', 'shop', 'retail', 'boutique', 'mall', 'ecommerce', 'e-commerce', 'supermarket', 'grocery', 'merchandise', 'checkout', 'accessories', 'gift', 'toy', 'mobile', 'phone', 'electronics'], keywordsAr: ['متجر', 'محل', 'متاجر', 'مول', 'تجاره', 'تجارة', 'بيع', 'سوبر', 'اكسسوارات', 'هدايا', 'هديه', 'لعاب', 'العاب', 'اطفال', 'موبايلات', 'جوالات', 'هواتف', 'الكترونيات', 'اجهزة'] },
   { name: 'warehouse', keywords: ['warehouse', 'inventory', 'stock', 'logistics', 'storage', 'distribution', 'supply chain', 'goods', 'shipment'], keywordsAr: ['مستودع', 'مخزون', 'تخزين', 'مخزن', 'مستلزمات', 'توريد'] },
   { name: 'accounting', keywords: ['accounting', 'finance', 'accountant', 'bookkeeping', 'invoice', 'billing', 'tax', 'audit', 'financial', 'expense', 'revenue', 'ledger', 'balance sheet'], keywordsAr: ['محاسبه', 'محاسبة', 'حسابات', 'ماليه', 'مالية', 'محاسب', 'فاتوره', 'فاتورة', 'ميزانيه', 'ضريبه'] },
   { name: 'hr', keywords: ['hr', 'human resources', 'payroll', 'recruitment', 'employee', 'staff', 'attendance', 'salary', 'hiring', 'personnel', 'timesheet', 'leave'], keywordsAr: ['موظف', 'موارد بشريه', 'موارد بشرية', 'رواتب', 'مرتبات', 'توظيف', 'حضور'] },
@@ -749,6 +749,45 @@ function handleProductQuery(
   const tokens = tokenize(input);
   const industries = detectIndustries(input);
   const needs = extractNeeds(input);
+
+  // ── Follow-up: check if user is confirming/accepting previous recommendation ──
+  const confirmPatterns = [
+    'تمام', 'ممتاز', 'نعم', 'ناوي', 'موافق', 'اريد هذا', 'اريد هذا النظام',
+    'هذا هو', 'هذا الحل', 'الحل الامثل', 'حل ممتاز', 'مقبول', 'بالتوفيق',
+    'تمام شكرا', 'تمام شكراً', 'شكرا', 'شكراً', 'this is it', 'perfect',
+    'sounds good', 'yes', 'i want this', 'great', 'nice', 'ok',
+    'تمام كده', 'تمام كدا', 'هذا مناسب', 'مناسب', 'حلو', 'جميل',
+  ];
+  const norm = normalizeArabic(input.toLowerCase());
+  const isConfirm = confirmPatterns.some(p => norm.includes(normalizeArabic(p)));
+  if (isConfirm && session.lastSuggestions && session.lastSuggestions.length > 0) {
+    const prev = session.lastSuggestions[0];
+    const name = lang === 'ar' ? prev.name.ar : prev.name.en;
+    if (lang === 'ar') {
+      return {
+        text: `ممتاز! **${name}** اختيار رائع 👍\n\nهل تحتاج مساعدة في شيء آخر؟`,
+        textAr: `ممتاز! **${name}** اختيار رائع 👍\n\nهل تحتاج مساعدة في شيء آخر؟`,
+        suggestions: [],
+        confidence: 'high',
+        quickReplies: [
+          { label: 'Services', labelAr: 'خدماتنا', value: 'What services do you offer?' },
+          { label: 'Contact', labelAr: 'اتصال', value: 'What is your phone number?' },
+          { label: 'Locations', labelAr: 'فروعنا', value: 'Where are your branches?' },
+        ],
+      };
+    }
+    return {
+      text: `Great! **${name}** is a solid choice 👍\n\nNeed help with anything else?`,
+      textAr: `ممتاز! **${name}** اختيار رائع 👍\n\nهل تحتاج مساعدة في شيء آخر؟`,
+      suggestions: [],
+      confidence: 'high',
+      quickReplies: [
+        { label: 'Services', labelAr: 'خدماتنا', value: 'What services do you offer?' },
+        { label: 'Contact', labelAr: 'اتصال', value: 'What is your phone number?' },
+        { label: 'Locations', labelAr: 'فروعنا', value: 'Where are your branches?' },
+      ],
+    };
+  }
 
   session.messages.push({ text: input, industries, needs });
 
