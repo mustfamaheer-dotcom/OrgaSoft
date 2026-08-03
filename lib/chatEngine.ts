@@ -20,6 +20,7 @@ interface ProductData {
   id: string;
   name: Record<string, string>;
   description: Record<string, string>;
+  longDescription?: Record<string, string>;
   image?: string;
   features?: Record<string, string[]>;
   keyFeatures?: { text: Record<string, string> }[];
@@ -138,6 +139,51 @@ const INTENT_KEYWORDS: Record<Intent, { en: string[]; ar: string[] }> = {
   unknown: { en: [], ar: [] },
 };
 
+function arabicStem(word: string): string {
+  let w = word;
+  if (w.startsWith('وال') && w.length > 5) w = w.slice(3);
+  else if (w.startsWith('بال') && w.length > 5) w = w.slice(3);
+  else if (w.startsWith('كال') && w.length > 5) w = w.slice(3);
+  else if (w.startsWith('لل') && w.length > 4) w = w.slice(2);
+  else if (w.startsWith('ال') && w.length > 4) w = w.slice(2);
+  if (w.endsWith('ون') && w.length > 4) w = w.slice(0, -2);
+  else if (w.endsWith('ين') && w.length > 4) w = w.slice(0, -2);
+  if (w.endsWith('يات') && w.length > 5) w = w.slice(0, -3);
+  else if (w.endsWith('ات') && w.length > 4) w = w.slice(0, -2);
+  if (w.endsWith('ية') || w.endsWith('يه')) w = w.slice(0, -2);
+  if (w.endsWith('ية') || w.endsWith('يه')) w = w.slice(0, -2);
+  if (w.endsWith('ة') || w.endsWith('ه')) w = w.slice(0, -1);
+  return w;
+}
+
+function stemMatch(text: string, term: string): number {
+  if (term.length < 2) return 0;
+  const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const exact = (text.match(new RegExp(escaped, 'g')) || []).length;
+  if (exact > 0) return exact;
+  const tStem = arabicStem(term);
+  if (tStem.length < 3) return 0;
+  const words = text.split(/[\s,،.\n\r!?؟;:()\-_]+/).filter(w => w.length > 1);
+  let count = 0;
+  for (const w of words) {
+    const wStem = arabicStem(w);
+    if (wStem === tStem || wStem.startsWith(tStem) || tStem.startsWith(wStem)) count++;
+  }
+  return count;
+}
+
+const NEEDS_AR_KEYWORDS: Record<string, string[]> = {
+  management: ['اداره', 'ادارة', 'ادار', 'اداري'],
+  accounting: ['محاسبه', 'محاسبة', 'حسابات', 'محاسب', 'مالية'],
+  sales: ['مبيعات', 'بيع', 'نقاط بيع', 'بيعا'],
+  inventory: ['مخزون', 'مخازن', 'تخزين', 'مستودع', 'مستودعات'],
+  hr: ['موظف', 'رواتب', 'موظفين', 'حضور', 'موارد'],
+  crm: ['عميل', 'عملاء', 'علاقه'],
+  invoicing: ['فاتوره', 'فاتورة', 'فواتير', 'فاتور'],
+  analytics: ['تقارير', 'تحليل', 'احصائيه', 'تقرير'],
+  cosmetics: ['مستحضر', 'تجميل', 'عطور', 'مكياج'],
+};
+
 function detectIntent(_tokens: string[], text: string): Intent {
   const lower = text.toLowerCase();
   const norm = normalizeArabic(lower);
@@ -162,19 +208,20 @@ interface IndustryCategory {
 
 const INDUSTRIES: IndustryCategory[] = [
   { name: 'pharmacy', keywords: ['pharmacy', 'pharma', 'drug', 'medication', 'pharmacist', 'prescription', 'rx', 'pill', 'medicine', 'pharmaceutical'], keywordsAr: ['صيدل', 'دواء', 'ادويه', 'علاج', 'مستحضر', 'وصفه'] },
-  { name: 'hospital', keywords: ['hospital', 'clinic', 'medical', 'healthcare', 'patient', 'doctor', 'nurse', 'ward', 'surgery', 'clinical', 'diagnosis', 'inpatient'], keywordsAr: ['مستشفى', 'مستوصف', 'مركز طبي', 'عياده', 'عيادة', 'رعايه', 'علاج'] },
+  { name: 'cosmetics', keywords: ['cosmetic', 'beauty', 'makeup', 'perfume', 'skincare', 'haircare'], keywordsAr: ['تجميل', 'عطور', 'مكياج', 'تجميلي', 'تجميليه'] },
+  { name: 'hospital', keywords: ['hospital', 'clinic', 'medical', 'healthcare', 'patient', 'doctor', 'nurse', 'ward', 'surgery', 'clinical', 'diagnosis', 'inpatient'], keywordsAr: ['مستشفى', 'مستوصف', 'مركز طبي', 'عياده', 'عيادة', 'رعايه'] },
   { name: 'restaurant', keywords: ['restaurant', 'cafe', 'coffee', 'kitchen', 'menu', 'dine', 'food', 'beverage', 'chef', 'catering', 'dining'], keywordsAr: ['مطعم', 'مقهى', 'كافيه', 'اكل', 'طعام', 'مطبخ', 'بقاله', 'سوبر ماركت', 'مأكولات'] },
-  { name: 'retail', keywords: ['store', 'shop', 'retail', 'boutique', 'mall', 'ecommerce', 'e-commerce', 'supermarket', 'grocery', 'merchandise', 'checkout'], keywordsAr: ['متجر', 'محل', 'متاجر', 'مول', 'تجاره', 'تجارة', 'بيع', 'سوبر'] },
+  { name: 'retail', keywords: ['store', 'shop', 'retail', 'boutique', 'mall', 'ecommerce', 'e-commerce', 'supermarket', 'grocery', 'merchandise', 'checkout', 'accessories', 'gift', 'toy'], keywordsAr: ['متجر', 'محل', 'متاجر', 'مول', 'تجاره', 'تجارة', 'بيع', 'سوبر', 'اكسسوارات', 'هدايا', 'هديه', 'لعاب', 'العاب', 'اطفال'] },
   { name: 'warehouse', keywords: ['warehouse', 'inventory', 'stock', 'logistics', 'storage', 'distribution', 'supply chain', 'goods', 'shipment'], keywordsAr: ['مستودع', 'مخزون', 'تخزين', 'مخزن', 'مستلزمات', 'توريد'] },
   { name: 'accounting', keywords: ['accounting', 'finance', 'accountant', 'bookkeeping', 'invoice', 'billing', 'tax', 'audit', 'financial', 'expense', 'revenue', 'ledger', 'balance sheet'], keywordsAr: ['محاسبه', 'محاسبة', 'حسابات', 'ماليه', 'مالية', 'محاسب', 'فاتوره', 'فاتورة', 'ميزانيه', 'ضريبه'] },
   { name: 'hr', keywords: ['hr', 'human resources', 'payroll', 'recruitment', 'employee', 'staff', 'attendance', 'salary', 'hiring', 'personnel', 'timesheet', 'leave'], keywordsAr: ['موظف', 'موارد بشريه', 'موارد بشرية', 'رواتب', 'مرتبات', 'توظيف', 'حضور'] },
-  { name: 'education', keywords: ['school', 'education', 'academy', 'university', 'college', 'student', 'teacher', 'learning', 'course', 'training', 'classroom', 'curriculum'], keywordsAr: ['مدرسه', 'مدرسة', 'تعليم', 'اكاديميه', 'أكاديميه', 'جامعه', 'جامعة', 'طالب', 'تدريب'] },
+  { name: 'education', keywords: ['school', 'education', 'academy', 'university', 'college', 'student', 'teacher', 'learning', 'course', 'training', 'classroom', 'curriculum', 'library', 'book', 'books'], keywordsAr: ['مدرسه', 'مدرسة', 'تعليم', 'اكاديميه', 'أكاديميه', 'جامعه', 'جامعة', 'طالب', 'تدريب', 'مكتبه', 'مكتبة', 'مكتبات', 'كتب', 'كتاب'] },
   { name: 'realestate', keywords: ['real estate', 'property', 'apartment', 'building', 'rent', 'lease', 'mortgage', 'estate', 'housing', 'land', 'tenant', 'broker'], keywordsAr: ['عقار', 'عقارات', 'عقاريه', 'عقارية', 'املاك', 'أملاك', 'ايجار', 'إيجار', 'مبنى'] },
   { name: 'construction', keywords: ['construction', 'engineering', 'contractor', 'architecture', 'project', 'site', 'infrastructure', 'building material', 'tender'], keywordsAr: ['مقاولات', 'بناء', 'هندسه', 'هندسة', 'مشروع', 'انشاء', 'إنشاء', 'تشطيب'] },
   { name: 'transportation', keywords: ['car', 'vehicle', 'fleet', 'transport', 'delivery', 'shipping', 'logistics', 'driver', 'taxi', 'tracking', 'dispatch'], keywordsAr: ['سياره', 'سيارة', 'نقل', 'توصيل', 'شحن', 'مواصلات'] },
   { name: 'hotel', keywords: ['hotel', 'resort', 'hospitality', 'tourism', 'travel', 'booking', 'guest', 'accommodation', 'check-in', 'concierge'], keywordsAr: ['فندق', 'سياحه', 'سياحة', 'سفر', 'حجز', 'نزل', 'ضيافه', 'ضيافة'] },
   { name: 'agriculture', keywords: ['agriculture', 'farm', 'farming', 'crop', 'harvest', 'irrigation', 'livestock', 'plantation', 'greenhouse'], keywordsAr: ['زراعه', 'زراعة', 'مزرعه', 'مزرعة', 'محصول', 'ري', 'مواشي'] },
-  { name: 'manufacturing', keywords: ['manufacturing', 'factory', 'production', 'industrial', 'plant', 'manufacture', 'assembly', 'quality control', 'machine'], keywordsAr: ['مصنع', 'مصانع', 'انتاج', 'إنتاج', 'صناعي', 'صناعه', 'صناعة'] },
+  { name: 'manufacturing', keywords: ['manufacturing', 'factory', 'production', 'industrial', 'plant', 'manufacture', 'assembly', 'quality control', 'machine'], keywordsAr: ['مصنع', 'مصانع', 'انتاج', 'إنتاج', 'صناعي', 'صناعه', 'صناعة', 'تصنيع'] },
 ];
 
 export function detectIndustries(text: string): string[] {
@@ -249,56 +296,56 @@ function scoreProductMatch(
   needs: string[],
   tokens: string[],
 ): number {
-  const descEn = (product.description?.en || '').toLowerCase();
-  const descAr = normalizeArabic(product.description?.ar || '');
+  const descEn = [
+    product.description?.en || '',
+    product.longDescription?.en || '',
+  ].join(' ').toLowerCase();
+  const descAr = [
+    product.description?.ar || '',
+    product.longDescription?.ar || '',
+  ].map(t => normalizeArabic(t)).join(' ');
   const nameEn = (product.name?.en || '').toLowerCase();
   const nameAr = normalizeArabic(product.name?.ar || '');
-  const featuresEn = (product.features?.en || []).join(' ').toLowerCase();
-  const featuresAr = normalizeArabic((product.features?.ar || []).join(' '));
-  const kfEn = (product.keyFeatures?.map(k => k.text?.en || '') || []).join(' ').toLowerCase();
-  const kfAr = normalizeArabic((product.keyFeatures?.map(k => k.text?.ar || '') || []).join(' '));
   let score = 0;
 
-  // ── Description is the primary signal ──
   for (const industry of industries) {
     const ind = INDUSTRIES.find(i => i.name === industry);
     if (!ind) continue;
     for (const kw of ind.keywords) {
-      const count = (descEn.match(new RegExp(kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi')) || []).length;
-      if (count > 0) score += count * 15;
+      score += stemMatch(descEn, kw) * 15;
     }
     for (const kw of ind.keywordsAr) {
-      const normalKw = normalizeArabic(kw);
-      const count = (descAr.match(new RegExp(normalKw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length;
-      if (count > 0) score += count * 15;
+      score += stemMatch(descAr, kw) * 15;
     }
   }
 
   for (const need of needs) {
-    const inDescEn = (descEn.match(new RegExp(need.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi')) || []).length;
-    const inDescAr = (descAr.match(new RegExp(need.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length;
-    score += (inDescEn + inDescAr) * 12;
+    const arKws = NEEDS_AR_KEYWORDS[need] || [];
+    for (const kw of arKws) {
+      score += stemMatch(descAr, kw) * 12;
+    }
+    score += stemMatch(descEn, need) * 12;
   }
 
   for (const token of tokens) {
     if (token.length < 3) continue;
-    const inDescEn = (descEn.match(new RegExp(token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length;
-    const inDescAr = (descAr.match(new RegExp(token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length;
-    score += (inDescEn + inDescAr) * 10;
+    score += stemMatch(descEn, token) * 10;
+    score += stemMatch(descAr, token) * 10;
   }
 
-  // ── Name match as tiebreaker only ──
-  for (const token of tokens) {
-    if (nameEn.includes(token) || nameAr.includes(token)) { score += 5; break; }
-  }
-
-  // ── Extra fields: minor boost ──
   for (const token of tokens) {
     if (token.length < 3) continue;
-    if (featuresEn.includes(token)) score += 1;
-    if (featuresAr.includes(token)) score += 1;
-    if (kfEn.includes(token)) score += 1;
-    if (kfAr.includes(token)) score += 1;
+    if (stemMatch(nameEn, token) > 0 || stemMatch(nameAr, token) > 0) { score += 5; break; }
+  }
+
+  const featuresEn = (product.features?.en || []).join(' ').toLowerCase();
+  const featuresAr = normalizeArabic((product.features?.ar || []).join(' '));
+  const kfEn = (product.keyFeatures?.map(k => k.text?.en || '') || []).join(' ').toLowerCase();
+  const kfAr = normalizeArabic((product.keyFeatures?.map(k => k.text?.ar || '') || []).join(' '));
+  for (const token of tokens) {
+    if (token.length < 3) continue;
+    if (stemMatch(featuresEn, token) > 0 || stemMatch(featuresAr, token) > 0) score += 1;
+    if (stemMatch(kfEn, token) > 0 || stemMatch(kfAr, token) > 0) score += 1;
   }
 
   return score;
@@ -317,9 +364,9 @@ function scoreItemMatch(
 
   for (const token of tokens) {
     if (token.length < 3) continue;
-    if (nameEn.includes(token) || nameAr.includes(token)) score += 20;
-    if (descEn.includes(token)) score += 6;
-    if (descAr.includes(token)) score += 6;
+    if (stemMatch(nameEn, token) > 0 || stemMatch(nameAr, token) > 0) score += 20;
+    if (stemMatch(descEn, token) > 0) score += 6;
+    if (stemMatch(descAr, token) > 0) score += 6;
   }
   return score;
 }
