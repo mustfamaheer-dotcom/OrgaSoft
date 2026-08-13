@@ -1,10 +1,10 @@
 import React, { useCallback, useRef, useState, useEffect } from 'react';
 import { useSite } from '../context/SiteContext';
-import { Rocket } from 'lucide-react';
+import { Rocket, MoveRight, MoveLeft } from 'lucide-react';
 import type { OrgaProService, Language } from '../types';
 import KitImage from './KitImage';
 
-const TiltCard: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className }) => {
+const TiltCard: React.FC<{ children: React.ReactNode; className?: string; onClick?: () => void }> = ({ children, className, onClick }) => {
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const card = e.currentTarget;
     const rect = card.getBoundingClientRect();
@@ -38,6 +38,7 @@ const TiltCard: React.FC<{ children: React.ReactNode; className?: string }> = ({
   }, []);
   return (
     <div className={className}
+      onClick={onClick}
       onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave}
       onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}>
       {children}
@@ -45,12 +46,14 @@ const TiltCard: React.FC<{ children: React.ReactNode; className?: string }> = ({
   );
 };
 
-const OrgaProCard: React.FC<{ service: OrgaProService; lang: Language; idx?: number }> = ({ service, lang, idx = 0 }) => {
+const OrgaProCard: React.FC<{ service: OrgaProService; lang: Language; isRTL: boolean; onNavigate?: (page: string) => void; idx?: number }> = ({ service, lang, isRTL, onNavigate, idx = 0 }) => {
   const [loaded, setLoaded] = useState(false);
   useEffect(() => { const t = setTimeout(() => setLoaded(true), idx * 80); return () => clearTimeout(t); }, [idx]);
 
   return (
-    <TiltCard className="group h-full">
+    <TiltCard
+      onClick={onNavigate ? () => onNavigate(`orga-pro-${service.id}`) : undefined}
+      className="group h-full cursor-pointer active:scale-[0.98]">
       <div className={`tilt-inner relative h-full rounded-2xl overflow-hidden bg-white dark:bg-[#131d31] border border-slate-100 dark:border-[#1e293b] hover:border-[#0f639e]/30 hover:shadow-xl transition-all duration-500 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
         style={{ transitionDelay: `${idx * 80}ms` }}>
         <div className="relative w-full aspect-[480/462.8] overflow-hidden bg-slate-100 dark:bg-[#1e293b]">
@@ -65,7 +68,11 @@ const OrgaProCard: React.FC<{ service: OrgaProService; lang: Language; idx?: num
         </div>
         <div className="relative px-5 sm:px-6 pb-5 sm:pb-6 pt-5 sm:pt-6">
           <h3 className="text-lg sm:text-xl font-black text-[#0f639e] dark:text-white mb-2 group-hover:text-[#df4d21] transition-colors">{service.name[lang]}</h3>
-          <p className="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed">{service.description[lang]}</p>
+          <p className="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2">{service.description[lang]}</p>
+          <div className={`flex items-center gap-1.5 mt-3 text-[#df4d21] font-bold uppercase tracking-[0.15em] text-[11px] ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
+            <span>{isRTL ? 'التفاصيل' : 'Learn More'}</span>
+            {isRTL ? <MoveLeft className="w-3.5 h-3.5" /> : <MoveRight className="w-3.5 h-3.5" />}
+          </div>
         </div>
         <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-slate-100 dark:ring-[#1e293b] group-hover:ring-[#0f639e]/20 transition-all duration-500 pointer-events-none" />
       </div>
@@ -73,7 +80,7 @@ const OrgaProCard: React.FC<{ service: OrgaProService; lang: Language; idx?: num
   );
 };
 
-const OrgaProServicesSection: React.FC = () => {
+const OrgaProServicesSection: React.FC<{ onNavigate?: (page: string) => void }> = ({ onNavigate }) => {
   const { lang, siteData, isRTL } = useSite();
   const section = siteData.orgaProServices;
 
@@ -150,7 +157,7 @@ const OrgaProServicesSection: React.FC = () => {
   const visiblePage = visibleItems.slice(page * perPage, (page + 1) * perPage);
 
   const renderCard = (service: OrgaProService, idx?: number) => (
-    <OrgaProCard key={service.id} service={service} lang={lang} idx={idx} />
+    <OrgaProCard key={service.id} service={service} lang={lang} isRTL={isRTL} onNavigate={onNavigate} idx={idx} />
   );
 
   return (

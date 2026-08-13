@@ -215,7 +215,7 @@ interface IndustryCategory {
 }
 
 const INDUSTRIES: IndustryCategory[] = [
-  { name: 'pharmacy', keywords: ['pharmacy', 'pharma', 'drug', 'medication', 'pharmacist', 'prescription', 'rx', 'pill', 'medicine', 'pharmaceutical'], keywordsAr: ['صيدل', 'دواء', 'ادويه', 'علاج', 'مستحضر', 'وصفه'] },
+  { name: 'pharmacy', keywords: ['pharmacy', 'pharma', 'drug', 'medication', 'pharmacist', 'prescription', 'rx', 'pill', 'medicine', 'pharmaceutical'], keywordsAr: ['صيدل', 'دواء', 'ادويه', 'علاج', 'وصفه'] },
   { name: 'cosmetics', keywords: ['cosmetic', 'beauty', 'makeup', 'perfume', 'skincare', 'haircare'], keywordsAr: ['تجميل', 'عطور', 'مكياج', 'تجميلي', 'تجميليه'] },
   { name: 'hospital', keywords: ['hospital', 'clinic', 'medical', 'healthcare', 'patient', 'doctor', 'nurse', 'ward', 'surgery', 'clinical', 'diagnosis', 'inpatient'], keywordsAr: ['مستشفى', 'مستوصف', 'مركز طبي', 'عياده', 'عيادة', 'رعايه'] },
   { name: 'restaurant', keywords: ['restaurant', 'cafe', 'coffee', 'kitchen', 'menu', 'dine', 'food', 'beverage', 'chef', 'catering', 'dining'], keywordsAr: ['مطعم', 'مقهى', 'كافيه', 'اكل', 'طعام', 'مطبخ', 'بقاله', 'سوبر ماركت', 'مأكولات'] },
@@ -893,9 +893,51 @@ function handleProductQuery(
   session: SessionState,
   lang: string,
 ): ChatResponse {
-  const tokens = tokenize(input);
+    const tokens = tokenize(input);
   const industries = detectIndustries(input);
   const needs = extractNeeds(input);
+
+  // ── Special handling for generic business management queries ──
+  if (input.toLowerCase().includes('إدارة نشاطي التجاري') || 
+      input.toLowerCase().includes('management my business')) {
+    const question = generateProductQuestion([], [], session.askedTopics, lang);
+    if (question) {
+      const quickReplies = [
+        { label: 'صيدلية', labelAr: 'صيدلية', value: 'I have a pharmacy' },
+        { label: 'محل', labelAr: 'محل', value: 'I have a shop' },
+        { label: 'مصنع', labelAr: 'مصنع', value: 'I have a factory' },
+        { label: 'مستشفى', labelAr: 'مستشفى', value: 'I have a hospital' },
+      ];
+      return {
+        text: question,
+        textAr: question,
+        suggestions: [],
+        confidence: 'low',
+        quickReplies,
+      };
+    }
+  }
+
+  // ── Special handling for generic business management queries ──
+  if (input.toLowerCase().includes('إدارة نشاطي التجاري') || 
+      input.toLowerCase().includes('management my business')) {
+    const question = generateProductQuestion([], [], session.askedTopics, lang);
+    if (question) {
+      const quickReplies = [
+        { label: 'صيدلية', labelAr: 'صيدلية', value: 'I have a pharmacy' },
+        { label: 'محل', labelAr: 'محل', value: 'I have a shop' },
+        { label: 'مصنع', labelAr: 'مصنع', value: 'I have a factory' },
+        { label: 'مستشفى', labelAr: 'مستشفى', value: 'I have a hospital' },
+      ];
+      return {
+        text: question,
+        textAr: question,
+        suggestions: [],
+        confidence: 'low',
+        quickReplies,
+      };
+    }
+  }
 
   // ── Follow-up: check if user is confirming/accepting previous recommendation ──
   const confirmPatterns = [
@@ -903,13 +945,13 @@ function handleProductQuery(
     'هذا هو', 'هذا الحل', 'الحل الامثل', 'حل ممتاز',
     'تمام شكرا', 'تمام شكراً', 'شكرا', 'شكراً',
     'this is it', 'perfect', 'sounds good', 'i want this',
-    'تمام كده', 'تمام كدا', 'هذا مناسب', 'مناسب',
+    'تمام كده', 'تمام كدا',
   ];
   const norm = normalizeArabic(input.toLowerCase());
   const normWords = norm.split(/\s+/);
   const isConfirm = confirmPatterns.some(p => {
     const np = normalizeArabic(p);
-    return normWords.some(w => w === np) || norm.includes(np);
+    return normWords.some(w => w === np);
   });
   if (isConfirm && session.lastSuggestions && session.lastSuggestions.length > 0) {
     const prev = session.lastSuggestions[0];
@@ -978,6 +1020,28 @@ function handleProductQuery(
           { label: topSuggestions[0].name.en, labelAr: topSuggestions[0].name.ar, value: `I'm interested in ${topSuggestions[0].name.en}` },
           { label: topSuggestions[1].name.en, labelAr: topSuggestions[1].name.ar, value: `I'm interested in ${topSuggestions[1].name.en}` },
         ],
+      };
+    }
+  }
+
+  // ── Generic query: no specific industry mentioned, ask for clarification ──
+  const meaningfulIndustries = allIndustries.filter(i => !['retail', 'warehouse', 'management'].includes(i));
+  const meaningfulNeeds = allNeeds.filter(n => !['management'].includes(n));
+  if (meaningfulIndustries.length === 0 && meaningfulNeeds.length === 0 && topSuggestions.length > 0) {
+    const question = generateProductQuestion([], [], session.askedTopics, lang);
+    if (question) {
+      const quickReplies = [
+        { label: 'صيدلية', labelAr: 'صيدلية', value: 'I have a pharmacy' },
+        { label: 'محل', labelAr: 'محل', value: 'I have a shop' },
+        { label: 'مصنع', labelAr: 'مصنع', value: 'I have a factory' },
+        { label: 'مستشفى', labelAr: 'مستشفى', value: 'I have a hospital' },
+      ];
+      return {
+        text: question,
+        textAr: question,
+        suggestions: topSuggestions.slice(0, 3).map(s => ({ ...s, matchScore: 0 })),
+        confidence: 'low',
+        quickReplies,
       };
     }
   }

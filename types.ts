@@ -133,6 +133,7 @@ export interface OrgaProService {
   id: string;
   name: Record<Language, string>;
   description: Record<Language, string>;
+  features?: Array<{ id: string; text: Record<Language, string> }>;
   image?: string;
   enabled: boolean;
 }

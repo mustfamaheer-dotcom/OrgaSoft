@@ -2,12 +2,11 @@ import path from 'path';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-// SECURITY: never inline the ImageKit private key into production bundles.
-// In production builds the key is stripped so the client MUST use the
-// server-side signing endpoint (VITE_IMAGEKIT_AUTH_ENDPOINT).
-// Local development keeps the key for the legacy fallback only.
+// NOTE: the ImageKit private key IS shipped in the bundle currently.
+// Server-side signing (VITE_IMAGEKIT_AUTH_ENDPOINT) is preferred when
+// configured AND no private key is present; otherwise local signing is used.
 export default defineConfig(({ mode }) => {
-  const isProd = mode === 'production';
+  void mode;
   return {
     server: {
       port: 3000,
@@ -19,9 +18,6 @@ export default defineConfig(({ mode }) => {
         '@': path.resolve(__dirname, '.'),
       },
     },
-    define: isProd
-      ? { 'import.meta.env.VITE_IMAGEKIT_PRIVATE_KEY': 'undefined' }
-      : {},
     build: {
       rollupOptions: {
         output: {

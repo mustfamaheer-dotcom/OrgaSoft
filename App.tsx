@@ -16,6 +16,7 @@ import ChatBot from './components/ChatBot';
 const AdminDashboard = lazy(() => import('./views/AdminDashboard'));
 const ProductDetail = lazy(() => import('./views/ProductDetail'));
 const AllProducts = lazy(() => import('./views/AllProducts'));
+const OrgaProServiceDetail = lazy(() => import('./views/OrgaProServiceDetail'));
 
 const ScrollToTop: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -44,12 +45,14 @@ const AppContent: React.FC = () => {
   const location = useLocation();
   const [currentPage, setCurrentPage] = useState('home');
   const [activeProductId, setActiveProductId] = useState<string | null>(null);
+  const [activeServiceId, setActiveServiceId] = useState<string | null>(null);
   const { isRTL, lang, siteData } = useSite();
 
   const getPageName = (path: string) => {
     if (path === '/admin') return 'admin';
     if (path === '/applications') return 'applications';
     if (path.startsWith('/product/')) return `product:${path.replace('/product/', '')}`;
+    if (path.startsWith('/orga-pro/')) return `orga-pro:${path.replace('/orga-pro/', '')}`;
     return 'home';
   };
 
@@ -62,28 +65,40 @@ const AppContent: React.FC = () => {
     if (page.startsWith('product-')) {
       const id = page.replace('product-', '');
       setActiveProductId(id);
+      setActiveServiceId(null);
       setCurrentPage('product-detail');
       navigate(`/product/${id}`);
+      window.scrollTo(0, 0);
+    } else if (page.startsWith('orga-pro-')) {
+      const id = page.replace('orga-pro-', '');
+      setActiveServiceId(id);
+      setActiveProductId(null);
+      setCurrentPage('orga-pro-detail');
+      navigate(`/orga-pro/${id}`);
       window.scrollTo(0, 0);
     } else if (page === 'admin') {
       navigate('/admin');
       setCurrentPage('admin');
       setActiveProductId(null);
+      setActiveServiceId(null);
       window.scrollTo(0, 0);
     } else if (page === 'all-applications') {
       navigate('/applications');
       setCurrentPage('all-applications');
       setActiveProductId(null);
+      setActiveServiceId(null);
       window.scrollTo(0, 0);
     } else if (page === 'home') {
       navigate('/');
       setCurrentPage('home');
       setActiveProductId(null);
+      setActiveServiceId(null);
       window.scrollTo(0, 0);
     } else {
       navigate('/');
       setCurrentPage('home');
       setActiveProductId(null);
+      setActiveServiceId(null);
       setTimeout(() => {
         const el = document.getElementById(page);
         if (el) el.scrollIntoView({ behavior: 'smooth' });
@@ -99,20 +114,28 @@ const AppContent: React.FC = () => {
   useEffect(() => {
     const path = location.pathname;
     if (path === '/admin') { setCurrentPage('admin'); }
-    else if (path === '/applications') { setCurrentPage('all-applications'); setActiveProductId(null); }
+    else if (path === '/applications') { setCurrentPage('all-applications'); setActiveProductId(null); setActiveServiceId(null); }
     else if (path.startsWith('/product/')) {
       setActiveProductId(path.replace('/product/', ''));
+      setActiveServiceId(null);
       setCurrentPage('product-detail');
-    } else if (path === '/' || path === '') { setCurrentPage('home'); setActiveProductId(null); }
-    else { setCurrentPage('not-found'); setActiveProductId(null); }
+    } else if (path.startsWith('/orga-pro/')) {
+      setActiveServiceId(path.replace('/orga-pro/', ''));
+      setActiveProductId(null);
+      setCurrentPage('orga-pro-detail');
+    } else if (path === '/' || path === '') { setCurrentPage('home'); setActiveProductId(null); setActiveServiceId(null); }
+    else { setCurrentPage('not-found'); setActiveProductId(null); setActiveServiceId(null); }
   }, [location.pathname]);
 
   const isAdmin = currentPage === 'admin';
   const product = currentPage === 'product-detail' && activeProductId
     ? siteData.products.find(p => p.id === activeProductId) : null;
+  const orgaService = currentPage === 'orga-pro-detail' && activeServiceId
+    ? siteData.orgaProServices.items.find(s => s.id === activeServiceId) : null;
   const pageTitle = isAdmin ? 'Admin Console | Orga Soft'
     : currentPage === 'all-applications' ? (lang === 'ar' ? 'جميع التطبيقات | أورجا سوفت' : 'All Applications | Orga Soft')
     : product ? `${product.name[lang]} | Orga Soft`
+    : orgaService ? `${orgaService.name[lang]} | Orga Soft`
     : 'Orga Soft | أورجا سوفت';
 
   return (
@@ -141,6 +164,11 @@ const AppContent: React.FC = () => {
           {currentPage === 'product-detail' && activeProductId && (
             <Suspense fallback={<LoadingScreen />}>
               <ProductDetail productId={activeProductId} onBack={() => handleNavigate('home')} onContact={() => handleNavigate('contact')} onNavigate={handleNavigate} />
+            </Suspense>
+          )}
+          {currentPage === 'orga-pro-detail' && activeServiceId && (
+            <Suspense fallback={<LoadingScreen />}>
+              <OrgaProServiceDetail serviceId={activeServiceId} onBack={() => handleNavigate('home')} onNavigate={handleNavigate} />
             </Suspense>
           )}
           {currentPage === 'not-found' && <NotFound onNavigate={handleNavigate} />}

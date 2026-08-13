@@ -157,6 +157,50 @@ const OrgaProServicesTab: React.FC<OrgaProServicesTabProps> = ({ data, setData, 
 
       <CloudImageUploader label={isRTL ? 'صورة الخدمة' : 'Service Image'} value={editingItem.image || ''} onChange={url => setEditingItem({ ...editingItem, image: url })} />
 
+      <div className="pt-6 border-t border-slate-100 dark:border-[#1e293b] space-y-6">
+        <div className="flex items-center justify-between">
+          <h4 className={sectionTitle}>
+            <CheckCircle2 className="w-5 h-5 text-[#df4d21]" /> {isRTL ? 'مميزات الخدمة' : 'Service Features'}
+          </h4>
+          <button onClick={() => {
+            setEditingItem({ ...editingItem, features: [...(editingItem.features || []), { id: `f-${Date.now()}`, text: { en: 'New Feature', ar: 'ميزة جديدة' } }] });
+          }} className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-[#df4d21] to-[#c43d18] text-white rounded-xl font-bold text-sm hover:shadow-lg hover:-translate-y-0.5 transition-all shadow-md">
+            <Plus className="w-4 h-4" /> <span>{isRTL ? 'إضافة ميزة' : 'Add Feature'}</span>
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {(editingItem.features || []).map((feature, index) => (
+            <div key={feature.id} className="p-5 bg-slate-50/50 dark:bg-[#1a2744]/50 rounded-xl border-2 border-slate-200 dark:border-[#1e293b] space-y-3 relative group">
+              <button onClick={() => setEditingItem({ ...editingItem, features: editingItem.features?.filter(f => f.id !== feature.id) })}
+                className="absolute top-3 right-3 w-7 h-7 bg-rose-500 text-white rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-rose-600">
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+              <div className="space-y-1.5">
+                <label className="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">EN</label>
+                <input value={feature.text.en} onChange={e => {
+                  const u = [...(editingItem.features || [])]; u[index] = { ...u[index], text: { ...u[index].text, en: e.target.value } };
+                  setEditingItem({ ...editingItem, features: u });
+                }} className={fieldBase} placeholder="Feature in English" />
+              </div>
+              <div className="space-y-1.5">
+                <label className="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest text-right">AR</label>
+                <input value={feature.text.ar} onChange={e => {
+                  const u = [...(editingItem.features || [])]; u[index] = { ...u[index], text: { ...u[index].text, ar: e.target.value } };
+                  setEditingItem({ ...editingItem, features: u });
+                }} className={`${fieldBase} text-right`} placeholder="الميزة بالعربية" dir="rtl" />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {(!editingItem.features || editingItem.features.length === 0) && (
+          <div className="text-center py-8 text-slate-400 font-medium">
+            {isRTL ? 'لا توجد مميزات. اضغط "إضافة ميزة" للبدء.' : 'No features yet. Click "Add Feature" to start.'}
+          </div>
+        )}
+      </div>
+
       <div className="p-5 bg-slate-50/50 dark:bg-[#1a2744]/50 rounded-xl border-2 border-slate-200 dark:border-[#1e293b]">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">

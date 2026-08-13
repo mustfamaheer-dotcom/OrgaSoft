@@ -382,7 +382,7 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
 
       <ServicesSection />
 
-      <OrgaProServicesSection />
+      <OrgaProServicesSection onNavigate={onNavigate} />
 
       <Section id="partners" className="py-12 sm:py-20 bg-white dark:bg-[#131d31]">
         <div className="max-w-6xl mx-auto px-4">
