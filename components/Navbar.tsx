@@ -65,33 +65,33 @@ const Navbar: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }
         : 'bg-white/90 dark:bg-[#0b1121]/90 backdrop-blur-md py-1.5'
     }`}>
       <div className="max-w-7xl mx-auto px-3 sm:px-6">
-        <div className="flex items-center justify-between h-16 sm:h-20">
+        <div className="flex items-center justify-between h-20 sm:h-24">
           <div className="flex items-center gap-2 cursor-pointer group min-w-0 flex-1 sm:flex-none" onClick={() => onNavigate('home')}>
             <div className="relative shrink-0">
-              <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+              <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
                 {siteData.logoImageUrl ? (
                   <img
                     src={siteData.logoImageUrl}
                     alt={siteData.logo?.[lang] || 'Orga Soft'}
                     className="w-full h-full object-contain rounded-full"
-                    width={64}
-                    height={64}
+                    width={80}
+                    height={80}
                     loading="eager"
                     decoding="sync"
                     fetchPriority="high"
                   />
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-[#0f639e] to-[#3292ca] rounded-full flex items-center justify-center shadow-md">
-                    <Terminal className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+                    <Terminal className="w-7 h-7 sm:w-9 sm:h-9 text-white" />
                   </div>
                 )}
               </div>
             </div>
             <div className="flex flex-col leading-none truncate">
-              <span className="text-base sm:text-lg font-black text-[#df4d21] tracking-tight uppercase truncate">
+              <span className="text-lg sm:text-xl font-black text-[#df4d21] tracking-tight uppercase truncate">
                 {(siteData.logo?.[lang] || 'Orga').split(' ')[0]}
               </span>
-              <span className="text-sm sm:text-sm font-bold text-[#3292ca] tracking-[0.05em] sm:tracking-[0.15em] uppercase truncate">
+              <span className="text-sm sm:text-base font-bold text-[#3292ca] tracking-[0.05em] sm:tracking-[0.15em] uppercase truncate">
                 {(siteData.logo?.[lang] || 'Orga Soft').split(' ').slice(1).join(' ') || 'SOFT'}
               </span>
             </div>
