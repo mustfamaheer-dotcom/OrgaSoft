@@ -94,15 +94,15 @@ const Hero: React.FC<{ onNavigate: (page: string) => void }> = React.memo(({ onN
               <div className="absolute top-0 right-0 w-32 h-32 bg-[#df4d21]/10 rounded-full blur-2xl"></div>
               <div className="absolute bottom-0 left-0 w-24 h-24 bg-[#3292ca]/10 rounded-full blur-[80px]"></div>
               <div className="flex items-center gap-3 mb-5">
-                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden bg-white dark:bg-[#1a2744] shrink-0 shadow-md flex items-center justify-center">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden bg-white dark:bg-[#1a2744] shrink-0 shadow-md flex items-center justify-center">
                   {siteData.logoImageUrl ? (
-                    <img src={siteData.logoImageUrl} alt="" className="w-full h-full object-contain" width={56} height={56} loading="eager" decoding="sync" />
+                    <img src={siteData.logoImageUrl} alt="" className="w-full h-full object-contain" width={80} height={80} loading="eager" decoding="sync" />
                   ) : (
-                    <Zap className="w-6 h-6 sm:w-7 sm:h-7 text-[#df4d21]" />
+                    <Zap className="w-8 h-8 sm:w-10 sm:h-10 text-[#df4d21]" />
                   )}
                 </div>
                 <div className={isRTL ? 'text-right' : 'text-left'}>
-                  <h3 className="font-black text-xl leading-tight">
+                  <h3 className="font-black text-2xl leading-tight">
                     <span className="text-[#df4d21]">{companyName[lang].split(' ')[0]}</span>
                     {companyName[lang].split(' ').slice(1).join(' ') && (
                       <>
