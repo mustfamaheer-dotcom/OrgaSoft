@@ -87,11 +87,11 @@ const Navbar: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }
                 )}
               </div>
             </div>
-            <div className="flex flex-col leading-none truncate">
-              <span className="text-lg sm:text-xl font-black text-[#df4d21] tracking-tight uppercase truncate">
+            <div className="flex items-baseline gap-1.5 leading-none truncate">
+              <span className="text-xl sm:text-2xl font-black text-[#df4d21] tracking-tight uppercase truncate">
                 {(siteData.logo?.[lang] || 'Orga').split(' ')[0]}
               </span>
-              <span className="text-sm sm:text-base font-bold text-[#3292ca] tracking-[0.05em] sm:tracking-[0.15em] uppercase truncate">
+              <span className="text-xl sm:text-2xl font-bold text-[#3292ca] tracking-[0.05em] sm:tracking-[0.15em] uppercase truncate">
                 {(siteData.logo?.[lang] || 'Orga Soft').split(' ').slice(1).join(' ') || 'SOFT'}
               </span>
             </div>
