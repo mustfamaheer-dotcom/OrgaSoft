@@ -7,7 +7,7 @@ import AnimatedCounter from '../components/AnimatedCounter';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import ServicesSection from '../components/ServicesSection';
 import OrgaProServicesSection from '../components/OrgaProServicesSection';
-import { Pill, Building2, Store, Users, Clock, Award, MapPin, Activity, Database, MoveRight, MoveLeft, Mail, PhoneCall, Globe, Handshake, Shield, Rocket, Grid3X3, ArrowUpRight, PlayCircle, Facebook, Twitter, Youtube, MessageCircle, Instagram, Music, Tag, Hospital, GraduationCap, DollarSign, Building, Factory, ShoppingBag, Stethoscope, Truck, HardHat, UtensilsCrossed, TreePalm, Laptop, HeartHandshake, Landmark, Car, FlaskConical, Crown, Gem, Ship, Plane, Bus, Tractor, ConciergeBell, Wine, Shirt, Watch, Armchair, Gamepad2, Palette, Camera, Newspaper, BookOpen, HeartPulse, Leaf, Sun, Zap, Droplets, Mountain, Compass, Map, Radio, Cpu, HardDrive, Printer, Scan, Baby, Dog, Syringe, Bike, Smartphone, Monitor } from 'lucide-react';
+import { Pill, Building2, Store, Users, Clock, Award, MapPin, Activity, Database, MoveRight, MoveLeft, Mail, PhoneCall, Globe, Handshake, Shield, Scale, Rocket, Grid3X3, ArrowUpRight, PlayCircle, Facebook, Twitter, Youtube, MessageCircle, Instagram, Music, Tag, Hospital, GraduationCap, DollarSign, Building, Factory, ShoppingBag, Stethoscope, Truck, HardHat, UtensilsCrossed, TreePalm, Laptop, HeartHandshake, Landmark, Car, FlaskConical, Crown, Gem, Ship, Plane, Bus, Tractor, ConciergeBell, Wine, Shirt, Watch, Armchair, Gamepad2, Palette, Camera, Newspaper, BookOpen, HeartPulse, Leaf, Sun, Zap, Droplets, Mountain, Compass, Map, Radio, Cpu, HardDrive, Printer, Scan, Baby, Dog, Syringe, Bike, Smartphone, Monitor } from 'lucide-react';
 
 const iconMap: Record<string, any> = {
   users: Users, clock: Clock, activity: Activity, pill: Pill,
@@ -177,6 +177,10 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
 
   const policyText = contacts.companyPolicy && contacts.showCompanyPolicy !== false
     ? contacts.companyPolicy[lang]
+    : null;
+
+  const termsText = contacts.termsAndConditions && contacts.showTermsAndConditions !== false
+    ? contacts.termsAndConditions[lang]
     : null;
 
   return (
@@ -590,26 +594,32 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
                 </div>
               </div>
 
-              {policyText && (
-                <div className="relative group overflow-hidden rounded-2xl bg-gradient-to-br from-[#0f639e]/5 to-[#df4d21]/5 dark:from-[#0f639e]/10 dark:to-[#df4d21]/10 border border-[#0f639e]/10 dark:border-[#df4d21]/10 hover:border-[#0f639e]/30 dark:hover:border-[#df4d21]/30 transition-all duration-300">
-                  <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#df4d21]/10 rounded-full blur-3xl group-hover:bg-[#df4d21]/20 transition-all" />
-                  <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-[#0f639e]/10 rounded-full blur-3xl group-hover:bg-[#0f639e]/20 transition-all" />
-                  <div className="relative p-5 sm:p-6 backdrop-blur-sm">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 bg-gradient-to-br from-[#df4d21] to-[#0f639e] rounded-xl flex items-center justify-center shadow-lg shadow-[#df4d21]/20 group-hover:shadow-xl group-hover:-translate-y-0.5 transition-all">
-                        <Shield className="w-5 h-5 text-white" />
+              {[
+                { icon: Shield, title: lang === 'ar' ? 'سياسة الشركة' : 'Company Policy', sub: lang === 'ar' ? 'الجودة والالتزام' : 'QUALITY & COMMITMENT', text: policyText },
+                { icon: Scale, title: lang === 'ar' ? 'شروط وأحكام' : 'Terms & Conditions', sub: lang === 'ar' ? 'الاستخدام والمسؤولية' : 'USAGE & RESPONSIBILITY', text: termsText },
+              ].filter(w => w.text).map((w, idx) => {
+                const Icon = w.icon;
+                return (
+                  <div key={idx} className="relative group overflow-hidden rounded-2xl bg-gradient-to-br from-[#0f639e]/5 to-[#df4d21]/5 dark:from-[#0f639e]/10 dark:to-[#df4d21]/10 border border-[#0f639e]/10 dark:border-[#df4d21]/10 hover:border-[#0f639e]/30 dark:hover:border-[#df4d21]/30 transition-all duration-300 h-full">
+                    <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#df4d21]/10 rounded-full blur-3xl group-hover:bg-[#df4d21]/20 transition-all" />
+                    <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-[#0f639e]/10 rounded-full blur-3xl group-hover:bg-[#0f639e]/20 transition-all" />
+                    <div className="relative p-5 sm:p-6 backdrop-blur-sm">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 bg-gradient-to-br from-[#df4d21] to-[#0f639e] rounded-xl flex items-center justify-center shadow-lg shadow-[#df4d21]/20 group-hover:shadow-xl group-hover:-translate-y-0.5 transition-all">
+                          <Icon className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <span className="text-sm font-black text-[#0f639e] dark:text-white uppercase tracking-widest">{w.title}</span>
+                          <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]">{w.sub}</p>
+                        </div>
                       </div>
-                      <div>
-                        <span className="text-sm font-black text-[#0f639e] dark:text-white uppercase tracking-widest">{lang === 'ar' ? 'سياسة الشركة' : 'Company Policy'}</span>
-                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]">{lang === 'ar' ? 'الجودة والالتزام' : 'QUALITY & COMMITMENT'}</p>
+                      <div className="relative ps-4 border-s-2 border-[#df4d21]/30 dark:border-[#df4d21]/50">
+                        <p className="text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-line">{w.text}</p>
                       </div>
-                    </div>
-                    <div className="relative pl-4 border-l-2 border-[#df4d21]/30 dark:border-[#df4d21]/50">
-                      <p className="text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-300 leading-relaxed">{policyText}</p>
                     </div>
                   </div>
-                </div>
-              )}
+                );
+              })}
             </div>
             {(activeBranch?.mapEmbedUrl || contacts.mapEmbedUrl) && (
               <div className="lg:col-span-7 rounded-2xl overflow-hidden shadow-lg relative h-[300px] sm:h-[350px] lg:h-auto">

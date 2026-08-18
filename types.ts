@@ -114,6 +114,8 @@ export interface SiteContent {
     showTiktok?: boolean;
     companyPolicy?: Record<Language, string>;
     showCompanyPolicy?: boolean;
+    termsAndConditions?: Record<Language, string>;
+    showTermsAndConditions?: boolean;
     branches?: Branch[];
   };
 }

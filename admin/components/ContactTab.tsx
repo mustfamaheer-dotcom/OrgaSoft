@@ -194,6 +194,15 @@ const ContactTab: React.FC<ContactTabProps> = ({ data, updateNestedField, isRTL 
           checked={data.contacts.showCompanyPolicy !== false} onChange={v => updateNestedField('contacts.showCompanyPolicy', v)} />
         <FieldGroup label={isRTL ? 'نص سياسة الشركة' : 'POLICY TEXT'} valueEn={data.contacts.companyPolicy?.en || ''} valueAr={data.contacts.companyPolicy?.ar || ''} onUpdateEn={v => updateNestedField('contacts.companyPolicy.en', v)} onUpdateAr={v => updateNestedField('contacts.companyPolicy.ar', v)} isTextArea isRTL={isRTL} />
       </div>
+
+      <div className="pt-6 border-t border-slate-100 dark:border-[#1e293b] space-y-6">
+        <h4 className={sectionTitle}>
+          <FileText className="w-5 h-5 text-[#df4d21]" /> {isRTL ? 'شروط وأحكام' : 'Terms & Conditions'}
+        </h4>
+        <ToggleField label={isRTL ? 'إظهار الشروط والأحكام' : 'Show Terms & Conditions'} description={isRTL ? 'عرض الشروط والأحكام في قسم الاتصال' : 'Display terms & conditions in contact section'}
+          checked={data.contacts.showTermsAndConditions !== false} onChange={v => updateNestedField('contacts.showTermsAndConditions', v)} />
+        <FieldGroup label={isRTL ? 'نص الشروط والأحكام' : 'TERMS TEXT'} valueEn={data.contacts.termsAndConditions?.en || ''} valueAr={data.contacts.termsAndConditions?.ar || ''} onUpdateEn={v => updateNestedField('contacts.termsAndConditions.en', v)} onUpdateAr={v => updateNestedField('contacts.termsAndConditions.ar', v)} isTextArea isRTL={isRTL} />
+      </div>
     </div>
   );
 };

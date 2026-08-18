@@ -112,6 +112,7 @@ export const INITIAL_SITE_DATA: SiteContent = {
     showInstagram: true,
     showTiktok: true,
     showCompanyPolicy: true,
+    showTermsAndConditions: true,
     branches: []
   }
 };
