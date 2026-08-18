@@ -620,8 +620,8 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
                     <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]">{w.sub}</p>
                   </div>
                 </div>
-                <div className="relative flex-1 min-h-0 ps-4 border-s-2 border-[#df4d21]/30 dark:border-[#df4d21]/50">
-                  <p className="text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-line line-clamp-[7]">{w.text}</p>
+                <div className="relative flex-1 min-h-0 ps-4 border-s-2 border-[#df4d21]/30 dark:border-[#df4d21]/50 overflow-y-auto">
+                  <p className="text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-line">{w.text}</p>
                 </div>
                 <button onClick={() => setOpenWidget(w.id)}
                   className="relative mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-[#df4d21] to-[#0f639e] text-white text-xs sm:text-sm font-black uppercase tracking-widest shadow-lg shadow-[#df4d21]/20 hover:shadow-xl hover:-translate-y-0.5 active:scale-95 transition-all duration-300">
