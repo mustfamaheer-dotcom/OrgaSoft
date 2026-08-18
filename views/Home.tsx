@@ -7,7 +7,9 @@ import AnimatedCounter from '../components/AnimatedCounter';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import ServicesSection from '../components/ServicesSection';
 import OrgaProServicesSection from '../components/OrgaProServicesSection';
-import { Pill, Building2, Store, Users, Clock, Award, MapPin, Activity, Database, MoveRight, MoveLeft, Mail, PhoneCall, Globe, Handshake, Shield, Scale, Rocket, Grid3X3, ArrowUpRight, PlayCircle, Facebook, Twitter, Youtube, MessageCircle, Instagram, Music, Tag, Hospital, GraduationCap, DollarSign, Building, Factory, ShoppingBag, Stethoscope, Truck, HardHat, UtensilsCrossed, TreePalm, Laptop, HeartHandshake, Landmark, Car, FlaskConical, Crown, Gem, Ship, Plane, Bus, Tractor, ConciergeBell, Wine, Shirt, Watch, Armchair, Gamepad2, Palette, Camera, Newspaper, BookOpen, HeartPulse, Leaf, Sun, Zap, Droplets, Mountain, Compass, Map, Radio, Cpu, HardDrive, Printer, Scan, Baby, Dog, Syringe, Bike, Smartphone, Monitor, X } from 'lucide-react';
+import TicketModal from '../components/TicketModal';
+import { DEFAULT_TICKET_DEPARTMENTS } from '../constants';
+import { Pill, Building2, Store, Users, Clock, Award, MapPin, Activity, Database, MoveRight, MoveLeft, Mail, PhoneCall, Globe, Handshake, Shield, Scale, Rocket, Grid3X3, ArrowUpRight, PlayCircle, Facebook, Twitter, Youtube, MessageCircle, Instagram, Music, Tag, Hospital, GraduationCap, DollarSign, Building, Factory, ShoppingBag, Stethoscope, Truck, HardHat, UtensilsCrossed, TreePalm, Laptop, HeartHandshake, Landmark, Car, FlaskConical, Crown, Gem, Ship, Plane, Bus, Tractor, ConciergeBell, Wine, Shirt, Watch, Armchair, Gamepad2, Palette, Camera, Newspaper, BookOpen, HeartPulse, Leaf, Sun, Zap, Droplets, Mountain, Compass, Map, Radio, Cpu, HardDrive, Printer, Scan, Baby, Dog, Syringe, Bike, Smartphone, Monitor, X, Ticket } from 'lucide-react';
 
 const iconMap: Record<string, any> = {
   users: Users, clock: Clock, activity: Activity, pill: Pill,
@@ -125,6 +127,7 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
   const branches = contacts.branches || [];
   const [activeBranchIdx, setActiveBranchIdx] = useState(0);
   const [openWidget, setOpenWidget] = useState<'policy' | 'terms' | null>(null);
+  const [ticketOpen, setTicketOpen] = useState(false);
   const activeBranch = branches.length > 0 ? branches[activeBranchIdx] : null;
 
   const [activePartnerCat, setActivePartnerCat] = useState<string | null>(null);
@@ -596,6 +599,13 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
                         className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white hover:bg-[#000] hover:-translate-y-1 transition-all"><Music className="w-5 h-5" /></a>
                     )}
                   </div>
+                  {siteData.tickets?.showTicketButton !== false && (
+                    <button onClick={() => setTicketOpen(true)}
+                      className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-[#df4d21] to-[#ff7847] text-white text-xs sm:text-sm font-black uppercase tracking-widest shadow-lg shadow-[#df4d21]/25 hover:shadow-xl hover:-translate-y-0.5 active:scale-95 transition-all duration-300">
+                      <Ticket className="w-4 h-4" />
+                      {lang === 'ar' ? 'إنشاء تذكرة' : 'MAKE A TICKET'}
+                    </button>
+                  )}
                 </div>
               </div>
               {(activeBranch?.mapEmbedUrl || contacts.mapEmbedUrl) && (
@@ -661,6 +671,16 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
           </div>
         );
       })()}
+
+      <TicketModal
+        open={ticketOpen}
+        onClose={() => setTicketOpen(false)}
+        departments={(siteData.tickets?.departments?.length ? siteData.tickets.departments : DEFAULT_TICKET_DEPARTMENTS)}
+        recipientEmail={siteData.tickets?.recipientEmail || 'support@orga4soft.com'}
+        emailEnabled={siteData.tickets?.emailEnabled !== false}
+        lang={lang}
+        isRTL={isRTL}
+      />
 
       <style>{`
         .scrollbar-hide::-webkit-scrollbar { display: none; }

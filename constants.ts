@@ -114,8 +114,26 @@ export const INITIAL_SITE_DATA: SiteContent = {
     showCompanyPolicy: true,
     showTermsAndConditions: true,
     branches: []
+  },
+  tickets: {
+    showTicketButton: true,
+    recipientEmail: 'support@orga4soft.com',
+    emailEnabled: true,
+    departments: [
+      { id: 'accounts', name: { en: 'Accounts', ar: 'الحسابات' } },
+      { id: 'support', name: { en: 'Technical Support', ar: 'الدعم الفني' } },
+      { id: 'sales', name: { en: 'Sales', ar: 'المبيعات' } },
+      { id: 'general', name: { en: 'General Inquiries', ar: 'استفسارات عامة' } },
+    ],
   }
 };
+
+export const DEFAULT_TICKET_DEPARTMENTS = [
+  { id: 'accounts', name: { en: 'Accounts', ar: 'الحسابات' } },
+  { id: 'support', name: { en: 'Technical Support', ar: 'الدعم الفني' } },
+  { id: 'sales', name: { en: 'Sales', ar: 'المبيعات' } },
+  { id: 'general', name: { en: 'General Inquiries', ar: 'استفسارات عامة' } },
+];
 
 export const UI_STRINGS = {
   navAdmin: { en: 'Console', ar: 'لوحة التحكم' },

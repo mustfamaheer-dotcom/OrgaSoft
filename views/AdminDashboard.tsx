@@ -12,6 +12,7 @@ import ServicesTab from '../admin/components/ServicesTab';
 import OrgaProServicesTab from '../admin/components/OrgaProServicesTab';
 import PartnersTab from '../admin/components/PartnersTab';
 import ContactTab from '../admin/components/ContactTab';
+import TicketsTab from '../admin/components/TicketsTab';
 import FooterTab from '../admin/components/FooterTab';
 import UIStringsTab from '../admin/components/UIStringsTab';
 import ChatBotTab from '../admin/components/ChatBotTab';
@@ -32,6 +33,7 @@ const TAB_SECTIONS: Record<string, (keyof SiteContent)[]> = {
   services:   ['services'],
   partners:   ['partners'],
   contact:    ['contacts'],
+  tickets:    ['tickets'],
   footer:     ['uiStrings'],
   uistrings:  ['uiStrings', 'companyName'],
   chatbot:    ['chatbot'],
@@ -126,6 +128,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
     services:   lang === 'ar' ? 'الخدمات التقنية' : 'IT Services',
     partners:   lang === 'ar' ? 'لوحة التحكم بالنظام' : 'System Control Panel',
     contact:    lang === 'ar' ? 'لوحة التحكم بالنظام' : 'System Control Panel',
+    tickets:    lang === 'ar' ? 'نظام التذاكر' : 'Ticket System',
     footer:     lang === 'ar' ? 'لوحة التحكم بالنظام' : 'System Control Panel',
     uistrings:  lang === 'ar' ? 'النصوص الظاهرة' : 'UI Strings',
     chatbot:    lang === 'ar' ? 'المساعد الذكي' : 'ChatBot',
@@ -156,6 +159,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
       case 'orgaproservices': return <OrgaProServicesTab {...tabProps} />;
       case 'partners': return <PartnersTab {...tabProps} />;
       case 'contact': return <ContactTab {...tabProps} />;
+      case 'tickets': return <TicketsTab {...tabProps} />;
       case 'footer': return <FooterTab {...tabProps} />;
       case 'uistrings': return <UIStringsTab {...tabProps} />;
       case 'chatbot': return <ChatBotTab {...tabProps} />;

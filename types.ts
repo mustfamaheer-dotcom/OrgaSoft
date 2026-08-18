@@ -118,6 +118,12 @@ export interface SiteContent {
     showTermsAndConditions?: boolean;
     branches?: Branch[];
   };
+  tickets: {
+    showTicketButton: boolean;
+    recipientEmail: string;
+    emailEnabled: boolean;
+    departments: TicketDepartment[];
+  };
 }
 
 export interface Branch {
@@ -129,6 +135,30 @@ export interface Branch {
   phoneAdmin: string;
   email: string;
   whatsapp: string;
+}
+
+export interface TicketDepartment {
+  id: string;
+  name: Record<Language, string>;
+}
+
+export type TicketStatus = 'new' | 'processing' | 'closed';
+
+export interface TicketRecord {
+  id: string;
+  ref: string;
+  createdAt: string;
+  name: string;
+  phone: string;
+  whatsapp: string;
+  email: string;
+  departmentId: string;
+  departmentLabel: Record<Language, string>;
+  isClient: boolean;
+  subject: string;
+  message: string;
+  status: TicketStatus;
+  lang: 'en' | 'ar';
 }
 
 export interface OrgaProService {
