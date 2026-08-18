@@ -113,26 +113,16 @@ const TicketsTab: React.FC<TicketsTabProps> = ({ data, updateNestedField, isRTL,
             onChange={v => setTicketsCfg('emailEnabled', v)}
           />
           <InputField label={ar ? 'البريد المستلم للتذاكر' : 'Ticket Recipient Email'} value={data.tickets?.recipientEmail || ''} onChange={v => setTicketsCfg('recipientEmail', v)} />
-          <div className="px-5 py-4 rounded-xl border-2 border-[#0f639e]/15 bg-[#0f639e]/5 dark:bg-[#0f639e]/10">
-            <p className="text-xs font-bold text-[#0f639e] dark:text-[#3292ca] leading-relaxed">
-              {ar
-                ? 'التفعيل الأول: عند إرسال أول تذكرة سيصلك بريد تفعيل من FormSubmit على البريد المستلم — افتحه واضغط على رابط التفعيل مرة واحدة فقط، وبعدها تصلك جميع التذاكر تلقائياً.'
-                : 'First-time activation: after the first ticket submission, an activation email from FormSubmit arrives at the recipient inbox — open it and click the activation link once. After that, all tickets arrive automatically.'}
-            </p>
+          <div className="pt-2">
+            <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3">{ar ? 'EmailJS (اختياري — بريد بتصميم حديث بدون شعار)' : 'EmailJS (optional — branded modern emails)'}</p>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <InputField label="EmailJS Public Key" value={data.tickets?.emailjsPublicKey || ''} onChange={v => setTicketsCfg('emailjsPublicKey', v)} />
+              <InputField label="EmailJS Service ID" value={data.tickets?.emailjsServiceId || ''} onChange={v => setTicketsCfg('emailjsServiceId', v)} />
+            </div>
+            <div className="mt-4">
+              <InputField label="EmailJS Template ID" value={data.tickets?.emailjsTemplateId || ''} onChange={v => setTicketsCfg('emailjsTemplateId', v)} />
+            </div>
           </div>
-          <div className="px-5 py-4 rounded-xl border-2 border-[#df4d21]/15 bg-[#df4d21]/5 dark:bg-[#df4d21]/10">
-            <p className="text-[10px] font-black text-[#df4d21] uppercase tracking-widest mb-2">EmailJS (optional) — modern branded emails, no sponsor footer</p>
-            <p className="text-xs font-bold text-slate-600 dark:text-slate-300 leading-relaxed">
-              {ar
-                ? 'لإرسال بريد بتصميم حديث بدون شعار FormSubmit: أنشئ حساباً مجانياً على emailjs.com، اربط Gmail كخدمة، وأنشئ قالباً (Template) والصق فيه HTML القالب الحديث — ثم الصق المعرفات الثلاثة هنا. بدون هذه الحقول يبقى الإرسال عبر FormSubmit.'
-                : 'For a fully branded modern email with no sponsor footer: create a free account at emailjs.com, connect Gmail as a service, create a Template and paste the modern HTML template into it — then paste the three IDs here. Without them, delivery falls back to FormSubmit.'}
-            </p>
-          </div>
-          <div className="grid sm:grid-cols-2 gap-4">
-            <InputField label="EmailJS Public Key" value={data.tickets?.emailjsPublicKey || ''} onChange={v => setTicketsCfg('emailjsPublicKey', v)} />
-            <InputField label="EmailJS Service ID" value={data.tickets?.emailjsServiceId || ''} onChange={v => setTicketsCfg('emailjsServiceId', v)} />
-          </div>
-          <InputField label="EmailJS Template ID" value={data.tickets?.emailjsTemplateId || ''} onChange={v => setTicketsCfg('emailjsTemplateId', v)} />
         </div>
       </div>
 
