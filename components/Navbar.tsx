@@ -68,7 +68,7 @@ const Navbar: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }
         <div className="flex items-center justify-between h-20 sm:h-24">
           <div className="flex items-center gap-2 cursor-pointer group min-w-0 flex-1 sm:flex-none" onClick={() => onNavigate('home')}>
             <div className="relative shrink-0">
-              <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+              <div className="relative w-16 h-16 max-[375px]:w-12 max-[375px]:h-12 sm:w-20 sm:h-20 rounded-full flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
                 {siteData.logoImageUrl ? (
                   <img
                     src={siteData.logoImageUrl}
@@ -82,7 +82,7 @@ const Navbar: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }
                   />
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-[#0f639e] to-[#3292ca] rounded-full flex items-center justify-center shadow-md">
-                    <Terminal className="w-7 h-7 sm:w-9 sm:h-9 text-white" />
+                    <Terminal className="w-7 h-7 max-[375px]:w-5 max-[375px]:h-5 sm:w-9 sm:h-9 text-white" />
                   </div>
                 )}
               </div>
@@ -112,11 +112,6 @@ const Navbar: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }
           </div>
 
           <div className="hidden lg:flex items-center gap-3">
-            <button onClick={toggleTheme}
-              className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 font-bold text-sm hover:bg-slate-100 dark:hover:bg-[#1e293b] transition-all"
-              title={lang === 'ar' ? 'تغيير المظهر' : 'Toggle theme'}>
-              {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-            </button>
             <button onClick={handleWhatsApp}
               className="flex items-center gap-2 px-4 py-2.5 bg-[#25D366] hover:bg-[#20BA5A] text-white font-bold text-sm rounded-xl shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200">
               <MessageCircle className="w-5 h-5" />
@@ -128,13 +123,14 @@ const Navbar: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }
               <Globe className="w-5 h-5" />
               <span>{UI_STRINGS.langSwitch[lang]}</span>
             </button>
+            <button onClick={toggleTheme}
+              className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 font-bold text-sm hover:bg-slate-100 dark:hover:bg-[#1e293b] transition-all"
+              title={lang === 'ar' ? 'تغيير المظهر' : 'Toggle theme'}>
+              {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
           </div>
 
           <div className="flex lg:hidden items-center gap-1.5">
-            <button onClick={toggleTheme}
-              className="w-11 h-11 flex items-center justify-center rounded-xl text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-[#1e293b] active:scale-90 transition-transform">
-              {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-            </button>
             <button onClick={handleWhatsApp}
               className="w-11 h-11 bg-[#25D366] rounded-xl flex items-center justify-center shadow-md active:scale-90 transition-transform">
               <MessageCircle className="w-5 h-5 text-white" />
@@ -142,6 +138,10 @@ const Navbar: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }
             <button onClick={toggleLang}
               className="w-11 h-11 flex items-center justify-center text-slate-600 dark:text-slate-400 font-bold text-xs bg-slate-100 dark:bg-[#1e293b] rounded-xl active:scale-90 transition-transform">
               {lang === 'ar' ? 'EN' : 'ع'}
+            </button>
+            <button onClick={toggleTheme}
+              className="w-11 h-11 flex items-center justify-center rounded-xl text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-[#1e293b] active:scale-90 transition-transform">
+              {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
             <button onClick={() => setIsOpen(!isOpen)}
               className="w-11 h-11 bg-slate-100 dark:bg-[#1e293b] rounded-xl flex items-center justify-center active:scale-90 transition-transform">
