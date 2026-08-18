@@ -176,8 +176,9 @@ const ChatBot: React.FC<{ onNavigate?: (page: string) => void }> = ({ onNavigate
       <div className={`fixed bottom-4 ${positionClass} xs:bottom-6 sm:bottom-10 z-[200] flex flex-col ${settings?.position === 'right' ? 'items-end' : 'items-start'}`}
         style={{ direction: isRTL ? 'rtl' : 'ltr' }}>
         {open && (
-          <div className="mb-3 w-[360px] sm:w-[400px] bg-white dark:bg-[#131d31] rounded-2xl shadow-2xl border border-slate-200 dark:border-[#1e293b] overflow-hidden animate-fadeInUp"
+          <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[200] w-[calc(100vw-32px)] max-w-[400px] flex flex-col md:static md:left-auto md:top-auto md:translate-x-0 md:translate-y-0 md:w-[400px] md:mb-3"
             onClick={e => e.stopPropagation()}>
+          <div className="w-full flex flex-col max-h-[72vh] bg-white dark:bg-[#131d31] rounded-2xl shadow-2xl border border-slate-200 dark:border-[#1e293b] overflow-hidden animate-fadeInUp">
             <div className="bg-gradient-to-r from-[#0f639e] to-[#3292ca] p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
@@ -203,7 +204,7 @@ const ChatBot: React.FC<{ onNavigate?: (page: string) => void }> = ({ onNavigate
               </div>
             </div>
 
-            <div className="h-[380px] overflow-y-auto p-4 space-y-3 custom-scrollbar bg-[#f8fafc] dark:bg-[#0b1121]/60">
+            <div className="flex-1 min-h-0 md:h-[380px] overflow-y-auto p-4 space-y-3 custom-scrollbar bg-[#f8fafc] dark:bg-[#0b1121]/60">
               {messages.map(msg => (
                 <div key={msg.id}
                   className={`flex items-end gap-2 ${msg.sender === 'user' ? 'flex-row-reverse' : 'flex-row'} message-enter`}>
@@ -296,6 +297,7 @@ const ChatBot: React.FC<{ onNavigate?: (page: string) => void }> = ({ onNavigate
               </div>
             </div>
           </div>
+        </div>
         )}
         <button onClick={() => setOpen(!open)}
           className="w-14 h-14 bg-gradient-to-br from-[#0f639e] to-[#3292ca] text-white rounded-2xl shadow-2xl flex items-center justify-center hover:shadow-[#0f639e]/30 hover:scale-110 active:scale-90 transition-all duration-300 relative border border-white/10 group">
