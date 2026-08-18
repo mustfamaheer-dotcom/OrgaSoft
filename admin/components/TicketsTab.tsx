@@ -62,6 +62,18 @@ const TicketsTab: React.FC<TicketsTabProps> = ({ data, updateNestedField, isRTL,
       <SectionHeader icon={Ticket} title={ar ? 'نظام التذاكر' : 'Ticket System'} subtitle="Departments, email delivery & incoming tickets" isRTL={isRTL} />
 
       <div className="pt-6 border-t border-slate-100 dark:border-[#1e293b] space-y-6">
+        <h4 className={sectionTitle}>
+          <ExternalLink className="w-5 h-5 text-[#df4d21]" /> {ar ? 'زر إنشاء التذكرة بالموقع' : 'Site Ticket Button'}
+        </h4>
+        <ToggleField
+          label={ar ? 'إظهار زر "إنشاء تذكرة" في بطاقة التواصل' : 'Show the "Make a Ticket" button on the contact card'}
+          description={ar ? 'عند الإيقاف يختفي الزر من صفحة الموقع الرئيسية نهائياً' : 'When off, the button disappears from the website contact section'}
+          checked={data.tickets?.showTicketButton !== false}
+          onChange={v => setTicketsCfg('showTicketButton', v)}
+        />
+      </div>
+
+      <div className="pt-6 border-t border-slate-100 dark:border-[#1e293b] space-y-6">
         <div className="flex items-center justify-between">
           <h4 className={sectionTitle}>
             <Ticket className="w-5 h-5 text-[#df4d21]" /> {ar ? 'الأقسام' : 'Departments'}
