@@ -574,35 +574,44 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
                     <span className="text-xs font-black text-white/80">{lang === 'ar' ? 'تواصل معنا' : 'Follow Us'}</span>
                   </div>
                   <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-2">
+                      {contacts.showWhatsapp !== false && contacts.whatsapp && (
+                        <a href={`https://wa.me/${contacts.whatsapp}`} target="_blank" rel="noopener noreferrer"
+                          className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white hover:bg-[#25D366] hover:-translate-y-1 transition-all"><MessageCircle className="w-5 h-5" /></a>
+                      )}
+                      {contacts.showFacebook !== false && contacts.facebook && (
+                        <a href={contacts.facebook} target="_blank" rel="noopener noreferrer"
+                          className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white hover:bg-[#1877F2] hover:-translate-y-1 transition-all"><Facebook className="w-5 h-5" /></a>
+                      )}
+                      {contacts.showInstagram !== false && contacts.instagram && (
+                        <a href={contacts.instagram} target="_blank" rel="noopener noreferrer"
+                          className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white hover:bg-[#E4405F] hover:-translate-y-1 transition-all"><Instagram className="w-5 h-5" /></a>
+                      )}
+                      {contacts.showTwitter !== false && contacts.twitter && (
+                        <a href={contacts.twitter} target="_blank" rel="noopener noreferrer"
+                          className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white hover:bg-[#000] hover:-translate-y-1 transition-all"><Twitter className="w-5 h-5" /></a>
+                      )}
+                      {contacts.showYoutube !== false && contacts.youtube && (
+                        <a href={contacts.youtube} target="_blank" rel="noopener noreferrer"
+                          className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white hover:bg-[#FF0000] hover:-translate-y-1 transition-all"><Youtube className="w-5 h-5" /></a>
+                      )}
+                      {contacts.showTiktok !== false && contacts.tiktok && (
+                        <a href={contacts.tiktok} target="_blank" rel="noopener noreferrer"
+                          className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white hover:bg-[#000] hover:-translate-y-1 transition-all"><Music className="w-5 h-5" /></a>
+                      )}
+                    </div>
                     {siteData.tickets?.showTicketButton !== false && (
                       <button onClick={() => setTicketOpen(true)}
-                        title={lang === 'ar' ? 'إنشاء تذكرة دعم' : 'Create a support ticket'}
-                        aria-label={lang === 'ar' ? 'إنشاء تذكرة دعم' : 'Create a support ticket'}
-                        className="w-10 h-10 bg-gradient-to-br from-[#df4d21] to-[#e8481e] rounded-xl flex items-center justify-center text-white shadow-lg shadow-[#df4d21]/30 hover:from-[#ff7a45] hover:to-[#e8481e] hover:-translate-y-1 hover:shadow-[#df4d21]/50 transition-all"><Ticket className="w-5 h-5" /></button>
-                    )}
-                    {contacts.showWhatsapp !== false && contacts.whatsapp && (
-                      <a href={`https://wa.me/${contacts.whatsapp}`} target="_blank" rel="noopener noreferrer"
-                        className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white hover:bg-[#25D366] hover:-translate-y-1 transition-all"><MessageCircle className="w-5 h-5" /></a>
-                    )}
-                    {contacts.showFacebook !== false && contacts.facebook && (
-                      <a href={contacts.facebook} target="_blank" rel="noopener noreferrer"
-                        className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white hover:bg-[#1877F2] hover:-translate-y-1 transition-all"><Facebook className="w-5 h-5" /></a>
-                    )}
-                    {contacts.showInstagram !== false && contacts.instagram && (
-                      <a href={contacts.instagram} target="_blank" rel="noopener noreferrer"
-                        className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white hover:bg-[#E4405F] hover:-translate-y-1 transition-all"><Instagram className="w-5 h-5" /></a>
-                    )}
-                    {contacts.showTwitter !== false && contacts.twitter && (
-                      <a href={contacts.twitter} target="_blank" rel="noopener noreferrer"
-                        className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white hover:bg-[#000] hover:-translate-y-1 transition-all"><Twitter className="w-5 h-5" /></a>
-                    )}
-                    {contacts.showYoutube !== false && contacts.youtube && (
-                      <a href={contacts.youtube} target="_blank" rel="noopener noreferrer"
-                        className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white hover:bg-[#FF0000] hover:-translate-y-1 transition-all"><Youtube className="w-5 h-5" /></a>
-                    )}
-                    {contacts.showTiktok !== false && contacts.tiktok && (
-                      <a href={contacts.tiktok} target="_blank" rel="noopener noreferrer"
-                        className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white hover:bg-[#000] hover:-translate-y-1 transition-all"><Music className="w-5 h-5" /></a>
+                        title={lang === 'ar' ? 'إنشاء تذكرة دعم — رد خلال 24 ساعة' : 'Create a support ticket — reply within 24 hours'}
+                        className="group ms-auto flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#df4d21] to-[#e8481e] text-white shadow-lg shadow-[#df4d21]/30 hover:from-[#ff7a45] hover:to-[#e8481e] hover:-translate-y-0.5 hover:shadow-[#df4d21]/50 active:scale-95 transition-all">
+                        <span className="w-7 h-7 shrink-0 rounded-lg bg-white/15 border border-white/20 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[-6deg]">
+                          <Ticket className="w-4 h-4 text-white" />
+                        </span>
+                        <span className="text-start leading-none">
+                          <span className="block text-[10px] font-black text-white uppercase tracking-widest">{lang === 'ar' ? 'إنشاء تذكرة' : 'MAKE A TICKET'}</span>
+                          <span className="block text-[8px] font-bold text-white/70 tracking-[0.18em] mt-1">{lang === 'ar' ? 'رد خلال 24 ساعة' : 'REPLY WITHIN 24H'}</span>
+                        </span>
+                      </button>
                     )}
                   </div>
                 </div>
