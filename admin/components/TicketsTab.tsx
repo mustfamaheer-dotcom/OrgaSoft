@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
-import { Ticket, Plus, Trash2, Mail, Inbox, Loader2, CheckCircle2, Clock, ExternalLink, MailCheck, MailX } from 'lucide-react';
+import { Ticket, Plus, Trash2, Mail, Inbox, Loader2, CheckCircle2, Clock, ExternalLink, MailCheck, MailX, X, ChevronRight, ChevronLeft } from 'lucide-react';
 import type { SiteContent, TicketDepartment, TicketRecord, TicketStatus } from '../../types';
 import { SectionHeader, InputField, ToggleField } from './FormComponents';
 
@@ -28,6 +28,7 @@ const TicketsTab: React.FC<TicketsTabProps> = ({ data, updateNestedField, isRTL,
   const depts = (data.tickets?.departments || []) as TicketDepartment[];
   const [tickets, setTickets] = useState<TicketRecord[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selected, setSelected] = useState<TicketRecord | null>(null);
 
   useEffect(() => {
     const q = query(collection(db, 'tickets'), orderBy('createdAt', 'desc'));
@@ -45,7 +46,10 @@ const TicketsTab: React.FC<TicketsTabProps> = ({ data, updateNestedField, isRTL,
     try { await updateDoc(doc(db, 'tickets', id), { status }); } catch { /* rules/network */ }
   };
   const removeTicket = async (id: string) => {
-    try { await deleteDoc(doc(db, 'tickets', id)); } catch { /* rules/network */ }
+    try {
+      await deleteDoc(doc(db, 'tickets', id));
+      if (selected?.id === id) setSelected(null);
+    } catch { /* rules/network */ }
   };
 
   const counts = {
@@ -166,82 +170,146 @@ const TicketsTab: React.FC<TicketsTabProps> = ({ data, updateNestedField, isRTL,
             </p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {tickets.map(t => {
               const StatusIcon = statusIcons[t.status] || Inbox;
               return (
-                <div key={t.id} className="p-5 rounded-2xl border border-slate-100 dark:border-[#1e293b] bg-white dark:bg-[#131d31] hover:shadow-lg transition-all duration-200">
-                  <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <span className="px-3 py-1.5 rounded-lg bg-[#0f639e]/10 text-[#0f639e] dark:text-[#3292ca] font-mono font-black text-xs" dir="ltr">{t.ref || t.id.slice(-6)}</span>
-                      <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[10px] font-black uppercase tracking-widest ${statusStyles[t.status] || statusStyles.new}`}>
+                <div key={t.id} onClick={() => setSelected(t)}
+                  className="group p-4 rounded-2xl border border-slate-100 dark:border-[#1e293b] bg-white dark:bg-[#131d31] hover:shadow-lg hover:border-[#0f639e]/30 dark:hover:border-[#3292ca]/30 transition-all duration-200 cursor-pointer">
+                  <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="px-2.5 py-1 rounded-lg bg-[#0f639e]/10 text-[#0f639e] dark:text-[#3292ca] font-mono font-black text-[11px]" dir="ltr">{t.ref || t.id.slice(-6)}</span>
+                      <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border text-[9px] font-black uppercase tracking-widest ${statusStyles[t.status] || statusStyles.new}`}>
                         <StatusIcon className="w-3 h-3" /> {ar ? ({ new: 'جديدة', processing: 'قيد المعالجة', closed: 'مغلقة' } as Record<TicketStatus, string>)[t.status] : t.status}
                       </span>
                       {t.emailSent === true && (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-emerald-500/20 bg-emerald-500/10 text-emerald-600 text-[10px] font-black uppercase tracking-widest">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-emerald-500/20 bg-emerald-500/10 text-emerald-600 text-[9px] font-black uppercase tracking-widest">
                           <MailCheck className="w-3 h-3" /> {ar ? 'أُرسل بالبريد' : 'Email sent'}
                         </span>
                       )}
                       {t.emailSent === false && (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-rose-500/20 bg-rose-500/10 text-rose-500 text-[10px] font-black uppercase tracking-widest" title={t.emailError || ''}>
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-rose-500/20 bg-rose-500/10 text-rose-500 text-[9px] font-black uppercase tracking-widest" title={t.emailError || ''}>
                           <MailX className="w-3 h-3" /> {ar ? 'فشل الإرسال' : 'Email failed'}
                         </span>
                       )}
                     </div>
-                    <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500" dir="ltr">
+                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500" dir="ltr">
                       {new Date(t.createdAt).toLocaleString(lang === 'ar' ? 'ar-EG' : 'en-GB')}
                     </span>
                   </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
-                    <div className="min-w-0">
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{ar ? 'الاسم' : 'NAME'}</p>
-                      <p className="text-sm font-black text-slate-900 dark:text-white truncate">{t.name} {t.isClient && <span className="ms-1 px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 text-[9px] font-black uppercase tracking-widest">{ar ? 'عميل' : 'Client'}</span>}</p>
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{ar ? 'التواصل' : 'CONTACT'}</p>
-                      <div className="text-xs font-bold text-slate-600 dark:text-slate-300 truncate" dir="ltr">
-                        <a href={`mailto:${t.email}`} className="hover:text-[#0f639e]">{t.email}</a>
-                      </div>
-                      <div className="text-[11px] font-bold text-slate-400 dark:text-slate-500" dir="ltr">
-                        {t.phone}{t.whatsapp ? ` · WA ${t.whatsapp}` : ''}
-                      </div>
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{ar ? 'القسم' : 'DEPARTMENT'}</p>
-                      <p className="text-sm font-black text-[#df4d21] truncate">{deptLabel(t)}</p>
-                    </div>
+                  <div className="flex items-center gap-2 min-w-0 mb-1">
+                    <span className="text-sm font-black text-slate-900 dark:text-white truncate">{t.name}</span>
+                    {t.isClient && <span className="shrink-0 px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 text-[9px] font-black uppercase tracking-widest">{ar ? 'عميل' : 'Client'}</span>}
+                    <span className="shrink-0 w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600" />
+                    <span className="text-xs font-black text-[#df4d21] truncate">{deptLabel(t)}</span>
                   </div>
-
-                  <div className="mb-4">
-                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{ar ? 'الموضوع' : 'SUBJECT'}</p>
-                    <p className="text-sm font-black text-slate-900 dark:text-white">{t.subject}</p>
-                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400 leading-relaxed whitespace-pre-line mt-1.5 line-clamp-3">{t.message}</p>
-                  </div>
-
-                  <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100 dark:border-[#1e293b]">
-                    <div className="flex items-center gap-2">
-                      <select value={t.status} onChange={e => updateStatus(t.id, e.target.value as TicketStatus)}
-                        className="px-3 py-2 rounded-xl border-2 border-slate-200 dark:border-[#1e293b] bg-white dark:bg-[#131d31] text-xs font-black text-slate-700 dark:text-slate-300 outline-none focus:border-[#0f639e] cursor-pointer">
-                        <option value="new">{ar ? 'جديدة' : 'New'}</option>
-                        <option value="processing">{ar ? 'قيد المعالجة' : 'Processing'}</option>
-                        <option value="closed">{ar ? 'مغلقة' : 'Closed'}</option>
-                      </select>
-                      <a href={`mailto:${t.email}?subject=${encodeURIComponent(`Re: [${t.ref || ''}] ${t.subject}`)}`}
-                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#0f639e]/10 text-[#0f639e] dark:text-[#3292ca] text-xs font-black hover:bg-[#0f639e] hover:text-white transition-all">
-                        <ExternalLink className="w-3.5 h-3.5" /> {ar ? 'رد بالبريد' : 'Reply'}
-                      </a>
-                    </div>
-                    <button onClick={() => removeTicket(t.id)}
-                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-rose-50 dark:bg-rose-500/10 text-rose-500 text-xs font-black hover:bg-rose-500 hover:text-white transition-all">
-                      <Trash2 className="w-3.5 h-3.5" /> {ar ? 'حذف' : 'Delete'}
-                    </button>
+                  <p className="text-[13px] font-black text-slate-700 dark:text-slate-200 truncate mb-0.5">{t.subject}</p>
+                  <p className="text-xs font-medium text-slate-500 dark:text-slate-400 leading-relaxed truncate">{t.message}</p>
+                  <div className="flex items-center justify-between mt-2.5 pt-2.5 border-t border-slate-100 dark:border-[#1e293b]">
+                    <span className="text-[9px] font-black text-[#0f639e] dark:text-[#3292ca] uppercase tracking-widest">
+                      {ar ? 'اضغط لعرض التفاصيل' : 'Click to open'}
+                    </span>
+                    {isRTL ? <ChevronLeft className="w-4 h-4 text-[#0f639e] dark:text-[#3292ca] group-hover:-translate-x-0.5 transition-transform" /> : <ChevronRight className="w-4 h-4 text-[#0f639e] dark:text-[#3292ca] group-hover:translate-x-0.5 transition-transform" />}
                   </div>
                 </div>
               );
             })}
           </div>
         )}
+
+        {selected && (() => {
+          const t = selected;
+          const StatusIcon = statusIcons[t.status] || Inbox;
+          return (
+            <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setSelected(null)}>
+              <div className={`relative w-full max-w-2xl max-h-[90vh] flex flex-col rounded-2xl bg-white dark:bg-[#131d31] shadow-2xl border border-slate-100 dark:border-[#1e293b] overflow-hidden ${ar ? 'font-tajawal' : 'font-inter'}`} dir={isRTL ? 'rtl' : 'ltr'} onClick={e => e.stopPropagation()}>
+                <div className="flex items-center justify-between gap-3 p-5 border-b border-slate-100 dark:border-[#1e293b] bg-gradient-to-r from-[#0f639e] to-[#3292ca]">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="px-3 py-1.5 rounded-lg bg-white/15 border border-white/20 font-mono font-black text-sm text-white" dir="ltr">{t.ref || t.id.slice(-6)}</span>
+                    <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[10px] font-black uppercase tracking-widest ${statusStyles[t.status] || statusStyles.new}`}>
+                      <StatusIcon className="w-3 h-3" /> {ar ? ({ new: 'جديدة', processing: 'قيد المعالجة', closed: 'مغلقة' } as Record<TicketStatus, string>)[t.status] : t.status}
+                    </span>
+                  </div>
+                  <button onClick={() => setSelected(null)} className="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center text-white hover:bg-white/25 transition-all shrink-0">
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="p-5 sm:p-6 overflow-y-auto space-y-5">
+                  <div className="flex flex-wrap items-center gap-2">
+                    {t.emailSent === true && (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border border-emerald-500/20 bg-emerald-500/10 text-emerald-600 text-[10px] font-black uppercase tracking-widest">
+                        <MailCheck className="w-3 h-3" /> {ar ? 'أُرسل البريد للعميل وللمستلم' : 'Email delivered'}
+                      </span>
+                    )}
+                    {t.emailSent === false && (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border border-rose-500/20 bg-rose-500/10 text-rose-500 text-[10px] font-black uppercase tracking-widest" title={t.emailError || ''}>
+                        <MailX className="w-3 h-3" /> {ar ? 'فشل إرسال البريد' : 'Email failed'}
+                      </span>
+                    )}
+                    <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500" dir="ltr">
+                      {new Date(t.createdAt).toLocaleString(lang === 'ar' ? 'ar-EG' : 'en-GB')}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="min-w-0">
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{ar ? 'الاسم' : 'NAME'}</p>
+                      <p className="text-sm font-black text-slate-900 dark:text-white">{t.name} {t.isClient && <span className="ms-1 px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 text-[9px] font-black uppercase tracking-widest">{ar ? 'عميل' : 'Client'}</span>}</p>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{ar ? 'القسم' : 'DEPARTMENT'}</p>
+                      <p className="text-sm font-black text-[#df4d21]">{deptLabel(t)}</p>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{ar ? 'الهاتف' : 'PHONE'}</p>
+                      <p className="text-sm font-black text-slate-900 dark:text-white" dir="ltr">{t.phone}</p>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{ar ? 'الواتساب' : 'WHATSAPP'}</p>
+                      <p className="text-sm font-black text-slate-900 dark:text-white" dir="ltr">{t.whatsapp || '—'}</p>
+                    </div>
+                    <div className="min-w-0 sm:col-span-2">
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{ar ? 'البريد الإلكتروني' : 'EMAIL'}</p>
+                      <a href={`mailto:${t.email}`} className="text-sm font-black text-[#0f639e] dark:text-[#3292ca] hover:underline" dir="ltr">{t.email}</a>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{ar ? 'الموضوع' : 'SUBJECT'}</p>
+                    <p className="text-base font-black text-slate-900 dark:text-white">{t.subject}</p>
+                  </div>
+
+                  <div>
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{ar ? 'الرسالة' : 'MESSAGE'}</p>
+                    <div className="p-4 rounded-xl bg-slate-50 dark:bg-[#0d1a2e] border border-slate-100 dark:border-[#1e293b]">
+                      <p className="text-sm font-medium text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line">{t.message}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-between gap-3 p-5 border-t border-slate-100 dark:border-[#1e293b] bg-slate-50/50 dark:bg-[#0d1a2e]/50">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <select value={t.status} onChange={e => updateStatus(t.id, e.target.value as TicketStatus)}
+                      className="px-3 py-2.5 rounded-xl border-2 border-slate-200 dark:border-[#1e293b] bg-white dark:bg-[#131d31] text-xs font-black text-slate-700 dark:text-slate-300 outline-none focus:border-[#0f639e] cursor-pointer">
+                      <option value="new">{ar ? 'جديدة' : 'New'}</option>
+                      <option value="processing">{ar ? 'قيد المعالجة' : 'Processing'}</option>
+                      <option value="closed">{ar ? 'مغلقة' : 'Closed'}</option>
+                    </select>
+                    <a href={`mailto:${t.email}?subject=${encodeURIComponent(`Re: [${t.ref || ''}] ${t.subject}`)}`}
+                      className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#0f639e]/10 text-[#0f639e] dark:text-[#3292ca] text-xs font-black hover:bg-[#0f639e] hover:text-white transition-all">
+                      <ExternalLink className="w-3.5 h-3.5" /> {ar ? 'رد بالبريد' : 'Reply'}
+                    </a>
+                  </div>
+                  <button onClick={() => removeTicket(t.id)}
+                    className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-rose-50 dark:bg-rose-500/10 text-rose-500 text-xs font-black hover:bg-rose-500 hover:text-white transition-all">
+                    <Trash2 className="w-3.5 h-3.5" /> {ar ? 'حذف' : 'Delete'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
       </div>
     </div>
   );
