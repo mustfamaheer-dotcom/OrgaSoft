@@ -122,9 +122,6 @@ export interface SiteContent {
     showTicketButton: boolean;
     recipientEmail: string;
     emailEnabled: boolean;
-    emailjsPublicKey?: string;
-    emailjsServiceId?: string;
-    emailjsTemplateId?: string;
     departments: TicketDepartment[];
   };
 }

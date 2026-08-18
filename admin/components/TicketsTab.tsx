@@ -113,16 +113,6 @@ const TicketsTab: React.FC<TicketsTabProps> = ({ data, updateNestedField, isRTL,
             onChange={v => setTicketsCfg('emailEnabled', v)}
           />
           <InputField label={ar ? 'البريد المستلم للتذاكر' : 'Ticket Recipient Email'} value={data.tickets?.recipientEmail || ''} onChange={v => setTicketsCfg('recipientEmail', v)} />
-          <div className="pt-2">
-            <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3">{ar ? 'EmailJS (اختياري — بريد بتصميم حديث بدون شعار)' : 'EmailJS (optional — branded modern emails)'}</p>
-            <div className="grid sm:grid-cols-2 gap-4">
-              <InputField label="EmailJS Public Key" value={data.tickets?.emailjsPublicKey || ''} onChange={v => setTicketsCfg('emailjsPublicKey', v)} />
-              <InputField label="EmailJS Service ID" value={data.tickets?.emailjsServiceId || ''} onChange={v => setTicketsCfg('emailjsServiceId', v)} />
-            </div>
-            <div className="mt-4">
-              <InputField label="EmailJS Template ID" value={data.tickets?.emailjsTemplateId || ''} onChange={v => setTicketsCfg('emailjsTemplateId', v)} />
-            </div>
-          </div>
         </div>
       </div>
 

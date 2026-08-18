@@ -686,9 +686,6 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
         departments={(siteData.tickets?.departments?.length ? siteData.tickets.departments : DEFAULT_TICKET_DEPARTMENTS)}
         recipientEmail={siteData.tickets?.recipientEmail || 'support@orga4soft.com'}
         emailEnabled={siteData.tickets?.emailEnabled !== false}
-        emailjs={siteData.tickets?.emailjsServiceId && siteData.tickets?.emailjsTemplateId && siteData.tickets?.emailjsPublicKey
-          ? { publicKey: siteData.tickets.emailjsPublicKey, serviceId: siteData.tickets.emailjsServiceId, templateId: siteData.tickets.emailjsTemplateId }
-          : undefined}
         lang={lang}
         isRTL={isRTL}
       />

@@ -9,7 +9,6 @@ interface TicketModalProps {
   departments: TicketDepartment[];
   recipientEmail: string;
   emailEnabled: boolean;
-  emailjs?: { publicKey: string; serviceId: string; templateId: string };
   lang: 'en' | 'ar';
   isRTL: boolean;
 }
@@ -38,7 +37,7 @@ const inputBase = `w-full px-4 py-3.5 rounded-xl border-2 border-slate-200 dark:
 const labelStyle = `block text-[10px] font-black text-slate-400 dark:text-slate-500
   uppercase tracking-[0.15em] mb-1.5`;
 
-const TicketModal: React.FC<TicketModalProps> = ({ open, onClose, departments, recipientEmail, emailEnabled, emailjs, lang, isRTL }) => {
+const TicketModal: React.FC<TicketModalProps> = ({ open, onClose, departments, recipientEmail, emailEnabled, lang, isRTL }) => {
   const ar = lang === 'ar';
   const [form, setForm] = useState<FormState>(emptyForm);
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
@@ -130,8 +129,6 @@ const TicketModal: React.FC<TicketModalProps> = ({ open, onClose, departments, r
     setSubmitting(true);
     const ref = generateTicketRef();
     let ticketId = '';
-    let emailOk = true;
-    let emailError = '';
     const payload: TicketInput = {
       name: form.name.trim(),
       phone: form.phone.trim(),
@@ -143,26 +140,21 @@ const TicketModal: React.FC<TicketModalProps> = ({ open, onClose, departments, r
       message: form.message.trim(),
       lang,
       recipientEmail,
-      emailjs,
     };
     try {
-      const res = await submitTicket(payload, ref);
-      ticketId = res.id;
+      ticketId = (await submitTicket(payload, ref)).id;
     } catch {
-      // Firestore may be unavailable (rules) — email still sent below
+      // Firestore may be unavailable (rules) — email still fires below
     }
     if (emailEnabled && recipientEmail) {
-      try {
-        await sendTicketEmail(payload, ref);
-      } catch (e: any) {
-        emailOk = false;
-        emailError = (e && e.message) ? String(e.message).slice(0, 200) : 'Email delivery failed';
-      }
+      sendTicketEmail(payload, ref).then(
+        () => { if (ticketId) void markTicketEmailResult(ticketId, true); },
+        (e: any) => { if (ticketId) void markTicketEmailResult(ticketId, false, (e && e.message) ? String(e.message).slice(0, 200) : 'Email delivery failed'); },
+      );
     }
-    if (ticketId) await markTicketEmailResult(ticketId, emailOk, emailError);
     lastSubmitRef.current = Date.now();
     setSubmitting(false);
-    setResult({ ref, emailOk, emailError });
+    setResult({ ref, emailOk: true, emailError: undefined });
   };
 
   const errCls = (key: keyof FormState) => errors[key] ? 'border-rose-400 dark:border-rose-500/60' : '';
