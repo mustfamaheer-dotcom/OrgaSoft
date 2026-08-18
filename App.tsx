@@ -112,6 +112,28 @@ const AppContent: React.FC = () => {
   }, [location.pathname]);
 
   useEffect(() => {
+    const blockKeys = (e: KeyboardEvent) => {
+      const k = e.key.toLowerCase();
+      if (
+        e.key === 'F12' ||
+        (e.ctrlKey && ['u', 's'].includes(k)) ||
+        (e.ctrlKey && e.shiftKey && ['i', 'j', 'c', 'k'].includes(k)) ||
+        (e.metaKey && ['u', 's'].includes(k))
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    };
+    const blockCtx = (e: MouseEvent) => e.preventDefault();
+    document.addEventListener('keydown', blockKeys, true);
+    document.addEventListener('contextmenu', blockCtx);
+    return () => {
+      document.removeEventListener('keydown', blockKeys, true);
+      document.removeEventListener('contextmenu', blockCtx);
+    };
+  }, []);
+
+  useEffect(() => {
     const path = location.pathname;
     if (path === '/admin') { setCurrentPage('admin'); }
     else if (path === '/applications') { setCurrentPage('all-applications'); setActiveProductId(null); setActiveServiceId(null); }
