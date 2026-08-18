@@ -486,11 +486,11 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
             </div>
           )}
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div className="lg:col-span-5 space-y-6">
-              <div className="bg-[#0f639e] rounded-2xl p-5 sm:p-6 text-white relative overflow-hidden">
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+              <div className="bg-[#0f639e] rounded-2xl p-5 sm:p-6 text-white relative overflow-hidden h-full flex flex-col">
                 <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full blur-2xl" />
-                <div className="relative space-y-4">
+                <div className="relative space-y-4 flex-1">
                   {activeBranch ? (
                     <>
                       <div className="flex items-center gap-2 pb-2 mb-1 border-b border-white/10">
@@ -593,40 +593,44 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
                   </div>
                 </div>
               </div>
+              {(activeBranch?.mapEmbedUrl || contacts.mapEmbedUrl) && (
+                <div className="rounded-2xl overflow-hidden shadow-lg relative h-[300px] sm:h-[350px] lg:h-full">
+                  <iframe src={activeBranch?.mapEmbedUrl || contacts.mapEmbedUrl} className="w-full h-full border-none grayscale opacity-90" loading="lazy" allowFullScreen />
+                  <div className="absolute top-4 left-4 bg-white/95 dark:bg-[#131d31]/95 backdrop-blur-xl px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest flex items-center gap-2 shadow-md">
+                    <Globe className="w-3 h-3 text-[#0a743c]" /> LIVE NODE
+                  </div>
+                </div>
+              )}
+            </div>
 
-              {[
-                { icon: Shield, title: lang === 'ar' ? 'سياسة الشركة' : 'Company Policy', sub: lang === 'ar' ? 'الجودة والالتزام' : 'QUALITY & COMMITMENT', text: policyText },
-                { icon: Scale, title: lang === 'ar' ? 'شروط وأحكام' : 'Terms & Conditions', sub: lang === 'ar' ? 'الاستخدام والمسؤولية' : 'USAGE & RESPONSIBILITY', text: termsText },
-              ].filter(w => w.text).map((w, idx) => {
-                const Icon = w.icon;
-                return (
-                  <div key={idx} className="relative group overflow-hidden rounded-2xl bg-gradient-to-br from-[#0f639e]/5 to-[#df4d21]/5 dark:from-[#0f639e]/10 dark:to-[#df4d21]/10 border border-[#0f639e]/10 dark:border-[#df4d21]/10 hover:border-[#0f639e]/30 dark:hover:border-[#df4d21]/30 transition-all duration-300 h-full">
-                    <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#df4d21]/10 rounded-full blur-3xl group-hover:bg-[#df4d21]/20 transition-all" />
-                    <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-[#0f639e]/10 rounded-full blur-3xl group-hover:bg-[#0f639e]/20 transition-all" />
-                    <div className="relative p-5 sm:p-6 backdrop-blur-sm">
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="w-10 h-10 bg-gradient-to-br from-[#df4d21] to-[#0f639e] rounded-xl flex items-center justify-center shadow-lg shadow-[#df4d21]/20 group-hover:shadow-xl group-hover:-translate-y-0.5 transition-all">
-                          <Icon className="w-5 h-5 text-white" />
+            {(policyText || termsText) && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+                {[
+                  { icon: Shield, title: lang === 'ar' ? 'سياسة الشركة' : 'Company Policy', sub: lang === 'ar' ? 'الجودة والالتزام' : 'QUALITY & COMMITMENT', text: policyText },
+                  { icon: Scale, title: lang === 'ar' ? 'شروط وأحكام' : 'Terms & Conditions', sub: lang === 'ar' ? 'الاستخدام والمسؤولية' : 'USAGE & RESPONSIBILITY', text: termsText },
+                ].filter(w => w.text).map((w, idx) => {
+                  const Icon = w.icon;
+                  return (
+                    <div key={idx} className="relative group overflow-hidden rounded-2xl bg-gradient-to-br from-[#0f639e]/5 to-[#df4d21]/5 dark:from-[#0f639e]/10 dark:to-[#df4d21]/10 border border-[#0f639e]/10 dark:border-[#df4d21]/10 hover:border-[#0f639e]/30 dark:hover:border-[#df4d21]/30 transition-all duration-300 h-full">
+                      <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#df4d21]/10 rounded-full blur-3xl group-hover:bg-[#df4d21]/20 transition-all" />
+                      <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-[#0f639e]/10 rounded-full blur-3xl group-hover:bg-[#0f639e]/20 transition-all" />
+                      <div className="relative p-5 sm:p-6 backdrop-blur-sm">
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="w-10 h-10 bg-gradient-to-br from-[#df4d21] to-[#0f639e] rounded-xl flex items-center justify-center shadow-lg shadow-[#df4d21]/20 group-hover:shadow-xl group-hover:-translate-y-0.5 transition-all">
+                            <Icon className="w-5 h-5 text-white" />
+                          </div>
+                          <div>
+                            <span className="text-sm font-black text-[#0f639e] dark:text-white uppercase tracking-widest">{w.title}</span>
+                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]">{w.sub}</p>
+                          </div>
                         </div>
-                        <div>
-                          <span className="text-sm font-black text-[#0f639e] dark:text-white uppercase tracking-widest">{w.title}</span>
-                          <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]">{w.sub}</p>
+                        <div className="relative ps-4 border-s-2 border-[#df4d21]/30 dark:border-[#df4d21]/50">
+                          <p className="text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-line">{w.text}</p>
                         </div>
-                      </div>
-                      <div className="relative ps-4 border-s-2 border-[#df4d21]/30 dark:border-[#df4d21]/50">
-                        <p className="text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-line">{w.text}</p>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
-            {(activeBranch?.mapEmbedUrl || contacts.mapEmbedUrl) && (
-              <div className="lg:col-span-7 rounded-2xl overflow-hidden shadow-lg relative h-[300px] sm:h-[350px] lg:h-auto">
-                <iframe src={activeBranch?.mapEmbedUrl || contacts.mapEmbedUrl} className="w-full h-full border-none grayscale opacity-90" loading="lazy" allowFullScreen />
-                <div className="absolute top-4 left-4 bg-white/95 dark:bg-[#131d31]/95 backdrop-blur-xl px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest flex items-center gap-2 shadow-md">
-                  <Globe className="w-3 h-3 text-[#0a743c]" /> LIVE NODE
-                </div>
+                  );
+                })}
               </div>
             )}
           </div>
