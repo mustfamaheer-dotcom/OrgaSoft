@@ -1,4 +1,4 @@
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, doc } from 'firebase/firestore';
 import { db } from '../firebase';
 import type { TicketDepartment, TicketRecord, TicketStatus } from '../types';
 
@@ -27,7 +27,12 @@ export function departmentLabel(dept: TicketDepartment, lang: 'en' | 'ar'): stri
   return (dept.name && (dept.name[lang] || dept.name.en)) || dept.id;
 }
 
-export async function submitTicket(input: TicketInput): Promise<string> {
+export interface TicketSubmitResult {
+  id: string;
+  ref: string;
+}
+
+export async function submitTicket(input: TicketInput): Promise<TicketSubmitResult> {
   const ref = generateTicketRef();
   const record: Omit<TicketRecord, 'id'> = {
     ref,
@@ -43,9 +48,18 @@ export async function submitTicket(input: TicketInput): Promise<string> {
     message: input.message,
     status: 'new' as TicketStatus,
     lang: input.lang,
+    emailSent: false,
   };
-  await addDoc(collection(db, 'tickets'), record);
-  return ref;
+  const docRef = await addDoc(collection(db, 'tickets'), record);
+  return { id: docRef.id, ref };
+}
+
+export async function markTicketEmailResult(id: string, ok: boolean, error?: string): Promise<void> {
+  try {
+    await updateDoc(doc(db, 'tickets', id), { emailSent: ok, emailError: ok ? '' : (error || 'unknown') });
+  } catch {
+    // non-blocking
+  }
 }
 
 export async function sendTicketEmail(input: TicketInput, ref: string): Promise<void> {
@@ -72,6 +86,7 @@ export async function sendTicketEmail(input: TicketInput, ref: string): Promise<
       _replyto: input.email,
       _template: 'modern',
       _autoresponse: autoresponse,
+      _captcha: 'false',
       _honey: '',
     }),
   });

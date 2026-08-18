@@ -159,6 +159,8 @@ export interface TicketRecord {
   message: string;
   status: TicketStatus;
   lang: 'en' | 'ar';
+  emailSent?: boolean;
+  emailError?: string;
 }
 
 export interface OrgaProService {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
-import { Ticket, Plus, Trash2, Mail, Inbox, Loader2, CheckCircle2, Clock, ExternalLink } from 'lucide-react';
+import { Ticket, Plus, Trash2, Mail, Inbox, Loader2, CheckCircle2, Clock, ExternalLink, MailCheck, MailX } from 'lucide-react';
 import type { SiteContent, TicketDepartment, TicketRecord, TicketStatus } from '../../types';
 import { SectionHeader, InputField, ToggleField } from './FormComponents';
 
@@ -164,6 +164,16 @@ const TicketsTab: React.FC<TicketsTabProps> = ({ data, updateNestedField, isRTL,
                       <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[10px] font-black uppercase tracking-widest ${statusStyles[t.status] || statusStyles.new}`}>
                         <StatusIcon className="w-3 h-3" /> {ar ? ({ new: 'جديدة', processing: 'قيد المعالجة', closed: 'مغلقة' } as Record<TicketStatus, string>)[t.status] : t.status}
                       </span>
+                      {t.emailSent === true && (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-emerald-500/20 bg-emerald-500/10 text-emerald-600 text-[10px] font-black uppercase tracking-widest">
+                          <MailCheck className="w-3 h-3" /> {ar ? 'أُرسل بالبريد' : 'Email sent'}
+                        </span>
+                      )}
+                      {t.emailSent === false && (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-rose-500/20 bg-rose-500/10 text-rose-500 text-[10px] font-black uppercase tracking-widest" title={t.emailError || ''}>
+                          <MailX className="w-3 h-3" /> {ar ? 'فشل الإرسال' : 'Email failed'}
+                        </span>
+                      )}
                     </div>
                     <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500" dir="ltr">
                       {new Date(t.createdAt).toLocaleString(lang === 'ar' ? 'ar-EG' : 'en-GB')}

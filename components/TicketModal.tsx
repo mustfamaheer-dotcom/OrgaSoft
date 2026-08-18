@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { X, User, Phone, MessageCircle, Mail, FolderKanban, PenLine, Send, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import type { TicketDepartment } from '../types';
-import { submitTicket, sendTicketEmail, generateTicketRef } from '../lib/tickets';
+import { submitTicket, sendTicketEmail, markTicketEmailResult, generateTicketRef } from '../lib/tickets';
 
 interface TicketModalProps {
   open: boolean;
@@ -43,7 +43,7 @@ const TicketModal: React.FC<TicketModalProps> = ({ open, onClose, departments, r
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [honey, setHoney] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [result, setResult] = useState<{ ref: string; emailOk: boolean } | null>(null);
+  const [result, setResult] = useState<{ ref: string; emailOk: boolean; emailError?: string } | null>(null);
   const lastSubmitRef = useRef(0);
 
   const t = {
@@ -128,9 +128,11 @@ const TicketModal: React.FC<TicketModalProps> = ({ open, onClose, departments, r
     const dept = departments.find(d => d.id === form.departmentId) || departments[0];
     setSubmitting(true);
     let ref = '';
+    let ticketId = '';
     let emailOk = true;
+    let emailError = '';
     try {
-      ref = await submitTicket({
+      const res = await submitTicket({
         name: form.name.trim(),
         phone: form.phone.trim(),
         whatsapp: form.whatsapp.trim(),
@@ -142,6 +144,8 @@ const TicketModal: React.FC<TicketModalProps> = ({ open, onClose, departments, r
         lang,
         recipientEmail,
       });
+      ticketId = res.id;
+      ref = res.ref;
     } catch {
       ref = generateTicketRef();
     }
@@ -159,13 +163,15 @@ const TicketModal: React.FC<TicketModalProps> = ({ open, onClose, departments, r
           lang,
           recipientEmail,
         });
-      } catch {
+      } catch (e: any) {
         emailOk = false;
+        emailError = (e && e.message) ? String(e.message).slice(0, 200) : 'Email delivery failed';
       }
     }
+    if (ticketId) await markTicketEmailResult(ticketId, emailOk, emailError);
     lastSubmitRef.current = Date.now();
     setSubmitting(false);
-    setResult({ ref, emailOk });
+    setResult({ ref, emailOk, emailError });
   };
 
   const errCls = (key: keyof FormState) => errors[key] ? 'border-rose-400 dark:border-rose-500/60' : '';
@@ -201,9 +207,13 @@ const TicketModal: React.FC<TicketModalProps> = ({ open, onClose, departments, r
               </div>
               <p className="text-sm font-medium text-slate-500 dark:text-slate-400 max-w-sm leading-relaxed">{t.successMsg}</p>
               {!result.emailOk && (
-                <p className="mt-3 flex items-center gap-2 text-xs font-bold text-amber-600 dark:text-amber-400">
-                  <AlertCircle className="w-4 h-4" /> {t.emailWarn}
-                </p>
+                <div className="mt-3 flex items-center gap-2 text-xs font-bold text-amber-600 dark:text-amber-400 max-w-sm">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span className="text-start">
+                    {t.emailWarn}
+                    {result.emailError && <span className="block text-[10px] font-mono text-amber-500/80 mt-0.5 truncate" dir="ltr">{result.emailError}</span>}
+                  </span>
+                </div>
               )}
               <div className="flex gap-3 mt-8 w-full max-w-xs">
                 <button onClick={() => { setForm({ ...emptyForm, departmentId: departments[0]?.id || '' }); setResult(null); }}
