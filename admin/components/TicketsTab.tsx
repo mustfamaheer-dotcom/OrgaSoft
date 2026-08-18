@@ -116,6 +116,19 @@ const TicketsTab: React.FC<TicketsTabProps> = ({ data, updateNestedField, isRTL,
                 : 'First-time activation: after the first ticket submission, an activation email from FormSubmit arrives at the recipient inbox — open it and click the activation link once. After that, all tickets arrive automatically.'}
             </p>
           </div>
+          <div className="px-5 py-4 rounded-xl border-2 border-[#df4d21]/15 bg-[#df4d21]/5 dark:bg-[#df4d21]/10">
+            <p className="text-[10px] font-black text-[#df4d21] uppercase tracking-widest mb-2">EmailJS (optional) — modern branded emails, no sponsor footer</p>
+            <p className="text-xs font-bold text-slate-600 dark:text-slate-300 leading-relaxed">
+              {ar
+                ? 'لإرسال بريد بتصميم حديث بدون شعار FormSubmit: أنشئ حساباً مجانياً على emailjs.com، اربط Gmail كخدمة، وأنشئ قالباً (Template) والصق فيه HTML القالب الحديث — ثم الصق المعرفات الثلاثة هنا. بدون هذه الحقول يبقى الإرسال عبر FormSubmit.'
+                : 'For a fully branded modern email with no sponsor footer: create a free account at emailjs.com, connect Gmail as a service, create a Template and paste the modern HTML template into it — then paste the three IDs here. Without them, delivery falls back to FormSubmit.'}
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-4">
+            <InputField label="EmailJS Public Key" value={data.tickets?.emailjsPublicKey || ''} onChange={v => setTicketsCfg('emailjsPublicKey', v)} />
+            <InputField label="EmailJS Service ID" value={data.tickets?.emailjsServiceId || ''} onChange={v => setTicketsCfg('emailjsServiceId', v)} />
+          </div>
+          <InputField label="EmailJS Template ID" value={data.tickets?.emailjsTemplateId || ''} onChange={v => setTicketsCfg('emailjsTemplateId', v)} />
         </div>
       </div>
 

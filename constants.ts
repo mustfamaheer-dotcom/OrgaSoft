@@ -119,6 +119,9 @@ export const INITIAL_SITE_DATA: SiteContent = {
     showTicketButton: true,
     recipientEmail: 'support@orga4soft.com',
     emailEnabled: true,
+    emailjsPublicKey: '',
+    emailjsServiceId: '',
+    emailjsTemplateId: '',
     departments: [
       { id: 'accounts', name: { en: 'Accounts', ar: 'الحسابات' } },
       { id: 'support', name: { en: 'Technical Support', ar: 'الدعم الفني' } },

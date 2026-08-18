@@ -13,6 +13,7 @@ export interface TicketInput {
   message: string;
   lang: 'en' | 'ar';
   recipientEmail: string;
+  emailjs?: { publicKey: string; serviceId: string; templateId: string };
 }
 
 const REF_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -32,8 +33,7 @@ export interface TicketSubmitResult {
   ref: string;
 }
 
-export async function submitTicket(input: TicketInput): Promise<TicketSubmitResult> {
-  const ref = generateTicketRef();
+export async function submitTicket(input: TicketInput, ref: string): Promise<TicketSubmitResult> {
   const record: Omit<TicketRecord, 'id'> = {
     ref,
     createdAt: new Date().toISOString(),
@@ -66,6 +66,36 @@ export async function sendTicketEmail(input: TicketInput, ref: string): Promise<
   const deptEn = input.department.name.en || input.department.id;
   const deptAr = input.department.name.ar || input.department.id;
   const isAr = input.lang === 'ar';
+  if (input.emailjs && input.emailjs.serviceId && input.emailjs.templateId) {
+    const ej = input.emailjs;
+    const res = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        service_id: ej.serviceId,
+        template_id: ej.templateId,
+        user_id: ej.publicKey,
+        template_params: {
+          ticketRef: ref,
+          name: input.name,
+          phone: input.phone,
+          whatsapp: input.whatsapp || '—',
+          email: input.email,
+          department: `${deptEn} / ${deptAr}`,
+          isClient: input.isClient ? 'Yes / نعم' : 'No / لا',
+          subject: input.subject,
+          message: input.message,
+          reply_to: input.email,
+          locale: input.lang,
+        },
+      }),
+    });
+    if (!res.ok) {
+      const body = await res.text().catch(() => '');
+      throw new Error(body ? `EmailJS error ${res.status}: ${body}` : `EmailJS error ${res.status}`);
+    }
+    return;
+  }
   const autoresponse = isAr
     ? `أهلاً ${input.name} 👋\n\nتم استلام تذكرتك بنجاح برقم: ${ref}\nالقسم: ${deptAr}\n\nسيتواصل معك فريق الدعم خلال 24 ساعة.\nيمكنك الرد على هذا البريد الإلكتروني لمتابعة التذكرة.\n\n— فريق OrgaSoft`
     : `Hi ${input.name} 👋\n\nYour ticket has been received successfully:\nReference: ${ref}\nDepartment: ${deptEn}\n\nOur support team will contact you within 24 hours.\nYou can reply to this email to follow up on your ticket.\n\n— OrgaSoft Team`;

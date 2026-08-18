@@ -88,10 +88,10 @@ const Navbar: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }
               </div>
             </div>
             <div className="flex items-baseline gap-1.5 leading-none truncate">
-              <span className="text-base sm:text-lg md:text-xl lg:text-2xl font-black text-[#df4d21] tracking-tight uppercase truncate">
+              <span className="text-sm sm:text-lg md:text-xl lg:text-2xl font-black text-[#df4d21] tracking-tight uppercase truncate">
                 {(siteData.logo?.[lang] || 'Orga').split(' ')[0]}
               </span>
-              <span className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-[#3292ca] tracking-[0.05em] sm:tracking-[0.15em] uppercase truncate">
+              <span className="text-sm sm:text-lg md:text-xl lg:text-2xl font-bold text-[#3292ca] tracking-[0.05em] sm:tracking-[0.15em] uppercase truncate">
                 {(siteData.logo?.[lang] || 'Orga Soft').split(' ').slice(1).join(' ') || 'SOFT'}
               </span>
             </div>

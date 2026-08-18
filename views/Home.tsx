@@ -574,6 +574,12 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
                     <span className="text-xs font-black text-white/80">{lang === 'ar' ? 'تواصل معنا' : 'Follow Us'}</span>
                   </div>
                   <div className="flex flex-wrap gap-2">
+                    {siteData.tickets?.showTicketButton !== false && (
+                      <button onClick={() => setTicketOpen(true)}
+                        title={lang === 'ar' ? 'إنشاء تذكرة دعم' : 'Create a support ticket'}
+                        aria-label={lang === 'ar' ? 'إنشاء تذكرة دعم' : 'Create a support ticket'}
+                        className="w-10 h-10 bg-gradient-to-br from-[#df4d21] to-[#e8481e] rounded-xl flex items-center justify-center text-white shadow-lg shadow-[#df4d21]/30 hover:from-[#ff7a45] hover:to-[#e8481e] hover:-translate-y-1 hover:shadow-[#df4d21]/50 transition-all"><Ticket className="w-5 h-5" /></button>
+                    )}
                     {contacts.showWhatsapp !== false && contacts.whatsapp && (
                       <a href={`https://wa.me/${contacts.whatsapp}`} target="_blank" rel="noopener noreferrer"
                         className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white hover:bg-[#25D366] hover:-translate-y-1 transition-all"><MessageCircle className="w-5 h-5" /></a>
@@ -599,30 +605,6 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
                         className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white hover:bg-[#000] hover:-translate-y-1 transition-all"><Music className="w-5 h-5" /></a>
                     )}
                   </div>
-                  {siteData.tickets?.showTicketButton !== false && (
-                    <button onClick={() => setTicketOpen(true)}
-                      className="group relative mt-4 w-full overflow-hidden rounded-xl bg-gradient-to-r from-[#e8481e] via-[#ef5a2b] to-[#ff7a45] p-[1.5px] shadow-lg shadow-[#df4d21]/25 hover:shadow-xl hover:shadow-[#df4d21]/40 hover:-translate-y-0.5 active:scale-[0.98] active:translate-y-0 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ff7a45]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f639e]">
-                      <span className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 -skew-x-12 bg-white/30 blur-md group-hover:animate-[shineSweep_0.9s_ease-in-out]" />
-                      <span className="relative flex w-full items-center justify-between gap-3 rounded-[11px] bg-gradient-to-r from-[#e8481e] to-[#ff7a45] px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.25)]">
-                        <span className="flex items-center gap-3 min-w-0">
-                          <span className="w-9 h-9 shrink-0 rounded-lg bg-white/15 border border-white/20 backdrop-blur-sm flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[-6deg]">
-                            <Ticket className="w-4 h-4 text-white" />
-                          </span>
-                          <span className="text-start min-w-0">
-                            <span className="block text-xs sm:text-sm font-black text-white uppercase tracking-widest leading-tight truncate">
-                              {lang === 'ar' ? 'إنشاء تذكرة' : 'MAKE A TICKET'}
-                            </span>
-                            <span className="block text-[9px] font-bold text-white/70 tracking-[0.18em] uppercase truncate">
-                              {lang === 'ar' ? 'رد خلال 24 ساعة' : 'REPLY WITHIN 24H'}
-                            </span>
-                          </span>
-                        </span>
-                        <span className="w-6 h-6 shrink-0 rounded-full bg-white/15 border border-white/20 flex items-center justify-center transition-transform duration-300 group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5">
-                          {isRTL ? <MoveLeft className="w-3.5 h-3.5 text-white" /> : <ArrowUpRight className="w-3.5 h-3.5 text-white" />}
-                        </span>
-                      </span>
-                    </button>
-                  )}
                 </div>
               </div>
               {(activeBranch?.mapEmbedUrl || contacts.mapEmbedUrl) && (
@@ -695,6 +677,9 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
         departments={(siteData.tickets?.departments?.length ? siteData.tickets.departments : DEFAULT_TICKET_DEPARTMENTS)}
         recipientEmail={siteData.tickets?.recipientEmail || 'support@orga4soft.com'}
         emailEnabled={siteData.tickets?.emailEnabled !== false}
+        emailjs={siteData.tickets?.emailjsServiceId && siteData.tickets?.emailjsTemplateId && siteData.tickets?.emailjsPublicKey
+          ? { publicKey: siteData.tickets.emailjsPublicKey, serviceId: siteData.tickets.emailjsServiceId, templateId: siteData.tickets.emailjsTemplateId }
+          : undefined}
         lang={lang}
         isRTL={isRTL}
       />

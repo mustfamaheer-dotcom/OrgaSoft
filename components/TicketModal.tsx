@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { X, User, Phone, MessageCircle, Mail, FolderKanban, PenLine, Send, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import type { TicketDepartment } from '../types';
-import { submitTicket, sendTicketEmail, markTicketEmailResult, generateTicketRef } from '../lib/tickets';
+import { submitTicket, sendTicketEmail, markTicketEmailResult, generateTicketRef, type TicketInput } from '../lib/tickets';
 
 interface TicketModalProps {
   open: boolean;
@@ -9,6 +9,7 @@ interface TicketModalProps {
   departments: TicketDepartment[];
   recipientEmail: string;
   emailEnabled: boolean;
+  emailjs?: { publicKey: string; serviceId: string; templateId: string };
   lang: 'en' | 'ar';
   isRTL: boolean;
 }
@@ -37,7 +38,7 @@ const inputBase = `w-full px-4 py-3.5 rounded-xl border-2 border-slate-200 dark:
 const labelStyle = `block text-[10px] font-black text-slate-400 dark:text-slate-500
   uppercase tracking-[0.15em] mb-1.5`;
 
-const TicketModal: React.FC<TicketModalProps> = ({ open, onClose, departments, recipientEmail, emailEnabled, lang, isRTL }) => {
+const TicketModal: React.FC<TicketModalProps> = ({ open, onClose, departments, recipientEmail, emailEnabled, emailjs, lang, isRTL }) => {
   const ar = lang === 'ar';
   const [form, setForm] = useState<FormState>(emptyForm);
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
@@ -127,42 +128,32 @@ const TicketModal: React.FC<TicketModalProps> = ({ open, onClose, departments, r
 
     const dept = departments.find(d => d.id === form.departmentId) || departments[0];
     setSubmitting(true);
-    let ref = '';
+    const ref = generateTicketRef();
     let ticketId = '';
     let emailOk = true;
     let emailError = '';
+    const payload: TicketInput = {
+      name: form.name.trim(),
+      phone: form.phone.trim(),
+      whatsapp: form.whatsapp.trim(),
+      email: form.email.trim(),
+      department: dept,
+      isClient: form.isClient,
+      subject: form.subject.trim(),
+      message: form.message.trim(),
+      lang,
+      recipientEmail,
+      emailjs,
+    };
     try {
-      const res = await submitTicket({
-        name: form.name.trim(),
-        phone: form.phone.trim(),
-        whatsapp: form.whatsapp.trim(),
-        email: form.email.trim(),
-        department: dept,
-        isClient: form.isClient,
-        subject: form.subject.trim(),
-        message: form.message.trim(),
-        lang,
-        recipientEmail,
-      });
+      const res = await submitTicket(payload, ref);
       ticketId = res.id;
-      ref = res.ref;
     } catch {
-      ref = generateTicketRef();
+      // Firestore may be unavailable (rules) — email still sent below
     }
     if (emailEnabled && recipientEmail) {
       try {
-        await sendTicketEmail({
-          name: form.name.trim(),
-          phone: form.phone.trim(),
-          whatsapp: form.whatsapp.trim(),
-          email: form.email.trim(),
-          department: dept,
-          isClient: form.isClient,
-          subject: form.subject.trim(),
-          message: form.message.trim(),
-          lang,
-          recipientEmail,
-        });
+        await sendTicketEmail(payload, ref);
       } catch (e: any) {
         emailOk = false;
         emailError = (e && e.message) ? String(e.message).slice(0, 200) : 'Email delivery failed';
