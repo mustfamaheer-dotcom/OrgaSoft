@@ -7,7 +7,7 @@ import AnimatedCounter from '../components/AnimatedCounter';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import ServicesSection from '../components/ServicesSection';
 import OrgaProServicesSection from '../components/OrgaProServicesSection';
-import { Pill, Building2, Store, Users, Clock, Award, MapPin, Activity, Database, MoveRight, MoveLeft, Mail, PhoneCall, Globe, Handshake, Shield, Scale, Rocket, Grid3X3, ArrowUpRight, PlayCircle, Facebook, Twitter, Youtube, MessageCircle, Instagram, Music, Tag, Hospital, GraduationCap, DollarSign, Building, Factory, ShoppingBag, Stethoscope, Truck, HardHat, UtensilsCrossed, TreePalm, Laptop, HeartHandshake, Landmark, Car, FlaskConical, Crown, Gem, Ship, Plane, Bus, Tractor, ConciergeBell, Wine, Shirt, Watch, Armchair, Gamepad2, Palette, Camera, Newspaper, BookOpen, HeartPulse, Leaf, Sun, Zap, Droplets, Mountain, Compass, Map, Radio, Cpu, HardDrive, Printer, Scan, Baby, Dog, Syringe, Bike, Smartphone, Monitor } from 'lucide-react';
+import { Pill, Building2, Store, Users, Clock, Award, MapPin, Activity, Database, MoveRight, MoveLeft, Mail, PhoneCall, Globe, Handshake, Shield, Scale, Rocket, Grid3X3, ArrowUpRight, PlayCircle, Facebook, Twitter, Youtube, MessageCircle, Instagram, Music, Tag, Hospital, GraduationCap, DollarSign, Building, Factory, ShoppingBag, Stethoscope, Truck, HardHat, UtensilsCrossed, TreePalm, Laptop, HeartHandshake, Landmark, Car, FlaskConical, Crown, Gem, Ship, Plane, Bus, Tractor, ConciergeBell, Wine, Shirt, Watch, Armchair, Gamepad2, Palette, Camera, Newspaper, BookOpen, HeartPulse, Leaf, Sun, Zap, Droplets, Mountain, Compass, Map, Radio, Cpu, HardDrive, Printer, Scan, Baby, Dog, Syringe, Bike, Smartphone, Monitor, X } from 'lucide-react';
 
 const iconMap: Record<string, any> = {
   users: Users, clock: Clock, activity: Activity, pill: Pill,
@@ -124,6 +124,7 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
 
   const branches = contacts.branches || [];
   const [activeBranchIdx, setActiveBranchIdx] = useState(0);
+  const [openWidget, setOpenWidget] = useState<'policy' | 'terms' | null>(null);
   const activeBranch = branches.length > 0 ? branches[activeBranchIdx] : null;
 
   const [activePartnerCat, setActivePartnerCat] = useState<string | null>(null);
@@ -182,6 +183,11 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
   const termsText = contacts.termsAndConditions && contacts.showTermsAndConditions !== false
     ? contacts.termsAndConditions[lang]
     : null;
+
+  const infoWidgets = [
+    { id: 'policy' as const, icon: Shield, title: lang === 'ar' ? 'سياسة الشركة' : 'Company Policy', sub: lang === 'ar' ? 'الجودة والالتزام' : 'QUALITY & COMMITMENT', text: policyText, btnLabel: lang === 'ar' ? 'قراءة سياسة الشركة' : 'Read the Company Policy' },
+    { id: 'terms' as const, icon: Scale, title: lang === 'ar' ? 'شروط وأحكام' : 'Terms & Conditions', sub: lang === 'ar' ? 'الاستخدام والمسؤولية' : 'USAGE & RESPONSIBILITY', text: termsText, btnLabel: lang === 'ar' ? 'قراءة الشروط والأحكام' : 'Read the Terms & Conditions' },
+  ].filter(w => w.text);
 
   return (
     <div className="bg-[#fcfdfe] dark:bg-[#0b1121] overflow-x-hidden">
@@ -486,9 +492,8 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
             </div>
           )}
 
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
-              <div className="bg-[#0f639e] rounded-2xl p-5 sm:p-6 text-white relative overflow-hidden h-full flex flex-col">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+              <div className="bg-[#0f639e] rounded-2xl p-5 sm:p-6 text-white relative overflow-hidden h-full lg:h-[460px] flex flex-col">
                 <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full blur-2xl" />
                 <div className="relative space-y-4 flex-1">
                   {activeBranch ? (
@@ -594,48 +599,68 @@ const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) 
                 </div>
               </div>
               {(activeBranch?.mapEmbedUrl || contacts.mapEmbedUrl) && (
-                <div className="rounded-2xl overflow-hidden shadow-lg relative h-[300px] sm:h-[350px] lg:h-full">
+                <div className="rounded-2xl overflow-hidden shadow-lg relative h-[300px] sm:h-[350px] lg:h-[460px]">
                   <iframe src={activeBranch?.mapEmbedUrl || contacts.mapEmbedUrl} className="w-full h-full border-none grayscale opacity-90" loading="lazy" allowFullScreen />
                   <div className="absolute top-4 left-4 bg-white/95 dark:bg-[#131d31]/95 backdrop-blur-xl px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest flex items-center gap-2 shadow-md">
                     <Globe className="w-3 h-3 text-[#0a743c]" /> LIVE NODE
                   </div>
                 </div>
               )}
-            </div>
 
-            {(policyText || termsText) && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
-                {[
-                  { icon: Shield, title: lang === 'ar' ? 'سياسة الشركة' : 'Company Policy', sub: lang === 'ar' ? 'الجودة والالتزام' : 'QUALITY & COMMITMENT', text: policyText },
-                  { icon: Scale, title: lang === 'ar' ? 'شروط وأحكام' : 'Terms & Conditions', sub: lang === 'ar' ? 'الاستخدام والمسؤولية' : 'USAGE & RESPONSIBILITY', text: termsText },
-                ].filter(w => w.text).map((w, idx) => {
-                  const Icon = w.icon;
-                  return (
-                    <div key={idx} className="relative group overflow-hidden rounded-2xl bg-gradient-to-br from-[#0f639e]/5 to-[#df4d21]/5 dark:from-[#0f639e]/10 dark:to-[#df4d21]/10 border border-[#0f639e]/10 dark:border-[#df4d21]/10 hover:border-[#0f639e]/30 dark:hover:border-[#df4d21]/30 transition-all duration-300 h-full">
-                      <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#df4d21]/10 rounded-full blur-3xl group-hover:bg-[#df4d21]/20 transition-all" />
-                      <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-[#0f639e]/10 rounded-full blur-3xl group-hover:bg-[#0f639e]/20 transition-all" />
-                      <div className="relative p-5 sm:p-6 backdrop-blur-sm">
-                        <div className="flex items-center gap-3 mb-4">
-                          <div className="w-10 h-10 bg-gradient-to-br from-[#df4d21] to-[#0f639e] rounded-xl flex items-center justify-center shadow-lg shadow-[#df4d21]/20 group-hover:shadow-xl group-hover:-translate-y-0.5 transition-all">
-                            <Icon className="w-5 h-5 text-white" />
-                          </div>
-                          <div>
-                            <span className="text-sm font-black text-[#0f639e] dark:text-white uppercase tracking-widest">{w.title}</span>
-                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]">{w.sub}</p>
-                          </div>
-                        </div>
-                        <div className="relative ps-4 border-s-2 border-[#df4d21]/30 dark:border-[#df4d21]/50">
-                          <p className="text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-line">{w.text}</p>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+            {infoWidgets.map(w => (
+              <div key={w.id} className="relative group overflow-hidden rounded-2xl bg-gradient-to-br from-[#0f639e]/5 to-[#df4d21]/5 dark:from-[#0f639e]/10 dark:to-[#df4d21]/10 border border-[#0f639e]/10 dark:border-[#df4d21]/10 hover:border-[#0f639e]/30 dark:hover:border-[#df4d21]/30 transition-all duration-300 h-full lg:h-[460px] flex flex-col p-5 sm:p-6 backdrop-blur-sm">
+                <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#df4d21]/10 rounded-full blur-3xl group-hover:bg-[#df4d21]/20 transition-all" />
+                <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-[#0f639e]/10 rounded-full blur-3xl group-hover:bg-[#0f639e]/20 transition-all" />
+                <div className="relative flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-gradient-to-br from-[#df4d21] to-[#0f639e] rounded-xl flex items-center justify-center shadow-lg shadow-[#df4d21]/20 group-hover:shadow-xl group-hover:-translate-y-0.5 transition-all">
+                    <w.icon className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <span className="text-sm font-black text-[#0f639e] dark:text-white uppercase tracking-widest">{w.title}</span>
+                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]">{w.sub}</p>
+                  </div>
+                </div>
+                <div className="relative flex-1 min-h-0 ps-4 border-s-2 border-[#df4d21]/30 dark:border-[#df4d21]/50">
+                  <p className="text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-line line-clamp-[7]">{w.text}</p>
+                </div>
+                <button onClick={() => setOpenWidget(w.id)}
+                  className="relative mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-[#df4d21] to-[#0f639e] text-white text-xs sm:text-sm font-black uppercase tracking-widest shadow-lg shadow-[#df4d21]/20 hover:shadow-xl hover:-translate-y-0.5 active:scale-95 transition-all duration-300">
+                  {w.btnLabel}
+                  {isRTL ? <MoveLeft className="w-4 h-4" /> : <ArrowUpRight className="w-4 h-4" />}
+                </button>
               </div>
-            )}
+            ))}
           </div>
         </div>
       </Section>
+
+      {openWidget && (() => {
+        const active = infoWidgets.find(w => w.id === openWidget);
+        if (!active) return null;
+        const Icon = active.icon;
+        return (
+          <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setOpenWidget(null)}>
+            <div className="relative w-full max-w-2xl max-h-[85vh] flex flex-col rounded-2xl bg-white dark:bg-[#131d31] shadow-2xl border border-slate-100 dark:border-[#1e293b] overflow-hidden" onClick={e => e.stopPropagation()}>
+              <div className="flex items-center justify-between gap-3 p-5 sm:p-6 border-b border-slate-100 dark:border-[#1e293b] bg-white/95 dark:bg-[#131d31]/95 backdrop-blur-xl">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-10 h-10 bg-gradient-to-br from-[#df4d21] to-[#0f639e] rounded-xl flex items-center justify-center shadow-lg shadow-[#df4d21]/20 shrink-0">
+                    <Icon className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="text-sm sm:text-lg font-black text-[#0f639e] dark:text-white uppercase tracking-widest truncate">{active.title}</h3>
+                </div>
+                <button onClick={() => setOpenWidget(null)} className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-[#1a2744] flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-[#df4d21] hover:bg-slate-200 dark:hover:bg-[#1e293b] transition-all shrink-0">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="p-5 sm:p-8 overflow-y-auto">
+                <div className={`ps-4 border-s-2 border-[#df4d21]/30 dark:border-[#df4d21]/50 ${isRTL ? 'text-right' : 'text-left'}`}>
+                  <p className="text-sm sm:text-base font-medium text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-line">{active.text}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       <style>{`
         .scrollbar-hide::-webkit-scrollbar { display: none; }
