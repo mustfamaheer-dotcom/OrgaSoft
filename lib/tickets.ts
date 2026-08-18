@@ -51,22 +51,27 @@ export async function submitTicket(input: TicketInput): Promise<string> {
 export async function sendTicketEmail(input: TicketInput, ref: string): Promise<void> {
   const deptEn = input.department.name.en || input.department.id;
   const deptAr = input.department.name.ar || input.department.id;
+  const isAr = input.lang === 'ar';
+  const autoresponse = isAr
+    ? `أهلاً ${input.name} 👋\n\nتم استلام تذكرتك بنجاح برقم: ${ref}\nالقسم: ${deptAr}\n\nسيتواصل معك فريق الدعم خلال 24 ساعة.\nيمكنك الرد على هذا البريد الإلكتروني لمتابعة التذكرة.\n\n— فريق OrgaSoft`
+    : `Hi ${input.name} 👋\n\nYour ticket has been received successfully:\nReference: ${ref}\nDepartment: ${deptEn}\n\nOur support team will contact you within 24 hours.\nYou can reply to this email to follow up on your ticket.\n\n— OrgaSoft Team`;
   const res = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(input.recipientEmail)}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
     body: JSON.stringify({
-      name: input.name,
-      phone: input.phone,
-      whatsapp: input.whatsapp || '—',
-      email: input.email,
-      department: `${deptEn} / ${deptAr}`,
-      isClient: input.isClient ? 'Yes / نعم' : 'No / لا',
-      subject: input.subject,
-      message: input.message,
-      ticketRef: ref,
+      'Ticket Ref': ref,
+      Name: input.name,
+      Phone: input.phone,
+      WhatsApp: input.whatsapp || '—',
+      Email: input.email,
+      Department: `${deptEn} / ${deptAr}`,
+      Client: input.isClient ? 'Yes / نعم' : 'No / لا',
+      Subject: input.subject,
+      Message: input.message,
       _subject: `[${ref}] New Ticket — ${deptEn}`,
       _replyto: input.email,
-      _template: 'table',
+      _template: 'modern',
+      _autoresponse: autoresponse,
       _honey: '',
     }),
   });
