@@ -76,6 +76,33 @@ export async function uploadToImageKit(file: File): Promise<string> {
   }
 }
 
+export async function uploadToServer(file: File): Promise<string> {
+  const uploadUrl = import.meta.env.VITE_UPLOAD_SERVER_URL || 'https://www.orga4soft.com/uploads/upload.php';
+  // Fallback to a hardcoded secure token if env var is missing. Must match the PHP script.
+  const secretToken = import.meta.env.VITE_UPLOAD_SECRET_TOKEN || 'orga4soft_secure_upload_token_2027';
+
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('token', secretToken);
+
+  try {
+    const res = await fetch(uploadUrl, {
+      method: 'POST',
+      body: formData,
+    });
+    if (!res.ok) {
+      const body = await res.text();
+      throw new Error(`Server upload failed: ${res.status} - ${body}`);
+    }
+    const data = await res.json();
+    logger.log('Server upload success:', data.url);
+    return data.url;
+  } catch (error) {
+    logger.error('Server upload error:', error);
+    throw error;
+  }
+}
+
 export function getOptimizedUrl(src: string, opts?: { width?: number; height?: number; quality?: number; format?: string }): string {
   if (!src) return src;
   const base = IMAGEKIT_URL_ENDPOINT;

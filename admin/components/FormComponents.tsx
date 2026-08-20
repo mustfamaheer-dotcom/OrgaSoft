@@ -1,6 +1,6 @@
 import React, { useRef, useState, useCallback } from 'react';
 import { Upload, X, Loader2, CheckCircle2, ImageIcon } from 'lucide-react';
-import { uploadToImageKit } from '../../lib/imagekit';
+import { uploadToServer } from '../../lib/imagekit';
 
 const inputBase = `w-full px-5 py-4 rounded-xl border-2 border-slate-200 dark:border-[#1e293b]
   bg-white dark:bg-[#131d31] text-slate-900 dark:text-white font-medium text-sm
@@ -64,7 +64,7 @@ export const CloudImageUploader = ({ label, value, onChange }: {
     if (file.size > 10 * 1024 * 1024) { setUploadError('Image must be under 10MB'); return; }
     try {
       setIsUploading(true); setUploadProgress(10); setUploadError('');
-      const result = await uploadToImageKit(file);
+      const result = await uploadToServer(file);
       setUploadProgress(100); onChange(result);
     } catch (error: any) { setUploadError(error.message || 'Upload failed');
     } finally { setIsUploading(false); setUploadProgress(0); }
@@ -84,7 +84,7 @@ export const CloudImageUploader = ({ label, value, onChange }: {
       <div className="space-y-3">
         <div className="flex gap-2">
           <input type="text" value={value} onChange={e => onChange(e.target.value)}
-            className={`${inputBase} font-mono text-xs flex-grow`} placeholder="https://ik.imagekit.io/..." />
+            className={`${inputBase} font-mono text-xs flex-grow`} placeholder="https://www.orga4soft.com/uploads/..." />
           <button onClick={() => fileInputRef.current?.click()} disabled={isUploading}
             className="px-6 py-4 bg-slate-100 dark:bg-[#1a2744] text-[#0f639e] dark:text-[#3292ca] rounded-xl hover:bg-[#0f639e] hover:text-white dark:hover:bg-[#0f639e] dark:hover:text-white transition-all shadow-sm disabled:opacity-50 shrink-0">
             {isUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Upload className="w-5 h-5" />}
@@ -123,7 +123,7 @@ export const CloudImageUploader = ({ label, value, onChange }: {
                 <X className="w-4 h-4" />
               </button>
               <div className="mt-3 flex items-center justify-center gap-2 text-emerald-600 dark:text-emerald-400 text-xs font-bold">
-                <CheckCircle2 className="w-4 h-4" /> Uploaded to ImageKit CDN
+                <CheckCircle2 className="w-4 h-4" /> Uploaded to Server
               </div>
             </div>
           ) : (
