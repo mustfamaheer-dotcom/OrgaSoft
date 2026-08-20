@@ -662,7 +662,7 @@ function handleGreeting(lang: string): ChatResponse {
   };
 }
 
-function handlePricing(siteData: WebsiteData, lang: string, tokens: string[]): ChatResponse | null {
+function handlePricing(siteData: WebsiteData, lang: string): ChatResponse | null {
   const c = siteData.contacts;
   const companyName = lang === 'ar'
     ? siteData.companyName?.ar || siteData.companyName?.en || 'أورجا سوفت'
@@ -1248,7 +1248,7 @@ export function processMessage(
       return handleCompany(siteData, lang) || handleProductQuery(input, siteData.products, session, lang);
 
     case 'pricing':
-      return handlePricing(siteData, lang, tokens);
+      return handlePricing(siteData, lang) || handleProductQuery(input, siteData.products, session, lang);
 
     case 'product-detail': {
       const detail = handleProductDetail(input, siteData.products, lang);
