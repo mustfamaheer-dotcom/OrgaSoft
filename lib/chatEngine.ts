@@ -66,6 +66,7 @@ interface WebsiteData {
     phoneAdmin: string;
     email: string;
     whatsapp: string;
+    companyPolicy?: Record<string, string>;
     branches: BranchData[];
   };
   about: {
@@ -78,7 +79,7 @@ interface WebsiteData {
   };
 }
 
-type Intent = 'product' | 'service' | 'orga-service' | 'location' | 'contact' | 'partner' | 'company' | 'greeting' | 'pricing' | 'product-detail' | 'unknown';
+type Intent = 'product' | 'service' | 'orga-service' | 'location' | 'contact' | 'partner' | 'company' | 'greeting' | 'pricing' | 'product-detail' | 'policy' | 'unknown';
 
 function normalizeArabic(text: string): string {
   return text
@@ -121,12 +122,12 @@ const INTENT_KEYWORDS: Record<Intent, { en: string[]; ar: string[] }> = {
     ar: ['شريك', 'شركاء', 'عميل', 'عملاء', 'شراكه', 'شراكة', 'يتعامل', 'موزع'],
   },
   service: {
-    en: ['service', 'services', 'it service', 'it services', 'development', 'programming', 'design', 'support', 'maintenance', 'hosting', 'cloud', 'network', 'software service'],
-    ar: ['خدمه', 'خدمة', 'خدمات', 'تطوير', 'برمجه', 'برمجة', 'تصميم', 'دعم', 'صيانه', 'صيانة', 'استضافه', 'شبكات'],
+    en: ['service', 'services', 'it service', 'it services', 'development', 'programming', 'design', 'support', 'maintenance', 'hosting', 'cloud', 'network', 'software service', 'custom software', 'mobile app', 'web design'],
+    ar: ['خدمه', 'خدمة', 'خدمات', 'تطوير', 'برمجه', 'برمجة', 'تصميم', 'دعم', 'صيانه', 'صيانة', 'استضافه', 'شبكات', 'تطبيقات', 'تطبيق', 'مواقع'],
   },
   'orga-service': {
-    en: ['orga pro', 'orgapro', 'premium', 'professional service'],
-    ar: ['اورجا برو', 'اورجا المتطوره', 'اورجا المتطورة', 'خدمات برو', 'احترافيه', 'احترافية'],
+    en: ['orga pro', 'orgapro', 'premium', 'professional service', 'advanced service', 'marketing', 'seo', 'consulting'],
+    ar: ['اورجا برو', 'اورجا المتطوره', 'اورجا المتطورة', 'خدمات برو', 'احترافيه', 'احترافية', 'تسويق', 'استشارات', 'متقدمة'],
   },
   company: {
     en: ['about', 'company', 'tell me about', 'who are you', 'what is orga', 'about orga', 'background', 'history', 'mission', 'vision'],
@@ -139,6 +140,10 @@ const INTENT_KEYWORDS: Record<Intent, { en: string[]; ar: string[] }> = {
   'product-detail': {
     en: ['tell me about', 'details about', 'features of', 'what is', 'describe', 'explain', 'overview of', 'info about'],
     ar: ['اعرف عن', 'اعرف تفاصيل', 'تفاصيل عن', 'مميزات', 'ايش هو', 'وش هو', 'شرح', 'معلومات عن', 'اختصر'],
+  },
+  policy: {
+    en: ['policy', 'terms', 'conditions', 'rules', 'agreement', 'privacy'],
+    ar: ['سياسه', 'سياسة', 'شروط', 'احكام', 'أحكام', 'قوانين', 'اتفاقية', 'اتفاقيه', 'خصوصيه'],
   },
   product: {
     en: ['product', 'software', 'system', 'program', 'solution', 'manage'],
@@ -589,9 +594,12 @@ function handleServices(
   const topName = lang === 'ar' ? top[0]?.name?.ar || '' : top[0]?.name?.en || '';
 
   if (top[0]?.matchScore >= 15) {
+    const matchedService = suggestions[0];
+    const topDesc = matchedService.description || '';
+    
     const text = lang === 'ar'
-      ? `أنا متأكد أن خدمة **${topName}** (${sectionTitle}) هي المناسبة لك!`
-      : `I'm confident **${topName}** (${sectionTitle}) is the right service for you!`;
+      ? `أنا متأكد أن خدمة **${topName}** (${sectionTitle}) هي المناسبة لك!\n\n### نظرة عامة مفصلة\n${topDesc}`
+      : `I'm confident **${topName}** (${sectionTitle}) is the right service for you!\n\n### Detailed Overview\n${topDesc}`;
     return { text, textAr: text, suggestions: suggestions.slice(0, 1), confidence: 'high' };
   }
 
@@ -626,6 +634,20 @@ function handleCompany(siteData: WebsiteData, lang: string): ChatResponse | null
   const cleaned = content.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
   const displayContent = lang === 'ar' ? cleaned : content;
   const text = `**${title}**\n\n${displayContent}`;
+  return { text, textAr: text, suggestions: [], confidence: 'high' };
+}
+
+function handlePolicy(siteData: WebsiteData, lang: string): ChatResponse | null {
+  const policy = siteData.contacts?.companyPolicy;
+  if (!policy || (!policy.en && !policy.ar)) return null;
+
+  const title = lang === 'ar' ? 'سياسة الشركة' : 'Company Policy';
+  const content = lang === 'ar' ? policy.ar || policy.en : policy.en || policy.ar;
+  
+  if (!content) return null;
+
+  const cleaned = content.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+  const text = `**${title}**\n\n${cleaned}`;
   return { text, textAr: text, suggestions: [], confidence: 'high' };
 }
 
@@ -735,7 +757,7 @@ function handleProductDetail(
       if (desc) parts.push(`\n${desc}`);
       if (longDesc) {
         const cleaned = longDesc.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
-        parts.push(`\n${cleaned}`);
+        parts.push(`\n\n### ${lang === 'ar' ? 'نظرة عامة مفصلة' : 'Detailed Overview'}\n${cleaned}`);
       }
       if (features && features.length > 0) {
         parts.push(`\n\n${lang === 'ar' ? '✨ المميزات:' : '✨ Features:'}`);
@@ -1246,6 +1268,9 @@ export function processMessage(
 
     case 'company':
       return handleCompany(siteData, lang) || handleProductQuery(input, siteData.products, session, lang);
+
+    case 'policy':
+      return handlePolicy(siteData, lang) || handleProductQuery(input, siteData.products, session, lang);
 
     case 'pricing':
       return handlePricing(siteData, lang) || handleProductQuery(input, siteData.products, session, lang);
