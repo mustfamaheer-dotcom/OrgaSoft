@@ -16,14 +16,27 @@ const NewsTicker: React.FC = () => {
   // - RTL goes left-to-right
   return (
     <div className="w-full bg-[#df4d21] text-white overflow-hidden flex items-center border-b border-white/20 h-8 sm:h-10 relative">
-      <div 
-        className={`whitespace-nowrap inline-block hover:[animation-play-state:paused] ${isRTL ? 'animate-marquee' : 'animate-marquee-rtl'}`}
-        style={{
-          paddingLeft: '100%',
-          '--marquee-duration': '30s',
-        } as React.CSSProperties}
-      >
-        <span className="text-xs sm:text-sm font-bold tracking-wider">{text}</span>
+      <style>
+        {`
+          @keyframes seamless-ltr {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+          }
+          @keyframes seamless-rtl {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(50%); }
+          }
+          .animate-seamless-ltr { animation: seamless-ltr 40s linear infinite; }
+          .animate-seamless-rtl { animation: seamless-rtl 40s linear infinite; }
+        `}
+      </style>
+      <div className={`flex whitespace-nowrap w-max hover:[animation-play-state:paused] ${isRTL ? 'animate-seamless-rtl' : 'animate-seamless-ltr'}`}>
+        {[...Array(16)].map((_, i) => (
+          <div key={i} className="flex items-center">
+            <span className="text-xs sm:text-sm font-bold tracking-wider px-8">{text}</span>
+            <span className="text-xs opacity-50 px-2">•</span>
+          </div>
+        ))}
       </div>
     </div>
   );
