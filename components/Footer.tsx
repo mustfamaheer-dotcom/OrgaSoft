@@ -87,8 +87,39 @@ const Footer: React.FC<{ onNavigate: (page: string) => void }> = React.memo(({ o
                   <div className="flex items-start gap-3"><div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center shrink-0 text-[#df4d21]"><Phone className="w-5 h-5" /></div><div className="min-w-0"><span className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">{lang === 'ar' ? 'الدعم الفني' : 'Technical Support'}</span><span className="text-white font-black tracking-tight text-sm" dir="ltr">{mainBranch ? mainBranch.phoneSupport : contacts.phoneSupport}</span></div></div>
                   <div className="flex items-start gap-3"><div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center shrink-0 text-[#df4d21]"><Mail className="w-5 h-5" /></div><div className="min-w-0"><span className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">{lang === 'ar' ? 'البريد الإلكتروني' : 'Mail Gateway'}</span><span className="text-white font-black tracking-tight text-sm break-all">{mainBranch ? mainBranch.email : contacts.email}</span></div></div>
                 </div>
-                <div className="flex items-start gap-3"><div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center shrink-0 text-[#df4d21]"><MapPin className="w-5 h-5" /></div><div className="min-w-0"><span className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">{lang === 'ar' ? (mainBranch ? 'عنوان الفرع' : 'المقر الرئيسي') : (mainBranch ? 'Branch Address' : 'Physical Node')}</span><span className="text-sm font-bold text-slate-400 leading-relaxed block break-words">{mainBranch ? mainBranch.address[lang] : contacts.address[lang]}</span></div></div>
-              </div>
+                <div className="space-y-5 sm:space-y-6">
+                  {contacts.branches && contacts.branches.length > 0 ? (
+                    contacts.branches.map(branch => (
+                      <div key={branch.id} className="flex items-start gap-3">
+                        <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center shrink-0 text-[#df4d21]">
+                          <MapPin className="w-5 h-5" />
+                        </div>
+                        <div className="min-w-0">
+                          <span className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">
+                            {branch.name[lang]}
+                          </span>
+                          <span className="text-sm font-bold text-slate-400 leading-relaxed block break-words">
+                            {branch.address[lang]}
+                          </span>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center shrink-0 text-[#df4d21]">
+                        <MapPin className="w-5 h-5" />
+                      </div>
+                      <div className="min-w-0">
+                        <span className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">
+                          {lang === 'ar' ? 'المقر الرئيسي' : 'Physical Node'}
+                        </span>
+                        <span className="text-sm font-bold text-slate-400 leading-relaxed block break-words">
+                          {contacts.address[lang]}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
           </div>
         </div>
       </div>
