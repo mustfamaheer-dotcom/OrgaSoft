@@ -120,6 +120,7 @@ const Footer: React.FC<{ onNavigate: (page: string) => void }> = React.memo(({ o
                     </div>
                   )}
                 </div>
+              </div>
           </div>
         </div>
       </div>
