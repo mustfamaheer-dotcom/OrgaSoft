@@ -7,6 +7,13 @@ export const INITIAL_SITE_DATA: SiteContent = {
   },
   logoImageUrl: 'https://ik.imagekit.io/y2t2putyl/orgasoft/ORGANEWLOGOtbg.png',
   favicon: 'https://ik.imagekit.io/y2t2putyl/orgasoft/ORGANEWLOGOtbg.png',
+  ticker: {
+    enabled: true,
+    text: {
+      en: 'Welcome to Orga Soft | Discover our latest software solutions and advanced IT services!',
+      ar: 'مرحباً بكم في أورجا سوفت | اكتشف أحدث حلولنا البرمجية وخدماتنا التقنية المتطورة!'
+    }
+  },
   theme: {
     primaryColor: '#0f639e',
     secondaryColor: '#3b82f6'

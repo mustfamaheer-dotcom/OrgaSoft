@@ -4,6 +4,7 @@ import { useSite } from '../context/SiteContext';
 import { UI_STRINGS } from '../constants';
 import { Menu, X, Globe, ChevronRight, MessageCircle, Phone, Terminal, Sun, Moon } from 'lucide-react';
 import { visitorTracker } from '../lib/visitorTracker';
+import NewsTicker from './NewsTicker';
 
 const Navbar: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) => {
   const { lang, setLang, siteData, isRTL, theme, toggleTheme } = useSite();
@@ -150,6 +151,7 @@ const Navbar: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }
           </div>
         </div>
       </div>
+      <NewsTicker />
 
       {isOpen && createPortal(
         <div className="fixed inset-0 z-[60] lg:!hidden" onClick={() => setIsOpen(false)}>

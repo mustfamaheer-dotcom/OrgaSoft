@@ -25,6 +25,10 @@ export interface SiteContent {
   logo: Record<Language, string>;
   logoImageUrl?: string;
   favicon?: string;
+  ticker?: {
+    enabled: boolean;
+    text: Record<Language, string>;
+  };
   theme: {
     primaryColor: string;
     secondaryColor: string;
