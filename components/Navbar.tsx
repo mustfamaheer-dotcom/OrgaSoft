@@ -60,8 +60,9 @@ const Navbar: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }
   };
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-      scrolled
+    <>
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled
         ? 'bg-white/95 dark:bg-[#0b1121]/95 backdrop-blur-xl shadow-md border-b border-slate-100/50 dark:border-[#1e293b] py-1'
         : 'bg-white/90 dark:bg-[#0b1121]/90 backdrop-blur-md py-1.5'
     }`}>
@@ -151,7 +152,6 @@ const Navbar: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }
           </div>
         </div>
       </div>
-      <NewsTicker />
 
       {isOpen && createPortal(
         <div className="fixed inset-0 z-[60] lg:!hidden" onClick={() => setIsOpen(false)}>
@@ -209,7 +209,12 @@ const Navbar: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }
         </div>,
         document.body
       )}
-    </nav>
+      )}
+      </nav>
+      <div className="pt-20 sm:pt-24 relative z-40 bg-[#df4d21]">
+        <NewsTicker />
+      </div>
+    </>
   );
 };
 

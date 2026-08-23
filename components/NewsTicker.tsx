@@ -18,19 +18,19 @@ const NewsTicker: React.FC = () => {
     <div className="w-full overflow-hidden flex items-center border-b border-white/20 h-8 sm:h-10 relative" style={{ backgroundColor: bgColor, color: textColor }}>
       <style>
         {`
-          @keyframes seamless-ltr {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
+          @keyframes seamless-ltr-to-r {
+            0% { transform: translateX(-50%); }
+            100% { transform: translateX(0); }
           }
-          @keyframes seamless-rtl {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(50%); }
+          @keyframes seamless-rtl-to-l {
+            0% { transform: translateX(50%); }
+            100% { transform: translateX(0); }
           }
-          .animate-seamless-ltr { animation: seamless-ltr ${speed}s linear infinite; }
-          .animate-seamless-rtl { animation: seamless-rtl ${speed}s linear infinite; }
+          .animate-seamless-ltr-to-r { animation: seamless-ltr-to-r ${speed}s linear infinite; }
+          .animate-seamless-rtl-to-l { animation: seamless-rtl-to-l ${speed}s linear infinite; }
         `}
       </style>
-      <div className={`flex whitespace-nowrap w-max hover:[animation-play-state:paused] ${isRTL ? 'animate-seamless-ltr' : 'animate-seamless-rtl'}`}>
+      <div className={`flex whitespace-nowrap w-max hover:[animation-play-state:paused] ${isRTL ? 'animate-seamless-rtl-to-l' : 'animate-seamless-ltr-to-r'}`}>
         {[...Array(16)].map((_, i) => (
           <div key={i} className="flex items-center">
             <span className="text-xs sm:text-sm font-bold tracking-wider px-8">{text}</span>
