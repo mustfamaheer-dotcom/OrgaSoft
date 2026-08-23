@@ -12,7 +12,10 @@ export const INITIAL_SITE_DATA: SiteContent = {
     text: {
       en: 'Welcome to Orga Soft | Discover our latest software solutions and advanced IT services!',
       ar: 'مرحباً بكم في أورجا سوفت | اكتشف أحدث حلولنا البرمجية وخدماتنا التقنية المتطورة!'
-    }
+    },
+    bgColor: '#df4d21',
+    textColor: '#ffffff',
+    speed: 40
   },
   theme: {
     primaryColor: '#0f639e',

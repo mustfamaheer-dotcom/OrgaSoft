@@ -28,6 +28,9 @@ export interface SiteContent {
   ticker?: {
     enabled: boolean;
     text: Record<Language, string>;
+    bgColor?: string;
+    textColor?: string;
+    speed?: number;
   };
   theme: {
     primaryColor: string;

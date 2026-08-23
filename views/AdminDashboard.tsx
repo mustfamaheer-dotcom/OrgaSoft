@@ -4,6 +4,7 @@ import type { SiteContent } from '../types';
 import AdminLogin from '../admin/components/AdminLogin';
 import AdminLayout from '../admin/components/AdminLayout';
 import GeneralTab from '../admin/components/GeneralTab';
+import TickerTab from '../admin/components/TickerTab';
 import NavigationTab from '../admin/components/NavigationTab';
 import HeroTab from '../admin/components/HeroTab';
 import AboutTab from '../admin/components/AboutTab';
@@ -26,6 +27,7 @@ interface AdminDashboardProps {
 
 const TAB_SECTIONS: Record<string, (keyof SiteContent)[]> = {
   general:    ['logo', 'logoImageUrl', 'favicon'],
+  ticker:     ['ticker'],
   navigation: ['navLabels'],
   hero:       ['hero'],
   about:      ['about'],
@@ -121,6 +123,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
 
   const titles: Record<string, string> = {
     general:    lang === 'ar' ? 'لوحة التحكم بالنظام' : 'System Control Panel',
+    ticker:     lang === 'ar' ? 'الشريط الإخباري' : 'News Ticker',
     navigation: lang === 'ar' ? 'لوحة التحكم بالنظام' : 'System Control Panel',
     hero:       lang === 'ar' ? 'لوحة التحكم بالنظام' : 'System Control Panel',
     about:      lang === 'ar' ? 'لوحة التحكم بالنظام' : 'System Control Panel',
@@ -151,6 +154,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
     const tabProps = { data, setData: setDataAndMarkDirty, updateNestedField, isRTL, lang, setDeleteTarget };
     switch (activeTab) {
       case 'general': return <GeneralTab {...tabProps} />;
+      case 'ticker': return <TickerTab {...tabProps} />;
       case 'navigation': return <NavigationTab {...tabProps} />;
       case 'hero': return <HeroTab {...tabProps} />;
       case 'about': return <AboutTab {...tabProps} />;

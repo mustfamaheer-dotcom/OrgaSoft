@@ -23,6 +23,7 @@ interface AdminLayoutProps {
 
 const tabs = [
   { id: 'general', icon: Image, labelEn: 'Brand Identity', labelAr: 'الهوية البصرية' },
+  { id: 'ticker', icon: Type, labelEn: 'News Ticker', labelAr: 'الشريط الإخباري' },
   { id: 'navigation', icon: Menu, labelEn: 'Navigation Nodes', labelAr: 'روابط التنقل' },
   { id: 'hero', icon: Globe, labelEn: 'Hero Interface', labelAr: 'القسم الرئيسي' },
   { id: 'about', icon: ShieldCheck, labelEn: 'Ecosystem Legacy', labelAr: 'إرث الشركة' },
