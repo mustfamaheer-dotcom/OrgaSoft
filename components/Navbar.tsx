@@ -209,11 +209,12 @@ const Navbar: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }
         </div>,
         document.body
       )}
-      )}
       </nav>
-      <div className="pt-20 sm:pt-24 relative z-40 bg-[#df4d21]">
-        <NewsTicker />
-      </div>
+      {siteData.ticker?.enabled && (
+        <div className="pt-20 sm:pt-24 relative z-40">
+          <NewsTicker />
+        </div>
+      )}
     </>
   );
 };
