@@ -103,11 +103,11 @@ const Hero: React.FC<{ onNavigate: (page: string) => void }> = React.memo(({ onN
                 </div>
                 <div className={isRTL ? 'text-right' : 'text-left'}>
                   <h3 className="font-black text-3xl leading-tight">
-                    <span className="text-[#df4d21]">{companyName[lang].split(' ')[0]}</span>
-                    {companyName[lang].split(' ').slice(1).join(' ') && (
+                    <span className="text-[#df4d21]">{(companyName[lang].replace(/\s*Systems/gi, '').trim()).split(' ')[0]}</span>
+                    {(companyName[lang].replace(/\s*Systems/gi, '').trim()).split(' ').slice(1).join(' ') && (
                       <>
                         {' '}
-                        <span className="text-[#3292ca]">{companyName[lang].split(' ').slice(1).join(' ')}</span>
+                        <span className="text-[#3292ca]">{(companyName[lang].replace(/\s*Systems/gi, '').trim()).split(' ').slice(1).join(' ')}</span>
                       </>
                     )}
                   </h3>
