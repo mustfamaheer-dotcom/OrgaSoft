@@ -63,8 +63,8 @@ const Navbar: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }
     <>
       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-        ? 'bg-white/95 dark:bg-[#0b1121]/95 backdrop-blur-xl shadow-md border-b border-slate-100/50 dark:border-[#1e293b] py-1'
-        : 'bg-white/90 dark:bg-[#0b1121]/90 backdrop-blur-md py-1.5'
+        ? 'bg-white/95 dark:bg-[#0b1121]/95 backdrop-blur-xl shadow-md border-b border-slate-100/50 dark:border-[#1e293b]'
+        : 'bg-white/90 dark:bg-[#0b1121]/90 backdrop-blur-md'
     }`}>
       <div className="max-w-7xl mx-auto px-3 sm:px-6">
         <div className="flex items-center justify-between h-20 sm:h-24">
@@ -132,22 +132,22 @@ const Navbar: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }
             </button>
           </div>
 
-          <div className="flex lg:hidden items-center gap-1.5">
+          <div className="flex lg:hidden items-center gap-1 sm:gap-1.5">
             <button onClick={handleWhatsApp}
-              className="w-11 h-11 bg-[#25D366] rounded-xl flex items-center justify-center shadow-md active:scale-90 transition-transform">
-              <MessageCircle className="w-5 h-5 text-white" />
+              className="w-9 h-9 sm:w-11 sm:h-11 bg-[#25D366] rounded-xl flex items-center justify-center shadow-md active:scale-90 transition-transform shrink-0">
+              <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </button>
             <button onClick={toggleLang}
-              className="w-11 h-11 flex items-center justify-center text-slate-600 dark:text-slate-400 font-bold text-xs bg-slate-100 dark:bg-[#1e293b] rounded-xl active:scale-90 transition-transform">
+              className="w-9 h-9 sm:w-11 sm:h-11 flex items-center justify-center text-slate-600 dark:text-slate-400 font-bold text-[10px] sm:text-xs bg-slate-100 dark:bg-[#1e293b] rounded-xl active:scale-90 transition-transform shrink-0">
               {lang === 'ar' ? 'EN' : 'ع'}
             </button>
             <button onClick={toggleTheme}
-              className="w-11 h-11 flex items-center justify-center rounded-xl text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-[#1e293b] active:scale-90 transition-transform">
-              {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              className="w-9 h-9 sm:w-11 sm:h-11 flex items-center justify-center rounded-xl text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-[#1e293b] active:scale-90 transition-transform shrink-0">
+              {theme === 'dark' ? <Sun className="w-4 h-4 sm:w-5 sm:h-5" /> : <Moon className="w-4 h-4 sm:w-5 sm:h-5" />}
             </button>
             <button onClick={() => setIsOpen(!isOpen)}
-              className="w-11 h-11 bg-slate-100 dark:bg-[#1e293b] rounded-xl flex items-center justify-center active:scale-90 transition-transform">
-              {isOpen ? <X className="w-5 h-5 text-slate-600 dark:text-slate-400" /> : <Menu className="w-5 h-5 text-slate-600 dark:text-slate-400" />}
+              className="w-9 h-9 sm:w-11 sm:h-11 bg-slate-100 dark:bg-[#1e293b] rounded-xl flex items-center justify-center active:scale-90 transition-transform shrink-0">
+              {isOpen ? <X className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600 dark:text-slate-400" /> : <Menu className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600 dark:text-slate-400" />}
             </button>
           </div>
         </div>
