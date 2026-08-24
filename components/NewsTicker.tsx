@@ -30,7 +30,7 @@ const NewsTicker: React.FC = () => {
           .animate-seamless-rtl-to-l { animation: seamless-rtl-to-l ${speed}s linear infinite; }
         `}
       </style>
-      <div className={`flex items-center h-full whitespace-nowrap w-max hover:[animation-play-state:paused] ${isRTL ? 'animate-seamless-rtl-to-l' : 'animate-seamless-ltr-to-r'}`}>
+      <div className={`flex items-center h-full whitespace-nowrap w-max hover:[animation-play-state:paused] ${isRTL ? 'animate-seamless-ltr-to-r' : 'animate-seamless-rtl-to-l'}`}>
         {[...Array(16)].map((_, i) => (
           <div key={i} className="flex items-center h-full">
             <span className="text-xs sm:text-sm font-bold tracking-wider px-8 pt-1.5">{text}</span>
