@@ -100,7 +100,6 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ data, setData, isRTL, lang, s
             </h4>
             <button onClick={() => {
               const newS: Service = { id: `s-${Date.now()}`, name: { en: 'New Service', ar: 'خدمة جديدة' }, description: { en: '', ar: '' }, icon: 'code', enabled: true };
-              setServices({ ...services, items: [...services.items, newS] });
               setEditingService(newS);
             }} className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-[#0f639e] to-[#3292ca] text-white rounded-xl font-bold text-sm hover:shadow-lg hover:-translate-y-0.5 transition-all shadow-md">
               <Plus className="w-4 h-4" /> {isRTL ? 'إضافة خدمة جديدة' : 'Add New Service'}
@@ -209,7 +208,12 @@ const ServicesTab: React.FC<ServicesTabProps> = ({ data, setData, isRTL, lang, s
       </div>
 
       <div className="pt-6 flex gap-4">
-        <button onClick={() => { setServices({ ...services, items: services.items.map(x => x.id === editingService.id ? editingService : x) }); setEditingService(null); }}
+        <button onClick={() => {
+          const exists = services.items.some(x => x.id === editingService.id);
+          const updatedItems = exists ? services.items.map(x => x.id === editingService.id ? editingService : x) : [...services.items, editingService];
+          setServices({ ...services, items: updatedItems });
+          setEditingService(null);
+        }}
           className="px-10 py-3.5 bg-gradient-to-r from-[#0f639e] to-[#3292ca] text-white font-black rounded-xl uppercase text-xs tracking-widest shadow-lg hover:-translate-y-0.5 transition-all">Update Service</button>
         <button onClick={() => setEditingService(null)} className="px-8 py-3.5 bg-slate-100 dark:bg-[#1a2744] text-slate-400 font-black rounded-xl uppercase text-xs tracking-widest transition-all">Discard</button>
       </div>

@@ -124,7 +124,9 @@ const PartnersTab: React.FC<PartnersTabProps> = ({ data, setData, isRTL, lang, s
         </div>
         <div className="flex gap-4">
           <button onClick={() => {
-            setData({ ...data, partnerCategories: categories.map(c => c.id === editingCategory.id ? editingCategory : c) });
+            const exists = categories.some(c => c.id === editingCategory.id);
+            const updatedCategories = exists ? categories.map(c => c.id === editingCategory.id ? editingCategory : c) : [...categories, editingCategory];
+            setData({ ...data, partnerCategories: updatedCategories });
             setEditingCategory(null);
           }} className="px-10 py-3.5 bg-gradient-to-r from-[#0f639e] to-[#3292ca] text-white font-black rounded-xl uppercase text-xs tracking-widest shadow-lg hover:-translate-y-0.5 transition-all">Save</button>
           <button onClick={() => setEditingCategory(null)} className="px-8 py-3.5 bg-slate-100 dark:bg-[#1a2744] text-slate-400 font-black rounded-xl uppercase text-xs tracking-widest transition-all">Discard</button>
@@ -143,7 +145,6 @@ const PartnersTab: React.FC<PartnersTabProps> = ({ data, setData, isRTL, lang, s
             <h4 className="text-sm font-black text-[#0f639e] dark:text-white flex items-center gap-2"><FolderOpen className="w-4 h-4 text-[#df4d21]" />{isRTL ? 'التصنيفات' : 'Categories'}</h4>
             <button onClick={() => {
               const newCat: PartnerCategory = { id: `cat-${Date.now()}`, name: { en: 'New Category', ar: 'تصنيف جديد' }, icon: 'building2' };
-              setData({ ...data, partnerCategories: [...categories, newCat] });
               setEditingCategory(newCat);
             }} className="flex items-center gap-2 px-4 py-2 bg-[#0f639e]/10 text-[#0f639e] rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-[#0f639e] hover:text-white transition-all">
               <Plus className="w-3.5 h-3.5" />{isRTL ? 'إضافة تصنيف' : 'ADD'}
@@ -178,7 +179,6 @@ const PartnersTab: React.FC<PartnersTabProps> = ({ data, setData, isRTL, lang, s
           </h4>
           <button onClick={() => {
             const newP: Partner = { id: `part-${Date.now()}`, name: { en: 'New Partner', ar: 'شريك جديد' }, location: { en: 'Global', ar: 'عالمي' }, categoryId: activeCatId || undefined };
-            setData({ ...data, partners: [...data.partners, newP] });
             setEditingPartner(newP);
           }} className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-[#0f639e] to-[#3292ca] text-white rounded-xl font-bold text-sm hover:shadow-lg hover:-translate-y-0.5 transition-all shadow-md">
             <Plus className="w-4 h-4" /> {isRTL ? 'إضافة شريك' : 'Add Partner'}
@@ -242,7 +242,12 @@ const PartnersTab: React.FC<PartnersTabProps> = ({ data, setData, isRTL, lang, s
       </div>
       <CloudImageUploader label="Partner Logo" value={editingPartner.logo || ''} onChange={url => setEditingPartner({ ...editingPartner, logo: url })} />
       <div className="pt-6 flex gap-4">
-        <button onClick={() => { setData({ ...data, partners: data.partners.map(x => x.id === editingPartner.id ? editingPartner : x) }); setEditingPartner(null); }}
+        <button onClick={() => {
+          const exists = data.partners.some(x => x.id === editingPartner.id);
+          const updatedPartners = exists ? data.partners.map(x => x.id === editingPartner.id ? editingPartner : x) : [...data.partners, editingPartner];
+          setData({ ...data, partners: updatedPartners });
+          setEditingPartner(null);
+        }}
           className="px-10 py-3.5 bg-gradient-to-r from-[#0f639e] to-[#3292ca] text-white font-black rounded-xl uppercase text-xs tracking-widest shadow-lg hover:-translate-y-0.5 transition-all">Update Partner</button>
         <button onClick={() => setEditingPartner(null)} className="px-8 py-3.5 bg-slate-100 dark:bg-[#1a2744] text-slate-400 font-black rounded-xl uppercase text-xs tracking-widest transition-all">Discard</button>
       </div>

@@ -231,6 +231,7 @@ export interface Product {
   }>;
   productPartners?: ProductPartner[];
   supportPhone?: string;
+  whatsappNumber?: string;
   showOnHome?: boolean;
   demoUrl?: string;
   youtubeLinks?: Array<{

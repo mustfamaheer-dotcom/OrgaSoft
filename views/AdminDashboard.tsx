@@ -37,7 +37,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   const [dirtyTabs, setDirtyTabs] = useState<Set<string>>(new Set());
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; type: 'product' | 'partner' | 'service' | 'orgaProService' | 'partnerCategory' } | null>(null);
 
-  useEffect(() => { setData(siteData); }, [siteData]);
+  useEffect(() => {
+    if (dirtyTabs.size === 0) {
+      setData(siteData);
+    }
+  }, [siteData, dirtyTabs.size]);
 
   useEffect(() => {
     const unsub = onAuthChange((user) => {

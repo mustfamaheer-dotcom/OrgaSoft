@@ -87,7 +87,6 @@ const OrgaProServicesTab: React.FC<OrgaProServicesTabProps> = ({ data, setData, 
             </h4>
             <button onClick={() => {
               const newItem: OrgaProService = { id: `ops-${Date.now()}`, name: { en: 'New Service', ar: 'خدمة جديدة' }, description: { en: '', ar: '' }, enabled: true };
-              setSection({ ...section, items: [...section.items, newItem] });
               setEditingItem(newItem);
             }} className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-[#0f639e] to-[#3292ca] text-white rounded-xl font-bold text-sm hover:shadow-lg hover:-translate-y-0.5 transition-all shadow-md">
               <Plus className="w-4 h-4" /> {isRTL ? 'إضافة خدمة' : 'Add New Service'}
@@ -224,7 +223,12 @@ const OrgaProServicesTab: React.FC<OrgaProServicesTabProps> = ({ data, setData, 
       </div>
 
       <div className="pt-6 flex gap-4">
-        <button onClick={() => { setSection({ ...section, items: section.items.map(x => x.id === editingItem.id ? editingItem : x) }); setEditingItem(null); }}
+        <button onClick={() => {
+          const exists = section.items.some(x => x.id === editingItem.id);
+          const updatedItems = exists ? section.items.map(x => x.id === editingItem.id ? editingItem : x) : [...section.items, editingItem];
+          setSection({ ...section, items: updatedItems });
+          setEditingItem(null);
+        }}
           className="px-10 py-3.5 bg-gradient-to-r from-[#0f639e] to-[#3292ca] text-white font-black rounded-xl uppercase text-xs tracking-widest shadow-lg hover:-translate-y-0.5 transition-all">Update Service</button>
         <button onClick={() => setEditingItem(null)} className="px-8 py-3.5 bg-slate-100 dark:bg-[#1a2744] text-slate-400 font-black rounded-xl uppercase text-xs tracking-widest transition-all">Discard</button>
       </div>

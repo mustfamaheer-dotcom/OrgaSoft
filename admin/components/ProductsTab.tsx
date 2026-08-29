@@ -55,7 +55,6 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ data, setData, isRTL, lang, s
               description: { en: '', ar: '' }, longDescription: { en: '', ar: '' },
               features: { en: [], ar: [] }, specs: [], image: '', icon: 'database', showOnHome: true,
             };
-            setData({ ...data, products: [...data.products, newP] });
             setEditingProduct(newP);
           }} className="w-full py-8 border-2 border-dashed border-slate-200 dark:border-[#1e293b] rounded-xl text-slate-300 font-black uppercase tracking-widest text-sm hover:border-[#0f639e] hover:text-[#0f639e] transition-all flex items-center justify-center gap-3">
             <Plus className="w-5 h-5" /> {isRTL ? 'إضافة منظومة تقنية جديدة' : 'Add New Logic Node'}
@@ -269,6 +268,7 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ data, setData, isRTL, lang, s
         </h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <InputField label={isRTL ? 'رقم الدعم الفني' : 'Support Phone Number'} value={editingProduct.supportPhone || ''} onChange={v => setEditingProduct({ ...editingProduct, supportPhone: v })} />
+          <InputField label={isRTL ? 'رقم الواتساب' : 'WhatsApp Number'} value={editingProduct.whatsappNumber || ''} onChange={v => setEditingProduct({ ...editingProduct, whatsappNumber: v })} />
           <InputField label={isRTL ? 'رابط النسخة التجريبية' : 'Application Demo URL'} value={editingProduct.demoUrl || ''} onChange={v => setEditingProduct({ ...editingProduct, demoUrl: v })} />
         </div>
         <div className="p-5 bg-slate-50/50 dark:bg-[#1a2744]/50 rounded-xl border-2 border-slate-200 dark:border-[#1e293b]">
@@ -421,7 +421,12 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ data, setData, isRTL, lang, s
       </div>
 
       <div className="pt-6 flex gap-4">
-        <button onClick={() => { setData({ ...data, products: data.products.map(x => x.id === editingProduct.id ? editingProduct : x) }); setEditingProduct(null); }}
+        <button onClick={() => {
+          const exists = data.products.some(x => x.id === editingProduct.id);
+          const updatedProducts = exists ? data.products.map(x => x.id === editingProduct.id ? editingProduct : x) : [...data.products, editingProduct];
+          setData({ ...data, products: updatedProducts });
+          setEditingProduct(null);
+        }}
           className="px-10 py-3.5 bg-gradient-to-r from-[#0f639e] to-[#3292ca] text-white font-black rounded-xl uppercase text-xs tracking-widest shadow-lg hover:-translate-y-0.5 transition-all">Update Node</button>
         <button onClick={() => setEditingProduct(null)} className="px-8 py-3.5 bg-slate-100 dark:bg-[#1a2744] text-slate-400 font-black rounded-xl uppercase text-xs tracking-widest transition-all">Discard</button>
       </div>
