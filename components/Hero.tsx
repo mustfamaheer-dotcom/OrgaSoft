@@ -1,7 +1,6 @@
 import React from 'react';
 import { useSite } from '../context/SiteContext';
 import { MessageCircle, ArrowRight, ArrowLeft, CheckCircle2, Zap, Shield, TrendingUp, Star, Users, Clock, Award, Database, Activity } from 'lucide-react';
-import KitImage from './KitImage';
 import { visitorTracker } from '../lib/visitorTracker';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {

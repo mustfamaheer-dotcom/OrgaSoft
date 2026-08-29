@@ -80,44 +80,90 @@ const Section: React.FC<{ id?: string; className?: string; children: React.React
   return <div id={id} className={className || ''}>{children}</div>;
 };
 
-const ProductCard: React.FC<{ product: any; onNavigate: (p: string) => void; uiStrings: any; lang: string; isRTL: boolean }> = ({ product, onNavigate, uiStrings, lang, isRTL }) => (
-  <TiltCard
-    onClick={() => onNavigate(`product-${product.id}`)}
-    className="group bg-white dark:bg-[#131d31] rounded-2xl overflow-hidden border border-slate-100 dark:border-[#1e293b] hover:border-[#df4d21]/30 hover:shadow-xl transition-all duration-300 cursor-pointer active:scale-[0.98] h-full">
-    <div className="tilt-inner flex flex-col h-full">
-      <div className="relative w-full aspect-[480/462.8] overflow-hidden bg-slate-100 dark:bg-[#1e293b]">
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent z-10" />
-        {product.image ? (
-          <KitImage src={product.image} alt={product.name[lang]} className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700" width={480} height={463} />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center"><Grid3X3 className="w-12 h-12 text-slate-300 dark:text-slate-500" /></div>
-        )}
-      </div>
-      <div className="p-5 sm:p-6 flex flex-col flex-grow">
-        <h3 className="text-base sm:text-lg font-black text-[#0f639e] dark:text-white mb-2 group-hover:text-[#df4d21] transition-colors">{product.name[lang]}</h3>
-        <p className="text-slate-600 dark:text-slate-400 font-medium text-xs sm:text-sm leading-relaxed line-clamp-2 mb-3">{product.description[lang]}</p>
-        <div className="flex flex-wrap gap-1.5 mb-3">
-          {(product.keyFeatures || []).slice(0, 2).map((kf: any, i: number) => (
-            <span key={i} className="px-3 py-1.5 bg-slate-100 dark:bg-[#1e293b] rounded-full text-xs font-semibold text-slate-600 dark:text-slate-400">{kf.text[lang]}</span>
-          ))}
-        </div>
-        <div className="flex items-center gap-2 mt-auto">
-          <div className={`flex items-center gap-1.5 text-[#df4d21] font-bold uppercase tracking-[0.15em] text-xs ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
-            {uiStrings.ctaMore[lang]}
-            {isRTL ? <MoveLeft className="w-3.5 h-3.5" /> : <MoveRight className="w-3.5 h-3.5" />}
+const ProductCard: React.FC<{ product: any; onNavigate: (p: string) => void; uiStrings: any; lang: string; isRTL: boolean }> = ({ product, onNavigate, uiStrings, lang, isRTL }) => {
+  const [showYoutubeModal, setShowYoutubeModal] = useState(false);
+
+  return (
+    <>
+      <TiltCard
+        onClick={() => onNavigate(`product-${product.id}`)}
+        className="group bg-white dark:bg-[#131d31] rounded-2xl overflow-hidden border border-slate-100 dark:border-[#1e293b] hover:border-[#df4d21]/30 hover:shadow-xl transition-all duration-300 cursor-pointer active:scale-[0.98] h-full">
+        <div className="tilt-inner flex flex-col h-full">
+          <div className="relative w-full aspect-[480/462.8] overflow-hidden bg-slate-100 dark:bg-[#1e293b]">
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent z-10" />
+            {product.image ? (
+              <KitImage src={product.image} alt={product.name[lang]} className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700" width={480} height={463} />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center"><Grid3X3 className="w-12 h-12 text-slate-300 dark:text-slate-500" /></div>
+            )}
           </div>
-          {product.demoUrl && (
-            <a href={product.demoUrl} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
-              className="mr-auto flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-[#df4d21] to-[#0f639e] text-white font-bold text-xs uppercase tracking-widest rounded-lg hover:shadow-lg hover:-translate-y-0.5 transition-all active:scale-95">
-              <PlayCircle className="w-4 h-4" />
-              <span>{lang === 'ar' ? 'نسخه تجريبيه' : 'Demo'}</span>
-            </a>
-          )}
+          <div className="p-5 sm:p-6 flex flex-col flex-grow">
+            <h3 className="text-base sm:text-lg font-black text-[#0f639e] dark:text-white mb-2 group-hover:text-[#df4d21] transition-colors">{product.name[lang]}</h3>
+            <p className="text-slate-600 dark:text-slate-400 font-medium text-xs sm:text-sm leading-relaxed line-clamp-2 mb-3">{product.description[lang]}</p>
+            <div className="flex flex-wrap gap-1.5 mb-3">
+              {(product.keyFeatures || []).slice(0, 2).map((kf: any, i: number) => (
+                <span key={i} className="px-3 py-1.5 bg-slate-100 dark:bg-[#1e293b] rounded-full text-xs font-semibold text-slate-600 dark:text-slate-400">{kf.text[lang]}</span>
+              ))}
+            </div>
+            <div className="flex items-center gap-2 mt-auto">
+              <div className={`flex items-center gap-1.5 text-[#df4d21] font-bold uppercase tracking-[0.15em] text-xs ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
+                {uiStrings.ctaMore[lang]}
+                {isRTL ? <MoveLeft className="w-3.5 h-3.5" /> : <MoveRight className="w-3.5 h-3.5" />}
+              </div>
+              
+              <div className="flex items-center gap-2 ml-auto" style={{ marginLeft: isRTL ? 0 : 'auto', marginRight: isRTL ? 'auto' : 0 }}>
+                {product.youtubeLinks && product.youtubeLinks.length > 0 && (
+                  <button onClick={(e) => { e.stopPropagation(); setShowYoutubeModal(true); }}
+                    title={lang === 'ar' ? 'شروحات يوتيوب' : 'YouTube Explanations'}
+                    className="flex items-center justify-center w-8 h-8 bg-slate-100 dark:bg-[#1a2744] hover:bg-[#FF0000] text-[#FF0000] hover:text-white rounded-lg transition-all active:scale-95">
+                    <Youtube className="w-4 h-4" />
+                  </button>
+                )}
+                {product.demoUrl && (
+                  <a href={product.demoUrl} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-[#df4d21] to-[#0f639e] text-white font-bold text-xs uppercase tracking-widest rounded-lg hover:shadow-lg hover:-translate-y-0.5 transition-all active:scale-95">
+                    <PlayCircle className="w-4 h-4" />
+                    <span>{lang === 'ar' ? 'نسخه تجريبيه' : 'Demo'}</span>
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-  </TiltCard>
-);
+      </TiltCard>
+
+      {showYoutubeModal && (
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={(e) => { e.stopPropagation(); setShowYoutubeModal(false); }}>
+          <div className="bg-white dark:bg-[#131d31] rounded-2xl shadow-2xl max-w-lg w-full max-h-[85vh] overflow-hidden flex flex-col" onClick={e => e.stopPropagation()} style={{ animation: 'fadeInUp 0.3s ease-out' }}>
+            <div className="flex items-center justify-between p-5 border-b border-slate-100 dark:border-[#1e293b]">
+              <div className="flex items-center gap-3">
+                <Youtube className="w-6 h-6 text-[#FF0000]" />
+                <h3 className="text-lg font-black text-slate-900 dark:text-white">{lang === 'ar' ? 'شروحات يوتيوب' : 'YouTube Explanations'}</h3>
+              </div>
+              <button onClick={() => setShowYoutubeModal(false)} className="w-8 h-8 flex items-center justify-center bg-slate-100 dark:bg-[#1e293b] rounded-lg text-slate-500 hover:text-slate-800 dark:hover:text-white transition-colors">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="p-5 overflow-y-auto space-y-3">
+              {(product.youtubeLinks || []).map((link: any) => (
+                <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer"
+                  className="flex items-center gap-4 p-4 rounded-xl border border-slate-100 dark:border-[#1e293b] bg-slate-50 dark:bg-[#1a2744] hover:border-[#FF0000]/30 hover:bg-[#FF0000]/5 transition-all group">
+                  <div className="w-10 h-10 bg-white dark:bg-[#131d31] rounded-lg flex items-center justify-center text-[#FF0000] shadow-sm group-hover:scale-110 transition-transform">
+                    <PlayCircle className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-bold text-sm text-slate-900 dark:text-white truncate">{link.name[lang]}</h4>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">{link.url}</p>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+};
 
 const Home: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) => {
   const { lang, siteData, isRTL, isLoading } = useSite();

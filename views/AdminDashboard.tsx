@@ -25,21 +25,6 @@ interface AdminDashboardProps {
   onNavigate: (page: string) => void;
 }
 
-const TAB_SECTIONS: Record<string, (keyof SiteContent)[]> = {
-  general:    ['logo', 'logoImageUrl', 'favicon'],
-  ticker:     ['ticker'],
-  navigation: ['navLabels'],
-  hero:       ['hero'],
-  about:      ['about'],
-  products:   ['products'],
-  services:   ['services'],
-  partners:   ['partners'],
-  contact:    ['contacts'],
-  tickets:    ['tickets'],
-  footer:     ['uiStrings'],
-  uistrings:  ['uiStrings', 'companyName'],
-  chatbot:    ['chatbot'],
-};
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   const { siteData, updateSiteData, lang, isRTL, isSyncing } = useSite();

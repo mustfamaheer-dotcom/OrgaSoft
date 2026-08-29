@@ -233,6 +233,11 @@ export interface Product {
   supportPhone?: string;
   showOnHome?: boolean;
   demoUrl?: string;
+  youtubeLinks?: Array<{
+    id: string;
+    name: Record<Language, string>;
+    url: string;
+  }>;
 }
 
 export type EventType = 'pageview' | 'cta_click' | 'whatsapp_click' | 'phone_click';

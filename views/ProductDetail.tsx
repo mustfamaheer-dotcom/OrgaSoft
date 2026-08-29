@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useSite } from '../context/SiteContext';
-import { ChevronLeft, ChevronRight, CheckCircle2, PhoneCall, MessageCircle, Zap, PlayCircle, Grid3X3, Handshake, ExternalLink } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CheckCircle2, PhoneCall, MessageCircle, Zap, PlayCircle, Grid3X3, Handshake, Youtube, X } from 'lucide-react';
 import KitImage from '../components/KitImage';
 import { visitorTracker } from '../lib/visitorTracker';
 
@@ -51,6 +51,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productId, onBack, onNavi
     : `Hello, I need technical support for: ${product.name[lang]}`;
 
   const [showDescriptionModal, setShowDescriptionModal] = useState(false);
+  const [showYoutubeModal, setShowYoutubeModal] = useState(false);
   const descLines = product.longDescription[lang].split('\n');
   const isLongDesc = descLines.length > 6;
   const displayLines = isLongDesc ? descLines.slice(0, 6) : descLines;
@@ -156,6 +157,15 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productId, onBack, onNavi
                 )}
               </div>
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-auto pt-4">
+                {product.youtubeLinks && product.youtubeLinks.length > 0 && (
+                  <button
+                    onClick={() => setShowYoutubeModal(true)}
+                    className="flex items-center justify-center gap-2 px-4 py-3 min-h-[44px] sm:px-6 sm:py-3.5 bg-slate-100 dark:bg-[#1a2744] hover:bg-[#FF0000] text-[#FF0000] hover:text-white font-black rounded-xl text-xs uppercase tracking-widest transition-all active:scale-[0.97]"
+                  >
+                    <Youtube className="w-4 h-4 shrink-0" />
+                    <span>{lang === 'ar' ? 'شروحات يوتيوب' : 'Explanations'}</span>
+                  </button>
+                )}
                 {product.demoUrl && (
                   <a
                     href={product.demoUrl}
@@ -318,6 +328,36 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productId, onBack, onNavi
             <div className="text-slate-600 dark:text-slate-400 font-medium leading-[1.8] space-y-3 text-sm">
               {descLines.map((line, i) => (
                 <p key={i}>{line}</p>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showYoutubeModal && (
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setShowYoutubeModal(false)}>
+          <div className="bg-white dark:bg-[#131d31] rounded-2xl shadow-2xl max-w-lg w-full max-h-[85vh] overflow-hidden flex flex-col" onClick={e => e.stopPropagation()} style={{ animation: 'fadeInUp 0.3s ease-out' }}>
+            <div className="flex items-center justify-between p-5 border-b border-slate-100 dark:border-[#1e293b]">
+              <div className="flex items-center gap-3">
+                <Youtube className="w-6 h-6 text-[#FF0000]" />
+                <h3 className="text-lg font-black text-slate-900 dark:text-white">{lang === 'ar' ? 'شروحات يوتيوب' : 'YouTube Explanations'}</h3>
+              </div>
+              <button onClick={() => setShowYoutubeModal(false)} className="w-8 h-8 flex items-center justify-center bg-slate-100 dark:bg-[#1e293b] rounded-lg text-slate-500 hover:text-slate-800 dark:hover:text-white transition-colors">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="p-5 overflow-y-auto space-y-3">
+              {(product.youtubeLinks || []).map((link: any) => (
+                <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer"
+                  className="flex items-center gap-4 p-4 rounded-xl border border-slate-100 dark:border-[#1e293b] bg-slate-50 dark:bg-[#1a2744] hover:border-[#FF0000]/30 hover:bg-[#FF0000]/5 transition-all group">
+                  <div className="w-10 h-10 bg-white dark:bg-[#131d31] rounded-lg flex items-center justify-center text-[#FF0000] shadow-sm group-hover:scale-110 transition-transform">
+                    <PlayCircle className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-bold text-sm text-slate-900 dark:text-white truncate">{link.name[lang]}</h4>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">{link.url}</p>
+                  </div>
+                </a>
               ))}
             </div>
           </div>

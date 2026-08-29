@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Database, Plus, Trash2, Edit3, ChevronLeft, ChevronRight, CheckCircle2, Eye, EyeOff, PhoneCall, Settings2, ArrowUp, ArrowDown, Search, Handshake } from 'lucide-react';
+import { Database, Plus, Trash2, Edit3, ChevronLeft, ChevronRight, CheckCircle2, Eye, EyeOff, PhoneCall, ArrowUp, ArrowDown, Search, Handshake, Youtube } from 'lucide-react';
 import type { Product, SiteContent } from '../../types';
 import { SectionHeader, FieldGroup, CloudImageUploader, InputField } from './FormComponents';
 
@@ -61,7 +61,7 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ data, setData, isRTL, lang, s
             <Plus className="w-5 h-5" /> {isRTL ? 'إضافة منظومة تقنية جديدة' : 'Add New Logic Node'}
           </button>
           <div className="space-y-3">
-            {filteredProducts.map((p, idx) => {
+            {filteredProducts.map((p) => {
               const realIdx = data.products.findIndex(x => x.id === p.id);
               return (
               <div key={p.id} className={`p-4 rounded-xl border flex items-center justify-between group hover:shadow-md hover:-translate-y-0.5 transition-all ${
@@ -146,8 +146,8 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ data, setData, isRTL, lang, s
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <CloudImageUploader label="Card Image (shown in product card)" value={editingProduct.image} onChange={url => setEditingProduct({ ...editingProduct, image: url })} />
-        <CloudImageUploader label="EN Banner Image" value={editingProduct.bannerImage?.en || ''} onChange={url => setEditingProduct({ ...editingProduct, bannerImage: { ...editingProduct.bannerImage, en: url } })} />
-        <CloudImageUploader label="AR Banner Image" value={editingProduct.bannerImage?.ar || ''} onChange={url => setEditingProduct({ ...editingProduct, bannerImage: { ...editingProduct.bannerImage, ar: url } })} />
+        <CloudImageUploader label="EN Banner Image" value={editingProduct.bannerImage?.en || ''} onChange={url => setEditingProduct({ ...editingProduct, bannerImage: { en: url, ar: editingProduct.bannerImage?.ar || '' } })} />
+        <CloudImageUploader label="AR Banner Image" value={editingProduct.bannerImage?.ar || ''} onChange={url => setEditingProduct({ ...editingProduct, bannerImage: { en: editingProduct.bannerImage?.en || '', ar: url } })} />
       </div>
 
       <div className="pt-6 border-t border-slate-100 dark:border-[#1e293b] space-y-6">
@@ -292,6 +292,69 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ data, setData, isRTL, lang, s
             </button>
           </div>
         </div>
+      </div>
+
+      <div className="pt-6 border-t border-slate-100 dark:border-[#1e293b] space-y-6">
+        <div className="flex items-center justify-between">
+          <h4 className={sectionTitle}>
+            <Youtube className="w-5 h-5 text-[#FF0000]" /> {isRTL ? 'شروحات يوتيوب' : 'YouTube Explanations'}
+          </h4>
+          <button onClick={() => {
+            setEditingProduct({ ...editingProduct, youtubeLinks: [...(editingProduct.youtubeLinks || []), { id: `yt-${Date.now()}`, name: { en: 'Video Name', ar: 'اسم الفيديو' }, url: '' }] });
+          }} className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-[#FF0000] to-[#cc0000] text-white rounded-xl font-bold text-sm hover:shadow-lg hover:-translate-y-0.5 transition-all shadow-md">
+            <Plus className="w-4 h-4" /> <span>{isRTL ? 'إضافة رابط' : 'Add Link'}</span>
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4">
+          {(editingProduct.youtubeLinks || []).map((link, index) => (
+            <div key={link.id} className="p-5 bg-slate-50/50 dark:bg-[#1a2744]/50 rounded-xl border-2 border-slate-200 dark:border-[#1e293b] space-y-3 relative group">
+              <div className="absolute top-3 right-3 flex items-center gap-1">
+                <button disabled={index === 0} onClick={() => { const u = [...(editingProduct.youtubeLinks || [])]; [u[index - 1], u[index]] = [u[index], u[index - 1]]; setEditingProduct({ ...editingProduct, youtubeLinks: u }); }}
+                  className="w-7 h-7 bg-slate-200 dark:bg-[#1e293b] text-slate-400 rounded-lg flex items-center justify-center hover:bg-[#FF0000] hover:text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+                  <ArrowUp className="w-3.5 h-3.5" />
+                </button>
+                <button disabled={index === (editingProduct.youtubeLinks || []).length - 1} onClick={() => { const u = [...(editingProduct.youtubeLinks || [])]; [u[index + 1], u[index]] = [u[index], u[index + 1]]; setEditingProduct({ ...editingProduct, youtubeLinks: u }); }}
+                  className="w-7 h-7 bg-slate-200 dark:bg-[#1e293b] text-slate-400 rounded-lg flex items-center justify-center hover:bg-[#FF0000] hover:text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+                  <ArrowDown className="w-3.5 h-3.5" />
+                </button>
+                <button onClick={() => setEditingProduct({ ...editingProduct, youtubeLinks: editingProduct.youtubeLinks?.filter(l => l.id !== link.id) })}
+                  className="w-7 h-7 bg-rose-500 text-white rounded-lg flex items-center justify-center hover:bg-rose-600 transition-all">
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">EN Name</label>
+                  <input value={link.name.en} onChange={e => {
+                    const u = [...(editingProduct.youtubeLinks || [])]; u[index] = { ...u[index], name: { ...u[index].name, en: e.target.value } };
+                    setEditingProduct({ ...editingProduct, youtubeLinks: u });
+                  }} className={fieldBase} placeholder="Video Name" />
+                </div>
+                <div className="space-y-1">
+                  <label className="block text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest text-right">AR Name</label>
+                  <input value={link.name.ar} onChange={e => {
+                    const u = [...(editingProduct.youtubeLinks || [])]; u[index] = { ...u[index], name: { ...u[index].name, ar: e.target.value } };
+                    setEditingProduct({ ...editingProduct, youtubeLinks: u });
+                  }} className={`${fieldBase} text-right`} placeholder="اسم الفيديو" dir="rtl" />
+                </div>
+              </div>
+              <div className="space-y-1">
+                <label className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">YouTube URL</label>
+                <input value={link.url} onChange={e => {
+                  const u = [...(editingProduct.youtubeLinks || [])]; u[index] = { ...u[index], url: e.target.value };
+                  setEditingProduct({ ...editingProduct, youtubeLinks: u });
+                }} className={fieldBase} placeholder="https://youtube.com/watch?v=..." />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {(!editingProduct.youtubeLinks || editingProduct.youtubeLinks.length === 0) && (
+          <div className="text-center py-8 text-slate-400 font-medium">
+            {isRTL ? 'لا توجد شروحات يوتيوب. اضغط "إضافة رابط" للبدء.' : 'No YouTube links. Click "Add Link" to start.'}
+          </div>
+        )}
       </div>
 
       <div className="pt-6 border-t border-slate-100 dark:border-[#1e293b] space-y-6">
