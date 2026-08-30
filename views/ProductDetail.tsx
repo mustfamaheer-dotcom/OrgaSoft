@@ -90,17 +90,17 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productId, onBack, onNavi
 
       <div className="max-w-6xl mx-auto px-4 lg:px-6 pt-4 sm:pt-8 pb-6 sm:pb-10">
         {product.bannerImage?.[lang] ? (
-          <div className="rounded-2xl overflow-hidden bg-slate-100 dark:bg-[#1e293b] shadow-lg w-full mb-6 sm:mb-8" style={{ height: 925 }}>
+          <div className="rounded-2xl overflow-hidden bg-slate-100 dark:bg-[#1e293b] shadow-lg w-full mb-6 sm:mb-8" style={{ maxHeight: 400 }}>
             <KitImage
               src={product.bannerImage[lang]}
               alt={product.name[lang]}
               className="w-full h-full object-cover"
               width={1152}
-              height={925}
+              height={500}
             />
           </div>
         ) : (
-          <div className="rounded-2xl bg-gradient-to-br from-[#0f639e] to-[#3292ca] flex items-center justify-center w-full mb-6 sm:mb-8" style={{ height: 925 }}>
+          <div className="rounded-2xl bg-gradient-to-br from-[#0f639e] to-[#3292ca] flex items-center justify-center w-full mb-6 sm:mb-8" style={{ height: 500 }}>
             <span className="text-white/20 font-black text-6xl">{product.name[lang]?.charAt(0) || 'P'}</span>
           </div>
         )}
@@ -116,82 +116,82 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productId, onBack, onNavi
         </div>
 
         <div className="mb-8 sm:mb-12">
-        <div className="bg-white dark:bg-[#131d31] rounded-2xl overflow-hidden shadow-md border border-slate-100 dark:border-[#1e293b]">
-          <div className="flex flex-col lg:flex-row">
-            <div className="aspect-[480/462.8] lg:w-[480px] shrink-0 bg-slate-50 dark:bg-[#1a2744]">
-              {product.image ? (
-                <div className="w-full h-full">
-                  <KitImage
-                    src={product.image}
-                    alt={product.name[lang]}
-                    className="w-full h-full object-cover"
-                    width={480}
-                    height={463}
-                  />
-                </div>
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
+          <div className="bg-white dark:bg-[#131d31] rounded-2xl overflow-hidden shadow-md border border-slate-100 dark:border-[#1e293b]">
+            <div className="flex flex-col lg:flex-row">
+              <div className="aspect-[480/462.8] lg:w-[480px] shrink-0 bg-slate-50 dark:bg-[#1a2744]">
+                {product.image ? (
+                  <div className="w-full h-full">
+                    <KitImage
+                      src={product.image}
+                      alt={product.name[lang]}
+                      className="w-full h-full object-cover"
+                      width={480}
+                      height={463}
+                    />
+                  </div>
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
                     <Grid3X3 className="w-16 h-16 text-slate-300 dark:text-slate-500" />
-                </div>
-              )}
-            </div>
+                  </div>
+                )}
+              </div>
 
-            <div className="flex flex-col flex-1 p-4 sm:p-6 lg:p-10">
-              <div className="flex items-center gap-2 mb-3 sm:mb-4">
-                <div className="h-[3px] w-6 sm:w-10 bg-[#df4d21] rounded-full"></div>
-                <span className="text-[#df4d21] font-black text-[10px] sm:text-xs uppercase tracking-[0.3em] sm:tracking-[0.4em]">
-                  {lang === 'ar' ? 'حل متكامل' : 'Enterprise Solution'}
-                </span>
-              </div>
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-[#0f639e] dark:text-white mb-3 sm:mb-4 leading-tight tracking-tight">
-                {product.name[lang]}
-              </h1>
-              <div className="flex-1 text-slate-600 dark:text-slate-400 font-medium leading-[1.8] space-y-3 text-xs sm:text-sm">
-                {displayLines.map((line, i) => (
-                  <p key={i}>{line}</p>
-                ))}
-                {isLongDesc && (
+              <div className="flex flex-col flex-1 p-4 sm:p-6 lg:p-10">
+                <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                  <div className="h-[3px] w-6 sm:w-10 bg-[#df4d21] rounded-full"></div>
+                  <span className="text-[#df4d21] font-black text-[10px] sm:text-xs uppercase tracking-[0.3em] sm:tracking-[0.4em]">
+                    {lang === 'ar' ? 'حل متكامل' : 'Enterprise Solution'}
+                  </span>
+                </div>
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-[#0f639e] dark:text-white mb-3 sm:mb-4 leading-tight tracking-tight">
+                  {product.name[lang]}
+                </h1>
+                <div className="flex-1 text-slate-600 dark:text-slate-400 font-medium leading-[1.8] space-y-3 text-xs sm:text-sm">
+                  {displayLines.map((line, i) => (
+                    <p key={i}>{line}</p>
+                  ))}
+                  {isLongDesc && (
+                    <button
+                      onClick={() => setShowDescriptionModal(true)}
+                      className="text-[#df4d21] font-black text-xs uppercase tracking-widest hover:underline mt-1 py-1.5 -my-1.5"
+                    >
+                      {lang === 'ar' ? '...عرض المزيد' : '...Read More'}
+                    </button>
+                  )}
+                </div>
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-auto pt-4">
+                  {product.youtubeLinks && product.youtubeLinks.length > 0 && (
+                    <button
+                      onClick={() => setShowYoutubeModal(true)}
+                      className="flex items-center justify-center gap-2 px-4 py-3 min-h-[44px] sm:px-6 sm:py-3.5 bg-slate-100 dark:bg-[#1a2744] hover:bg-[#FF0000] text-[#FF0000] hover:text-white font-black rounded-xl text-xs uppercase tracking-widest transition-all active:scale-[0.97]"
+                    >
+                      <Youtube className="w-4 h-4 shrink-0" />
+                      <span>{lang === 'ar' ? 'شروحات يوتيوب' : 'Explanations'}</span>
+                    </button>
+                  )}
+                  {product.demoUrl && (
+                    <a
+                      href={product.demoUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 px-4 py-3 min-h-[44px] sm:px-6 sm:py-3.5 bg-gradient-to-r from-[#df4d21] to-[#0f639e] text-white font-black rounded-xl text-xs uppercase tracking-widest shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all active:scale-[0.97]"
+                    >
+                      <PlayCircle className="w-4 h-4" />
+                      <span>{lang === 'ar' ? 'نسخه تجريبيه' : 'Live Demo'}</span>
+                    </a>
+                  )}
                   <button
-                    onClick={() => setShowDescriptionModal(true)}
-                    className="text-[#df4d21] font-black text-xs uppercase tracking-widest hover:underline mt-1 py-1.5 -my-1.5"
+                    onClick={() => handleWhatsApp(orderMsg)}
+                    className="flex items-center justify-center gap-2 px-4 py-3 min-h-[44px] sm:px-6 sm:py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white font-black rounded-xl text-xs uppercase tracking-widest hover:shadow-lg hover:-translate-y-0.5 transition-all active:scale-[0.97]"
                   >
-                    {lang === 'ar' ? '...عرض المزيد' : '...Read More'}
+                    <MessageCircle className="w-4 h-4" />
+                    <span>{siteData.uiStrings.ctaRequest[lang]}</span>
                   </button>
-                )}
-              </div>
-              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-auto pt-4">
-                {product.youtubeLinks && product.youtubeLinks.length > 0 && (
-                  <button
-                    onClick={() => setShowYoutubeModal(true)}
-                    className="flex items-center justify-center gap-2 px-4 py-3 min-h-[44px] sm:px-6 sm:py-3.5 bg-slate-100 dark:bg-[#1a2744] hover:bg-[#FF0000] text-[#FF0000] hover:text-white font-black rounded-xl text-xs uppercase tracking-widest transition-all active:scale-[0.97]"
-                  >
-                    <Youtube className="w-4 h-4 shrink-0" />
-                    <span>{lang === 'ar' ? 'شروحات يوتيوب' : 'Explanations'}</span>
-                  </button>
-                )}
-                {product.demoUrl && (
-                  <a
-                    href={product.demoUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 px-4 py-3 min-h-[44px] sm:px-6 sm:py-3.5 bg-gradient-to-r from-[#df4d21] to-[#0f639e] text-white font-black rounded-xl text-xs uppercase tracking-widest shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all active:scale-[0.97]"
-                  >
-                    <PlayCircle className="w-4 h-4" />
-                    <span>{lang === 'ar' ? 'نسخه تجريبيه' : 'Live Demo'}</span>
-                  </a>
-                )}
-                <button
-                  onClick={() => handleWhatsApp(orderMsg)}
-                  className="flex items-center justify-center gap-2 px-4 py-3 min-h-[44px] sm:px-6 sm:py-3.5 bg-[#25D366] hover:bg-[#20BA5A] text-white font-black rounded-xl text-xs uppercase tracking-widest hover:shadow-lg hover:-translate-y-0.5 transition-all active:scale-[0.97]"
-                >
-                  <MessageCircle className="w-4 h-4" />
-                  <span>{siteData.uiStrings.ctaRequest[lang]}</span>
-                </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
       </div>
 
       <div className="max-w-6xl mx-auto px-4 lg:px-6 pb-16 sm:pb-20 space-y-6 sm:space-y-10">
