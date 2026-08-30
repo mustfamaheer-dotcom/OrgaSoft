@@ -41,7 +41,10 @@ const OrgaProServiceDetail: React.FC<OrgaProServiceDetailProps> = ({ serviceId, 
 
   const handleWhatsApp = (msg: string) => {
     visitorTracker.trackCTAClick('whatsapp_click', `orga-pro:${service.id}`, service.id);
-    window.open(`https://wa.me/${siteData.contacts.whatsapp}?text=${encodeURIComponent(msg)}`, '_blank');
+    let cleanNumber = siteData.contacts.whatsapp.trim().replace(/[^0-9+]/g, '');
+    if (cleanNumber.startsWith('01')) cleanNumber = '2' + cleanNumber;
+    if (cleanNumber.startsWith('+')) cleanNumber = cleanNumber.substring(1);
+    window.open(`https://wa.me/${cleanNumber}?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
   const orderMsg = lang === 'ar'

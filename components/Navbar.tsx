@@ -56,7 +56,10 @@ const Navbar: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }
     const message = lang === 'ar'
       ? 'مرحباً، أرغب في الاستفسار عن خدماتكم'
       : 'Hello, I would like to inquire about your services';
-    window.open(`https://wa.me/${siteData.contacts.whatsapp}?text=${encodeURIComponent(message)}`, '_blank');
+    let cleanNumber = siteData.contacts.whatsapp.trim().replace(/[^0-9+]/g, '');
+    if (cleanNumber.startsWith('01')) cleanNumber = '2' + cleanNumber;
+    if (cleanNumber.startsWith('+')) cleanNumber = cleanNumber.substring(1);
+    window.open(`https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   return (

@@ -20,7 +20,10 @@ const Hero: React.FC<{ onNavigate: (page: string) => void }> = React.memo(({ onN
     const message = lang === 'ar'
       ? 'مرحباً، أرغب في الاستفسار عن خدماتكم'
       : 'Hello, I would like to inquire about your services';
-    const whatsappUrl = `https://wa.me/${contacts.whatsapp}?text=${encodeURIComponent(message)}`;
+    let cleanNumber = contacts.whatsapp.trim().replace(/[^0-9+]/g, '');
+    if (cleanNumber.startsWith('01')) cleanNumber = '2' + cleanNumber;
+    if (cleanNumber.startsWith('+')) cleanNumber = cleanNumber.substring(1);
+    const whatsappUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
 
