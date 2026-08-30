@@ -4,8 +4,6 @@ import { INITIAL_SITE_DATA } from '../constants';
 import {
   saveSectionsToFirebase,
   subscribeSiteData,
-  subscribeLanguage,
-  saveLanguagePreference,
   initializeSiteData,
   resetDatabase,
   initAnalytics,
@@ -171,17 +169,8 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsLoading(false);
     });
 
-    const unsubLang = subscribeLanguage((savedLang) => {
-      if (userToggleLock.current) return;
-      if (savedLang) {
-        setLangState(savedLang as Language);
-        try { localStorage.setItem('orgasoft_lang', savedLang); } catch { /* ignore */ }
-      }
-    });
-
     return () => {
       unsubData();
-      unsubLang();
     };
   }, []);
 
@@ -256,10 +245,8 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const setLang = async (newLang: Language) => {
-    userToggleLock.current = true;
     setLangState(newLang);
     try { localStorage.setItem('orgasoft_lang', newLang); } catch { /* ignore */ }
-    saveLanguagePreference(newLang);
   };
 
   const toggleTheme = useCallback(() => setTheme(prev => prev === 'light' ? 'dark' : 'light'), []);

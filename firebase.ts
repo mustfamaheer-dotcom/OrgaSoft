@@ -30,7 +30,6 @@ export function initAnalytics(): void {
 logger.log('Firebase initialized (Firestore)');
 
 const SITE_DATA_DOC = doc(db, 'siteData', 'main');
-const LANGUAGE_DOC = doc(db, 'userPreferences', 'language');
 
 let lastSnapshotHash = '';
 function hashData(data: unknown): string {
@@ -118,29 +117,6 @@ export const subscribeSiteData = (
   });
 };
 
-export const subscribeLanguage = (
-  callback: (lang: string | null) => void,
-): (() => void) => {
-  let lastHash = '';
-  return onSnapshot(LANGUAGE_DOC, (snapshot) => {
-    const val = snapshot.exists() ? (snapshot.data().value as string) : null;
-    const hash = val || '';
-    if (hash !== lastHash) {
-      lastHash = hash;
-      callback(val);
-    }
-  }, () => {
-    callback(null);
-  });
-};
 
-export const saveLanguagePreference = async (lang: string): Promise<void> => {
-  try {
-    await setDoc(LANGUAGE_DOC, { value: lang }, { merge: true });
-    logger.log('Language preference saved');
-  } catch (error) {
-    logger.warn('Could not save language preference to Firebase:', error);
-  }
-};
 
 export { app, db, firebaseConfig };
