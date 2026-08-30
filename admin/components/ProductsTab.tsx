@@ -167,56 +167,7 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ data, setData, isRTL, lang, s
         </div>
       </div>
 
-      <div className="pt-6 border-t border-slate-100 dark:border-[#1e293b] space-y-6">
-        <h4 className={sectionTitle}>
-          <CheckCircle2 className="w-5 h-5 text-[#df4d21]" /> {isRTL ? 'المميزات الجوهرية' : 'Key Features'}
-        </h4>
-        <button onClick={addSpec}
-          className="flex items-center gap-2 px-5 py-3 bg-slate-100 dark:bg-[#1a2744] text-[#0f639e] dark:text-[#3292ca] rounded-xl font-bold text-sm hover:bg-[#0f639e] hover:text-white dark:hover:bg-[#0f639e] dark:hover:text-white transition-all">
-          <Plus className="w-4 h-4" /> {isRTL ? 'إضافة مواصفة' : 'Add Spec'}
-        </button>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {(editingProduct.specs || []).map((spec, idx) => (
-            <div key={idx} className="p-5 bg-slate-50/50 dark:bg-[#1a2744]/50 rounded-xl border-2 border-slate-200 dark:border-[#1e293b] space-y-4 relative group">
-              <button onClick={() => {
-                const updated = [...(editingProduct.specs || [])]; updated.splice(idx, 1);
-                setEditingProduct({ ...editingProduct, specs: updated });
-              }} className="absolute top-3 right-3 w-7 h-7 bg-rose-500 text-white rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-rose-600">
-                <Trash2 className="w-3.5 h-3.5" />
-              </button>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">EN Key</label>
-                  <input value={spec.key.en} onChange={e => { const u = [...(editingProduct.specs || [])]; u[idx] = { ...u[idx], key: { ...u[idx].key, en: e.target.value } }; setEditingProduct({ ...editingProduct, specs: u }); }}
-                    className={fieldBase} placeholder="Processor" />
-                </div>
-                <div className="space-y-1">
-                  <label className="block text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest text-right">AR Key</label>
-                  <input value={spec.key.ar} onChange={e => { const u = [...(editingProduct.specs || [])]; u[idx] = { ...u[idx], key: { ...u[idx].key, ar: e.target.value } }; setEditingProduct({ ...editingProduct, specs: u }); }}
-                    className={`${fieldBase} text-right`} placeholder="المعالج" dir="rtl" />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">EN Value</label>
-                  <input value={spec.value.en} onChange={e => { const u = [...(editingProduct.specs || [])]; u[idx] = { ...u[idx], value: { ...u[idx].value, en: e.target.value } }; setEditingProduct({ ...editingProduct, specs: u }); }}
-                    className={fieldBase} placeholder="2.4 GHz" />
-                </div>
-                <div className="space-y-1">
-                  <label className="block text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest text-right">AR Value</label>
-                  <input value={spec.value.ar} onChange={e => { const u = [...(editingProduct.specs || [])]; u[idx] = { ...u[idx], value: { ...u[idx].value, ar: e.target.value } }; setEditingProduct({ ...editingProduct, specs: u }); }}
-                    className={`${fieldBase} text-right`} placeholder="2.4 جيجاهرتز" dir="rtl" />
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-        {(!editingProduct.specs || editingProduct.specs.length === 0) && (
-          <div className="text-center py-8 text-slate-400 font-medium">
-            {isRTL ? 'لا توجد مواصفات. أضف مواصفة للبدء.' : 'No specs yet. Click "Add Spec" to start.'}
-          </div>
-        )}
-      </div>
+
 
       <div className="pt-6 border-t border-slate-100 dark:border-[#1e293b] space-y-6">
         <div className="flex items-center justify-between">
