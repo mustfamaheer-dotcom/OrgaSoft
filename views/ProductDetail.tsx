@@ -90,17 +90,17 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productId, onBack, onNavi
 
       <div className="max-w-6xl mx-auto px-4 lg:px-6 pt-4 sm:pt-8 pb-6 sm:pb-10">
         {product.bannerImage?.[lang] ? (
-          <div className="rounded-2xl overflow-hidden bg-slate-100 dark:bg-[#1e293b] shadow-lg w-full mb-6 sm:mb-8" style={{ maxHeight: 400 }}>
+          <div className="rounded-2xl overflow-hidden bg-slate-100 dark:bg-[#1e293b] shadow-lg w-full mb-6 sm:mb-8" style={{ height: 925 }}>
             <KitImage
               src={product.bannerImage[lang]}
               alt={product.name[lang]}
               className="w-full h-full object-cover"
               width={1152}
-              height={460}
+              height={925}
             />
           </div>
         ) : (
-          <div className="rounded-2xl bg-gradient-to-br from-[#0f639e] to-[#3292ca] flex items-center justify-center w-full mb-6 sm:mb-8" style={{ height: 400 }}>
+          <div className="rounded-2xl bg-gradient-to-br from-[#0f639e] to-[#3292ca] flex items-center justify-center w-full mb-6 sm:mb-8" style={{ height: 925 }}>
             <span className="text-white/20 font-black text-6xl">{product.name[lang]?.charAt(0) || 'P'}</span>
           </div>
         )}
