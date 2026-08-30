@@ -120,12 +120,7 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ data, setData, isRTL, lang, s
     );
   }
 
-  const addSpec = () => {
-    setEditingProduct({
-      ...editingProduct,
-      specs: [...(editingProduct.specs || []), { key: { en: '', ar: '' }, value: { en: '', ar: '' } }]
-    });
-  };
+
 
   return (
     <div className="space-y-10">

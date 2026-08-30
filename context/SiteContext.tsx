@@ -143,7 +143,7 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   });
   const initialized = useRef(false);
-  const userToggleLock = useRef(false);
+
 
   useEffect(() => {
     if (initialized.current) return;
